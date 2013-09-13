@@ -19,6 +19,7 @@ object Name {
   val scala = Name("scala")
   val js = Name("js")
 
+  val EMPTY = Name("")
   val CONSTRUCTOR = Name("<init>")
   val REPEATED = Name("*")
 }
@@ -43,10 +44,11 @@ object QualifiedName {
   val scala_js = scala dot Name.js
 
   val Array = scala_js dot Name("Array")
+  val FunctionBase = scala_js dot Name("Function")
   def Function(arity: Int) = scala_js dot Name("Function"+arity)
 }
 
-class Symbol(val name: QualifiedName) {
+class Symbol(val name: Name) {
   override def toString() =
     s"${this.getClass.getSimpleName}($name)}"
 }
@@ -56,7 +58,7 @@ class CommentSymbol(val text: String) extends Symbol(Name("<comment>")) {
     s"/* $text */"
 }
 
-class ContainerSymbol(nme: QualifiedName) extends Symbol(nme) {
+class ContainerSymbol(nme: Name) extends Symbol(nme) {
   val members = new ListBuffer[Symbol]
 
   private var _anonMemberCounter = 0
@@ -67,13 +69,13 @@ class ContainerSymbol(nme: QualifiedName) extends Symbol(nme) {
 
   def findClass(name: Name): Option[ClassSymbol] = {
     members.collectFirst {
-      case sym: ClassSymbol if sym.name.last == name => sym
+      case sym: ClassSymbol if sym.name == name => sym
     }
   }
 
   def findModule(name: Name): Option[ModuleSymbol] = {
     members.collectFirst {
-      case sym: ModuleSymbol if sym.name.last == name => sym
+      case sym: ModuleSymbol if sym.name == name => sym
     }
   }
 
@@ -114,11 +116,25 @@ class ContainerSymbol(nme: QualifiedName) extends Symbol(nme) {
   }
 }
 
-class PackageSymbol(nme: QualifiedName) extends ContainerSymbol(nme) {
+class PackageSymbol(nme: Name) extends ContainerSymbol(nme) {
   override def toString() = s"package $name"
+
+  def findPackage(name: Name): Option[PackageSymbol] = {
+    members.collectFirst {
+      case sym: PackageSymbol if sym.name == name => sym
+    }
+  }
+
+  def getPackageOrCreate(name: Name): PackageSymbol = {
+    findPackage(name) getOrElse {
+      val result = new PackageSymbol(name)
+      members += result
+      result
+    }
+  }
 }
 
-class ClassSymbol(nme: QualifiedName) extends ContainerSymbol(nme) {
+class ClassSymbol(nme: Name) extends ContainerSymbol(nme) {
   val tparams = new ListBuffer[Name]
   val parents = new ListBuffer[TypeRef]
   var companionModule: ModuleSymbol = _
@@ -129,19 +145,19 @@ class ClassSymbol(nme: QualifiedName) extends ContainerSymbol(nme) {
       (if (tparams.isEmpty) "" else tparams.mkString("<", ", ", ">")))
 }
 
-class ModuleSymbol(nme: QualifiedName) extends ContainerSymbol(nme) {
+class ModuleSymbol(nme: Name) extends ContainerSymbol(nme) {
   var companionClass: ClassSymbol = _
 
   override def toString() = s"object $name"
 }
 
-class FieldSymbol(nme: QualifiedName) extends Symbol(nme) {
+class FieldSymbol(nme: Name) extends Symbol(nme) {
   var tpe: TypeRef = TypeRef.Any
 
   override def toString() = s"var $name: $tpe"
 }
 
-class MethodSymbol(nme: QualifiedName) extends Symbol(nme) {
+class MethodSymbol(nme: Name) extends Symbol(nme) {
   val tparams = new ListBuffer[Name]
   val params = new ListBuffer[ParamSymbol]
   var resultType: TypeRef = TypeRef.Dynamic
@@ -154,7 +170,7 @@ class MethodSymbol(nme: QualifiedName) extends Symbol(nme) {
   }
 }
 
-class ParamSymbol(nme: QualifiedName) extends Symbol(nme) {
+class ParamSymbol(nme: Name) extends Symbol(nme) {
   var optional: Boolean = false
   var tpe: TypeRef = TypeRef.Any
 

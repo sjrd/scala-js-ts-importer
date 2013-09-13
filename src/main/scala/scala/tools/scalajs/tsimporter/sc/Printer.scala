@@ -7,10 +7,12 @@ package scala.tools.scalajs.tsimporter.sc
 
 import java.io.PrintWriter
 
-class Printer(private val output: PrintWriter) {
+class Printer(private val output: PrintWriter, outputPackage: String) {
   import Printer._
 
   private implicit val self = this
+
+  private var currentJSNamespace = ""
 
   def printSymbol(sym: Symbol) {
     val name = sym.name
@@ -22,23 +24,42 @@ class Printer(private val output: PrintWriter) {
         val (topLevels, packageObjectMembers) =
           sym.members.partition(canBeTopLevel)
 
-        val parentPackage = name.init
-        val thisPackage = name.last
+        val parentPackage :+ thisPackage =
+          if (name == Name.EMPTY) outputPackage.split("\\.").toList // root
+          else List(name)
 
-        pln"package $name {"
-        pln"";
-        for (sym <- topLevels)
-          printSymbol(sym)
-        pln""
+        if (!parentPackage.isEmpty) {
+          pln"package ${parentPackage.mkString(".")}"
+        }
 
-        if (!parentPackage.isRoot)
-          pln"package $parentPackage {"
-        pln"package object $thisPackage extends js.GlobalScope {"
-        for (sym <- packageObjectMembers)
-          printSymbol(sym)
-        pln"}"
-        if (!parentPackage.isRoot)
+        val oldJSNamespace = currentJSNamespace
+        if (name != Name.EMPTY)
+          currentJSNamespace += name.name + "."
+
+        if (!topLevels.isEmpty) {
+          pln"";
+          pln"package $thisPackage {"
+          for (sym <- topLevels)
+            printSymbol(sym)
+          pln"";
           pln"}"
+        }
+
+        if (!packageObjectMembers.isEmpty) {
+          pln"";
+          if (currentJSNamespace == "") {
+            pln"package object $thisPackage extends js.GlobalScope {"
+          } else {
+            val jsName = currentJSNamespace.init
+            pln"""@scala.js.annotation.JSName("$jsName")"""
+            pln"package object $thisPackage extends js.Object {"
+          }
+          for (sym <- packageObjectMembers)
+            printSymbol(sym)
+          pln"}"
+        }
+
+        currentJSNamespace = oldJSNamespace
 
       case sym: ClassSymbol =>
         val kw = if (sym.isTrait) "trait" else "class"
@@ -55,12 +76,16 @@ class Printer(private val output: PrintWriter) {
 
         implicit val withSep = ListElemSeparator.WithKeyword
         pln"";
+        if (currentJSNamespace != "")
+          pln"""@scala.js.annotation.JSName("$currentJSNamespace$name")"""
         pln"$kw $name$tparamsStr$constructorStr extends $parents {"
         printMemberDecls(sym)
         pln"}"
 
       case sym: ModuleSymbol =>
         pln"";
+        if (currentJSNamespace != "")
+          pln"""@scala.js.annotation.JSName("$currentJSNamespace$name")"""
         pln"object $name extends js.Object {"
         printMemberDecls(sym)
         pln"}"
@@ -71,7 +96,7 @@ class Printer(private val output: PrintWriter) {
       case sym: MethodSymbol =>
         val params = sym.params
 
-        if (name.last == Name.CONSTRUCTOR) {
+        if (name == Name.CONSTRUCTOR) {
           if (!params.isEmpty)
             pln"  def this($params) = this()"
         } else {
@@ -88,7 +113,7 @@ class Printer(private val output: PrintWriter) {
 
   private def printMemberDecls(owner: ContainerSymbol) {
     val (constructors, others) =
-      owner.members.toList.partition(_.name.last == Name.CONSTRUCTOR)
+      owner.members.toList.partition(_.name == Name.CONSTRUCTOR)
     for (sym <- constructors ++ others)
       printSymbol(sym)
   }
@@ -99,7 +124,7 @@ class Printer(private val output: PrintWriter) {
   private def isParameterlessConstructor(sym: Symbol): Boolean = {
     sym match {
       case sym: MethodSymbol =>
-        sym.name.last == Name.CONSTRUCTOR && sym.params.isEmpty
+        sym.name == Name.CONSTRUCTOR && sym.params.isEmpty
       case _ =>
         false
     }

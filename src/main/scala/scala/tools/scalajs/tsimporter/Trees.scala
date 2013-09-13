@@ -60,6 +60,8 @@ object Trees {
 
   // Declarations
 
+  case class ModuleDecl(name: Ident, members: List[DeclTree]) extends DeclTree
+
   case class VarDecl(name: Ident, tpe: Option[TypeTree]) extends DeclTree
 
   case class FunctionDecl(name: Ident, signature: FunSignature) extends DeclTree
@@ -103,6 +105,8 @@ object Trees {
   case class TypeName(name: String) extends BaseTypeRef {
     Ident.requireValidIdent(name)
   }
+
+  case class QualifiedTypeName(qualifier: List[Ident], name: TypeName) extends BaseTypeRef
 
   case class ObjectType(members: List[MemberTree]) extends TypeTree
 

@@ -39,7 +39,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       "public", "static", "yield",
 
       // Additional keywords of TypeScript
-      "declare"
+      "declare", "module"
   )
 
   lexical.delimiters ++= List(
@@ -67,8 +67,29 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val ambientDeclaration: Parser[DeclTree] =
     opt("declare") ~> ambientDeclaration1
 
-  lazy val ambientDeclaration1 =
-    ambientVarDecl | ambientFunctionDecl | ambientInterfaceDecl
+  lazy val ambientDeclaration1 = (
+      ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
+    | ambientInterfaceDecl
+  )
+
+  lazy val ambientModuleDecl: Parser[DeclTree] =
+    "module" ~> rep1sep(identifier, ".") ~ moduleBody ^^ {
+      case nameParts ~ body =>
+        nameParts.init.foldRight(ModuleDecl(nameParts.last, body)) {
+          (name, inner) => ModuleDecl(name, inner :: Nil)
+        }
+    }
+
+  lazy val moduleBody: Parser[List[DeclTree]] =
+    "{" ~> rep(moduleElementDecl) <~ "}"
+
+  lazy val moduleElementDecl: Parser[DeclTree] =
+    opt("export") ~> moduleElementDecl1
+
+  lazy val moduleElementDecl1: Parser[DeclTree] = (
+      ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
+    | ambientInterfaceDecl
+  )
 
   lazy val ambientVarDecl: Parser[DeclTree] =
     "var" ~> identifier ~ optTypeAnnotation <~ opt(";") ^^ VarDecl
@@ -131,13 +152,18 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   )
 
   lazy val typeRef: Parser[TypeRef] =
-    ident ~ opt(typeArgs) ~ rep("[" ~ "]") ^^ {
+    baseTypeRef ~ opt(typeArgs) ~ rep("[" ~ "]") ^^ {
       case base ~ optTargs ~ arrayDims =>
-        val baseTypeRef = typeNameToTypeRef(base)
-        val withArgs = TypeRef(baseTypeRef, optTargs getOrElse Nil)
+        val withArgs = TypeRef(base, optTargs getOrElse Nil)
         (withArgs /: arrayDims) {
           (elem, _) => ArrayType(elem)
         }
+    }
+
+  lazy val baseTypeRef: Parser[BaseTypeRef] =
+    rep1sep("void" | ident, ".") ^^ { parts =>
+      if (parts.tail.isEmpty) typeNameToTypeRef(parts.head)
+      else QualifiedTypeName(parts.init map Ident, TypeName(parts.last))
     }
 
   lazy val typeArgs: Parser[List[TypeRef]] =
@@ -185,7 +211,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     identLike ^^ TypeName
 
   lazy val identLike =
-    ident | "declare"
+    "declare" | "module" | "delete" | ident
 
   lazy val propertyName: Parser[PropertyName] =
     identifier | stringLiteral

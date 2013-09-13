@@ -12,17 +12,24 @@ class Importer(val output: java.io.PrintWriter) {
 
   /** Entry point */
   def apply(declarations: List[DeclTree], outputPackage: String) {
-    val packParts = outputPackage.split("\\.").map(Name(_))
-    val pack = new PackageSymbol(QualifiedName(packParts:_*))
+    val rootPackage = new PackageSymbol(Name.EMPTY)
 
     for (declaration <- declarations)
-      processDecl(pack, declaration)
+      processDecl(rootPackage, declaration)
 
-    new Printer(output).printSymbol(pack)
+    new Printer(output, outputPackage).printSymbol(rootPackage)
   }
 
   private def processDecl(owner: ContainerSymbol, declaration: DeclTree) {
     declaration match {
+      case ModuleDecl(IdentName(name), innerDecls) =>
+        assert(owner.isInstanceOf[PackageSymbol],
+            s"Found package $name in non-package $owner")
+        val sym = owner.asInstanceOf[PackageSymbol].getPackageOrCreate(name)
+
+        for (innerDecl <- innerDecls)
+          processDecl(sym, innerDecl)
+
       case VarDecl(IdentName(name), Some(tpe @ ObjectType(members))) =>
         val sym = owner.getModuleOrCreate(name)
         processMembersDecls(owner, sym, members)
@@ -57,7 +64,7 @@ class Importer(val output: java.io.PrintWriter) {
   private def processMembersDecls(enclosing: ContainerSymbol,
       owner: ContainerSymbol, members: List[MemberTree]) {
 
-    val OwnerName = owner.name.last
+    val OwnerName = owner.name
 
     lazy val companionClassRef = {
       val tparams = enclosing.findClass(OwnerName) match {
@@ -74,7 +81,7 @@ class Importer(val output: java.io.PrintWriter) {
 
       case ConstructorMember(sig @ FunSignature(tparamsIgnored, params, Some(resultType)))
       if owner.isInstanceOf[ModuleSymbol] && resultType == companionClassRef =>
-        val classSym = enclosing.getClassOrCreate(owner.name.last)
+        val classSym = enclosing.getClassOrCreate(owner.name)
         classSym.isTrait = false
         processDefDecl(classSym, Name.CONSTRUCTOR,
             FunSignature(Nil, params, Some(TypeRefTree(CoreType("void")))))
@@ -136,11 +143,17 @@ class Importer(val output: java.io.PrintWriter) {
       case TypeRefTree(tpe: CoreType, Nil) =>
         coreTypeToScala(tpe, anyAsDynamic)
 
-      case TypeRefTree(TypeNameName(name), targs) =>
-        val name1: QualifiedName =
-          if (name.name == "Array") QualifiedName.Array
-          else name
-        TypeRef(name1, targs map typeToScala)
+      case TypeRefTree(base, targs) =>
+        val baseTypeRef = base match {
+          case TypeName("Array") => QualifiedName.Array
+          case TypeName("Function") => QualifiedName.FunctionBase
+          case TypeNameName(name) => QualifiedName(name)
+          case QualifiedTypeName(qualifier, TypeNameName(name)) =>
+            val qual1 = qualifier map (x => Name(x.name))
+            QualifiedName((qual1 :+ name): _*)
+          case _: CoreType => throw new MatchError(base)
+        }
+        TypeRef(baseTypeRef, targs map typeToScala)
 
       case ObjectType(members) =>
         // ???
