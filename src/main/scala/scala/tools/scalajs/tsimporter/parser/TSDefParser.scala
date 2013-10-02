@@ -101,9 +101,12 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     "interface" ~> typeName ~ tparams ~ intfInheritance ~ memberBlock <~ opt(";") ^^ InterfaceDecl
 
   lazy val tparams = (
-      "<" ~> rep1sep(typeName, ",") <~ ">"
+      "<" ~> rep1sep(typeParam, ",") <~ ">"
     | success(Nil)
   )
+
+  lazy val typeParam: Parser[TypeParam] =
+    typeName ~ opt("extends" ~> typeRef) ^^ TypeParam
 
   lazy val intfInheritance = (
       "extends" ~> repsep(typeRef, ",")

@@ -63,9 +63,6 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
       case sym: ClassSymbol =>
         val kw = if (sym.isTrait) "trait" else "class"
-        val tparamsStr =
-          if (sym.tparams.isEmpty) ""
-          else sym.tparams.mkString("[", ", ", "]")
         val constructorStr =
           if (sym.isTrait) ""
           else if (sym.members.exists(isParameterlessConstructor)) ""
@@ -74,11 +71,18 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           if (sym.parents.isEmpty) List(TypeRef.Object)
           else sym.parents.toList
 
-        implicit val withSep = ListElemSeparator.WithKeyword
         pln"";
         if (currentJSNamespace != "")
           pln"""@scala.js.annotation.JSName("$currentJSNamespace$name")"""
-        pln"$kw $name$tparamsStr$constructorStr extends $parents {"
+        p"$kw $name"
+        if (!sym.tparams.isEmpty)
+          p"[${sym.tparams}]"
+
+        {
+          implicit val withSep = ListElemSeparator.WithKeyword
+          pln"$constructorStr extends $parents {"
+        }
+
         printMemberDecls(sym)
         pln"}"
 
@@ -100,14 +104,18 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           if (!params.isEmpty)
             pln"  def this($params) = this()"
         } else {
-          val tparamsStr =
-            if (sym.tparams.isEmpty) ""
-            else sym.tparams.mkString("[", ", ", "]")
-          pln"  def $name$tparamsStr($params): ${sym.resultType} = ???"
+          p"  def $name"
+          if (!sym.tparams.isEmpty)
+            p"[${sym.tparams}]"
+          pln"($params): ${sym.resultType} = ???"
         }
 
       case sym: ParamSymbol =>
         p"$name: ${sym.tpe}"
+
+      case sym: TypeParamSymbol =>
+        p"$name"
+        sym.upperBound.foreach(bound => p" <: $bound")
     }
   }
 

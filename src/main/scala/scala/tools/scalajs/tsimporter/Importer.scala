@@ -45,8 +45,7 @@ class Importer(val output: java.io.PrintWriter) {
 
         val sym = owner.getClassOrCreate(name)
         sym.parents ++= parents
-        for (TypeNameName(tparam) <- tparams)
-          sym.tparams += tparam
+        sym.tparams ++= typeParamsToScala(tparams)
         processMembersDecls(owner, sym, members)
 
       case VarDecl(IdentName(name), TypeOrAny(tpe)) =>
@@ -69,7 +68,7 @@ class Importer(val output: java.io.PrintWriter) {
     lazy val companionClassRef = {
       val tparams = enclosing.findClass(OwnerName) match {
         case Some(clazz) =>
-          clazz.tparams.toList.map(tp => TypeRefTree(TypeNameName(tp), Nil))
+          clazz.tparams.toList.map(tp => TypeRefTree(TypeNameName(tp.name), Nil))
         case _ => Nil
       }
       TypeRefTree(TypeNameName(OwnerName), tparams)
@@ -109,8 +108,7 @@ class Importer(val output: java.io.PrintWriter) {
     for (sig <- makeAlternatives(signature)) {
       val sym = owner.newMethod(name)
 
-      for (TypeNameName(tparam) <- sig.tparams)
-        sym.tparams += tparam
+      sym.tparams ++= typeParamsToScala(sig.tparams)
 
       for (FunParam(IdentName(paramName), opt, TypeOrAny(tpe)) <- sig.params) {
         val paramSym = new ParamSymbol(paramName)
@@ -136,6 +134,11 @@ class Importer(val output: java.io.PrintWriter) {
   private def makeAlternatives(signature: FunSignature): List[FunSignature] = {
     for (params <- makeAlternativeParamss(signature.params))
       yield FunSignature(signature.tparams, params, signature.resultType)
+  }
+
+  private def typeParamsToScala(tparams: List[TypeParam]): List[TypeParamSymbol] = {
+    for (TypeParam(TypeNameName(tparam), upperBound) <- tparams) yield
+      new TypeParamSymbol(tparam, upperBound map typeToScala)
   }
 
   private def typeToScala(tpe: TypeTree): TypeRef =

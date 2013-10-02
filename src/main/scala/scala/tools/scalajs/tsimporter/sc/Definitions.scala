@@ -135,7 +135,7 @@ class PackageSymbol(nme: Name) extends ContainerSymbol(nme) {
 }
 
 class ClassSymbol(nme: Name) extends ContainerSymbol(nme) {
-  val tparams = new ListBuffer[Name]
+  val tparams = new ListBuffer[TypeParamSymbol]
   val parents = new ListBuffer[TypeRef]
   var companionModule: ModuleSymbol = _
   var isTrait: Boolean = true
@@ -158,7 +158,7 @@ class FieldSymbol(nme: Name) extends Symbol(nme) {
 }
 
 class MethodSymbol(nme: Name) extends Symbol(nme) {
-  val tparams = new ListBuffer[Name]
+  val tparams = new ListBuffer[TypeParamSymbol]
   val params = new ListBuffer[ParamSymbol]
   var resultType: TypeRef = TypeRef.Dynamic
 
@@ -167,6 +167,12 @@ class MethodSymbol(nme: Name) extends Symbol(nme) {
       if (tparams.isEmpty) ""
       else tparams.mkString("[", ", ", "]")
     s"def $name$tparamsStr(${params.mkString(", ")}): $resultType"
+  }
+}
+
+class TypeParamSymbol(nme: Name, val upperBound: Option[TypeRef]) extends Symbol(nme) {
+  override def toString() = {
+    nme.toString + upperBound.fold("")(bound => s" <: $bound")
   }
 }
 

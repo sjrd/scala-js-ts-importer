@@ -68,10 +68,14 @@ object Trees {
 
   // Function signature
 
-  case class FunSignature(tparams: List[TypeName], params: List[FunParam],
+  case class FunSignature(tparams: List[TypeParam], params: List[FunParam],
       resultType: Option[TypeTree]) extends Tree
 
   case class FunParam(name: Ident, optional: Boolean, tpe: Option[TypeTree]) extends Tree
+
+  // Type parameters
+
+  case class TypeParam(name: TypeName, upperBound: Option[TypeRef]) extends Tree
 
   // Literals
 
@@ -93,7 +97,7 @@ object Trees {
 
   case class TypeDecl(name: TypeName, tpe: TypeTree) extends DeclTree
 
-  case class InterfaceDecl(name: TypeName, tparams: List[TypeName],
+  case class InterfaceDecl(name: TypeName, tparams: List[TypeParam],
       inheritance: List[TypeRef], members: List[MemberTree]) extends DeclTree
 
   case class TypeRef(name: BaseTypeRef, tparams: List[TypeRef] = Nil) extends TypeTree
