@@ -90,6 +90,21 @@ class Importer(val output: java.io.PrintWriter) {
       case FunctionMember(PropertyNameName(name), opt, signature) =>
         processDefDecl(owner, name, signature)
 
+      case IndexMember(IdentName(indexName), indexType, valueType) =>
+        val indexTpe = typeToScala(indexType)
+        val valueTpe = typeToScala(valueType)
+
+        val getterSym = owner.newMethod(Name("apply"))
+        getterSym.params += new ParamSymbol(indexName, indexTpe)
+        getterSym.resultType = valueTpe
+        getterSym.isBracketAccess = true
+
+        val setterSym = owner.newMethod(Name("update"))
+        setterSym.params += new ParamSymbol(indexName, indexTpe)
+        setterSym.params += new ParamSymbol(Name("v"), valueTpe)
+        setterSym.resultType = TypeRef.Unit
+        setterSym.isBracketAccess = true
+
       case _ =>
         owner.members += new CommentSymbol("??? "+member)
     }

@@ -104,6 +104,11 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           if (!params.isEmpty)
             pln"  def this($params) = this()"
         } else {
+          sym.jsName foreach { jsName =>
+            pln"""  @scala.js.annotation.JSName("$jsName")"""
+          }
+          if (sym.isBracketAccess)
+            pln"""  @scala.js.annotation.JSBracketAccess"""
           p"  def $name"
           if (!sym.tparams.isEmpty)
             p"[${sym.tparams}]"

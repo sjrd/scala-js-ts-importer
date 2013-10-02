@@ -162,11 +162,18 @@ class MethodSymbol(nme: Name) extends Symbol(nme) {
   val params = new ListBuffer[ParamSymbol]
   var resultType: TypeRef = TypeRef.Dynamic
 
+  var jsName: Option[String] = None
+  var isBracketAccess: Boolean = false
+
   override def toString() = {
+    val jsNameStr =
+      jsName.fold("")(n => s"""@JSName("$n") """)
+    val bracketAccessStr =
+      if (isBracketAccess) "@JSBracketAccess " else ""
     val tparamsStr =
       if (tparams.isEmpty) ""
       else tparams.mkString("[", ", ", "]")
-    s"def $name$tparamsStr(${params.mkString(", ")}): $resultType"
+    s"$jsNameStr${bracketAccessStr}def $name$tparamsStr(${params.mkString(", ")}): $resultType"
   }
 }
 
@@ -177,6 +184,11 @@ class TypeParamSymbol(nme: Name, val upperBound: Option[TypeRef]) extends Symbol
 }
 
 class ParamSymbol(nme: Name) extends Symbol(nme) {
+  def this(nme: Name, tpe: TypeRef) = {
+    this(nme)
+    this.tpe = tpe
+  }
+
   var optional: Boolean = false
   var tpe: TypeRef = TypeRef.Any
 
