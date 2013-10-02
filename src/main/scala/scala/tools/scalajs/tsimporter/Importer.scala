@@ -102,6 +102,9 @@ class Importer(val output: java.io.PrintWriter) {
 
   private def processDefDecl(owner: ContainerSymbol, name: Name,
       signature: FunSignature) {
+    // Discard specialized signatures
+    if (signature.params.exists(_.tpe.exists(_.isInstanceOf[ConstantType])))
+      return
 
     for (sig <- makeAlternatives(signature)) {
       val sym = owner.newMethod(name)

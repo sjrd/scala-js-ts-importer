@@ -108,6 +108,8 @@ object Trees {
 
   case class QualifiedTypeName(qualifier: List[Ident], name: TypeName) extends BaseTypeRef
 
+  case class ConstantType(literal: Literal) extends TypeTree
+
   case class ObjectType(members: List[MemberTree]) extends TypeTree
 
   case class FunctionType(signature: FunSignature) extends TypeTree
