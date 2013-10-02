@@ -222,7 +222,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     identLike ^^ TypeName
 
   lazy val identLike =
-    "declare" | "module" | "delete" | ident
+    "declare" | "module" | "delete" | "continue" | "default" | ident
 
   lazy val propertyName: Parser[PropertyName] =
     identifier | stringLiteral
