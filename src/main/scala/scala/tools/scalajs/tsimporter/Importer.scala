@@ -39,12 +39,8 @@ class Importer(val output: java.io.PrintWriter) {
         processMembersDecls(owner, sym, members)
 
       case InterfaceDecl(TypeNameName(name), tparams, inheritance, members) =>
-        val parents: List[TypeRef] =
-          if (inheritance.isEmpty) List(TypeRef.Object)
-          else inheritance.map(typeToScala)
-
         val sym = owner.getClassOrCreate(name)
-        sym.parents ++= parents
+        sym.parents ++= inheritance.map(typeToScala)
         sym.tparams ++= typeParamsToScala(tparams)
         processMembersDecls(owner, sym, members)
 
