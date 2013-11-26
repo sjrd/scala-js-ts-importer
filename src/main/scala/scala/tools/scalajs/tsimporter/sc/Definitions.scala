@@ -115,6 +115,12 @@ class ContainerSymbol(nme: Name) extends Symbol(nme) {
     members += result
     result
   }
+
+  def removeIfDuplicate(sym: MethodSymbol): Unit = {
+    val isDuplicate = members.exists(s => (s ne sym) && (s == sym))
+    if (isDuplicate)
+      members.remove(members.indexWhere(_ eq sym))
+  }
 }
 
 class PackageSymbol(nme: Name) extends ContainerSymbol(nme) {
@@ -176,11 +182,29 @@ class MethodSymbol(nme: Name) extends Symbol(nme) {
       else tparams.mkString("[", ", ", "]")
     s"$jsNameStr${bracketAccessStr}def $name$tparamsStr(${params.mkString(", ")}): $resultType"
   }
+
+  override def equals(that: Any): Boolean = that match {
+    case that: MethodSymbol =>
+      (this.name == that.name &&
+          this.tparams == that.tparams &&
+          this.params == that.params &&
+          this.resultType == that.resultType)
+    case _ =>
+      false
+  }
 }
 
 class TypeParamSymbol(nme: Name, val upperBound: Option[TypeRef]) extends Symbol(nme) {
   override def toString() = {
     nme.toString + upperBound.fold("")(bound => s" <: $bound")
+  }
+
+  override def equals(that: Any): Boolean = that match {
+    case that: TypeParamSymbol =>
+      (this.name == that.name &&
+          this.upperBound == that.upperBound)
+    case _ =>
+      false
   }
 }
 
@@ -195,6 +219,13 @@ class ParamSymbol(nme: Name) extends Symbol(nme) {
 
   override def toString() =
     s"$name: $tpe" + (if (optional) " = _" else "")
+
+  override def equals(that: Any): Boolean = that match {
+    case that: ParamSymbol =>
+      this.name == that.name
+    case _ =>
+      false
+  }
 }
 
 case class TypeRef(typeName: QualifiedName, targs: List[TypeRef] = Nil) {

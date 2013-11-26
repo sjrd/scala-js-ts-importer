@@ -40,7 +40,12 @@ class Importer(val output: java.io.PrintWriter) {
 
       case InterfaceDecl(TypeNameName(name), tparams, inheritance, members) =>
         val sym = owner.getClassOrCreate(name)
-        sym.parents ++= inheritance.map(typeToScala)
+        for {
+          parent <- inheritance.map(typeToScala)
+          if !sym.parents.contains(parent)
+        } {
+          sym.parents += parent
+        }
         sym.tparams ++= typeParamsToScala(tparams)
         processMembersDecls(owner, sym, members)
 
@@ -133,6 +138,8 @@ class Importer(val output: java.io.PrintWriter) {
       }
 
       sym.resultType = typeToScala(signature.resultType.orDynamic, true)
+
+      owner.removeIfDuplicate(sym)
     }
   }
 
