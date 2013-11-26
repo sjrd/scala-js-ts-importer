@@ -17,6 +17,7 @@ case class Name(name: String) {
 
 object Name {
   val scala = Name("scala")
+  val scalajs = Name("scalajs")
   val js = Name("js")
 
   val EMPTY = Name("")
@@ -41,7 +42,7 @@ object QualifiedName {
 
   val Root = QualifiedName()
   val scala = Root dot Name.scala
-  val scala_js = scala dot Name.js
+  val scala_js = scala dot Name.scalajs dot Name.js
 
   val Array = scala_js dot Name("Array")
   val FunctionBase = scala_js dot Name("Function")

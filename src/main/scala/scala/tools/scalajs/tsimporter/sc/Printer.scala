@@ -21,19 +21,26 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         pln"/* ${comment.text} */"
 
       case sym: PackageSymbol =>
+        val isRootPackage = name == Name.EMPTY
+
         val (topLevels, packageObjectMembers) =
           sym.members.partition(canBeTopLevel)
 
         val parentPackage :+ thisPackage =
-          if (name == Name.EMPTY) outputPackage.split("\\.").toList // root
+          if (isRootPackage) outputPackage.split("\\.").toList
           else List(name)
 
         if (!parentPackage.isEmpty) {
           pln"package ${parentPackage.mkString(".")}"
         }
 
+        if (isRootPackage) {
+          pln"";
+          pln"import scala.scalajs.js"
+        }
+
         val oldJSNamespace = currentJSNamespace
-        if (name != Name.EMPTY)
+        if (!isRootPackage)
           currentJSNamespace += name.name + "."
 
         if (!topLevels.isEmpty) {
@@ -51,7 +58,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
             pln"package object $thisPackage extends js.GlobalScope {"
           } else {
             val jsName = currentJSNamespace.init
-            pln"""@scala.js.annotation.JSName("$jsName")"""
+            pln"""@scala.scalajs.js.annotation.JSName("$jsName")"""
             pln"package object $thisPackage extends js.Object {"
           }
           for (sym <- packageObjectMembers)
@@ -73,7 +80,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
         pln"";
         if (currentJSNamespace != "")
-          pln"""@scala.js.annotation.JSName("$currentJSNamespace$name")"""
+          pln"""@scala.scalajs.js.annotation.JSName("$currentJSNamespace$name")"""
         p"$kw $name"
         if (!sym.tparams.isEmpty)
           p"[${sym.tparams}]"
@@ -89,7 +96,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
       case sym: ModuleSymbol =>
         pln"";
         if (currentJSNamespace != "")
-          pln"""@scala.js.annotation.JSName("$currentJSNamespace$name")"""
+          pln"""@scala.scalajs.js.annotation.JSName("$currentJSNamespace$name")"""
         pln"object $name extends js.Object {"
         printMemberDecls(sym)
         pln"}"
@@ -105,10 +112,10 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
             pln"  def this($params) = this()"
         } else {
           sym.jsName foreach { jsName =>
-            pln"""  @scala.js.annotation.JSName("$jsName")"""
+            pln"""  @scala.scalajs.js.annotation.JSName("$jsName")"""
           }
           if (sym.isBracketAccess)
-            pln"""  @scala.js.annotation.JSBracketAccess"""
+            pln"""  @scala.scalajs.js.annotation.JSBracketAccess"""
           p"  def $name"
           if (!sym.tparams.isEmpty)
             p"[${sym.tparams}]"
@@ -160,7 +167,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
     x match {
       case x: Symbol => printSymbol(x)
       case x: TypeRef => printTypeRef(x)
-      case QualifiedName(Name.scala, Name.js, name) =>
+      case QualifiedName(Name.scala, Name.scalajs, Name.js, name) =>
         output.print("js.")
         output.print(name)
       case QualifiedName(Name.scala, name) => output.print(name)
