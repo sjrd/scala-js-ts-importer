@@ -32,9 +32,9 @@ object Main {
         }
 
       case _ => println(""" |Typescript Importer <inputFile> <outputFile> <outputPackage>
-    					    |   You need to specifiy 2 arguments for the importer
+                            |   You need to specifiy 2 arguments for the importer
                             |   The "outputPackage" has the default value of "importedjs"
-    					    |""".stripMargin)
+                            |""".stripMargin)
     }
   }
 
