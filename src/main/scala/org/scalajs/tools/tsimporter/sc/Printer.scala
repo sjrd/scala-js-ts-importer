@@ -123,7 +123,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         }
 
       case sym: ParamSymbol =>
-        p"$name: ${sym.tpe}"
+        p"$name: ${sym.tpe}${if (sym.optional) " = ???" else ""}"
 
       case sym: TypeParamSymbol =>
         p"$name"

@@ -126,37 +126,25 @@ class Importer(val output: java.io.PrintWriter) {
     if (signature.params.exists(_.tpe.exists(_.isInstanceOf[ConstantType])))
       return
 
-    for (sig <- makeAlternatives(signature)) {
-      val sym = owner.newMethod(name)
+    val sym = owner.newMethod(name)
 
-      sym.tparams ++= typeParamsToScala(sig.tparams)
+    sym.tparams ++= typeParamsToScala(signature.tparams)
 
-      for (FunParam(IdentName(paramName), opt, TypeOrAny(tpe)) <- sig.params) {
-        val paramSym = new ParamSymbol(paramName)
-        tpe match {
-          case RepeatedType(tpe0) =>
-            paramSym.tpe = TypeRef.Repeated(typeToScala(tpe0))
-          case _ =>
-            paramSym.tpe = typeToScala(tpe)
-        }
-        sym.params += paramSym
+    for (FunParam(IdentName(paramName), opt, TypeOrAny(tpe)) <- signature.params) {
+      val paramSym = new ParamSymbol(paramName)
+      paramSym.optional = opt
+      tpe match {
+        case RepeatedType(tpe0) =>
+          paramSym.tpe = TypeRef.Repeated(typeToScala(tpe0))
+        case _ =>
+          paramSym.tpe = typeToScala(tpe)
       }
-
-      sym.resultType = typeToScala(signature.resultType.orDynamic, true)
-
-      owner.removeIfDuplicate(sym)
+      sym.params += paramSym
     }
-  }
 
-  private def makeAlternativeParamss(
-      params: List[FunParam]): List[List[FunParam]] = {
-    if (params.isEmpty || !params.last.optional) params :: Nil
-    else params :: makeAlternativeParamss(params.init)
-  }
+    sym.resultType = typeToScala(signature.resultType.orDynamic, true)
 
-  private def makeAlternatives(signature: FunSignature): List[FunSignature] = {
-    for (params <- makeAlternativeParamss(signature.params))
-      yield FunSignature(signature.tparams, params, signature.resultType)
+    owner.removeIfDuplicate(sym)
   }
 
   private def typeParamsToScala(tparams: List[TypeParam]): List[TypeParamSymbol] = {
