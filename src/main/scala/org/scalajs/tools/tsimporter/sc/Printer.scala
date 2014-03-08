@@ -102,7 +102,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         pln"}"
 
       case sym: FieldSymbol =>
-        pln"  var $name: ${sym.tpe} = _"
+        pln"  var $name: ${sym.tpe} = ???"
 
       case sym: MethodSymbol =>
         val params = sym.params
