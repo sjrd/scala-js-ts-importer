@@ -1,9 +1,9 @@
 /* TypeScript importer for Scala.js
- * Copyright 2013 LAMP/EPFL
+ * Copyright 2013-2014 LAMP/EPFL
  * @author  Sébastien Doeraene
  */
 
-package scala.tools.scalajs.tsimporter
+package org.scalajs.tools.tsimporter
 
 import java.io.{ Console => _, Reader => _, _ }
 

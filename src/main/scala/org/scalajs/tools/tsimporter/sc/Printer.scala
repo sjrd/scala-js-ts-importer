@@ -1,9 +1,9 @@
 /* TypeScript importer for Scala.js
- * Copyright 2013 LAMP/EPFL
+ * Copyright 2013-2014 LAMP/EPFL
  * @author  Sébastien Doeraene
  */
 
-package scala.tools.scalajs.tsimporter.sc
+package org.scalajs.tools.tsimporter.sc
 
 import java.io.PrintWriter
 

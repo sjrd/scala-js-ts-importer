@@ -1,4 +1,9 @@
-package scala.tools.scalajs.tsimporter
+/* TypeScript importer for Scala.js
+ * Copyright 2013-2014 LAMP/EPFL
+ * @author  Sébastien Doeraene
+ */
+
+package org.scalajs.tools.tsimporter
 
 import Trees.{ TypeRef => TypeRefTree, _ }
 import sc._

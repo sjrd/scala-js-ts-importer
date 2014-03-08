@@ -1,15 +1,15 @@
 /* TypeScript importer for Scala.js
- * Copyright 2013 LAMP/EPFL
+ * Copyright 2013-2014 LAMP/EPFL
  * @author  Sébastien Doeraene
  */
 
-package scala.tools.scalajs.tsimporter.sc
+package org.scalajs.tools.tsimporter.sc
 
 import scala.language.implicitConversions
 
 import scala.collection.mutable._
 
-import scala.tools.scalajs.tsimporter.Utils
+import org.scalajs.tools.tsimporter.Utils
 
 case class Name(name: String) {
   override def toString() = Utils.scalaEscape(name)

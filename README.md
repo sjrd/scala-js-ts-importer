@@ -13,4 +13,4 @@ ways.
 ## License
 
 The TypeScript Importer for Scala.js is distributed under the
-[Scala License](http://www.scala-lang.org/node/146).
+[Scala License](http://www.scala-lang.org/license.html).

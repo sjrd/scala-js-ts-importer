@@ -1,11 +1,11 @@
 /* TypeScript importer for Scala.js
- * Copyright 2013 LAMP/EPFL
+ * Copyright 2013-2014 LAMP/EPFL
  * @author  Sébastien Doeraene
  */
 
-package scala.tools.scalajs.tsimporter.parser
+package org.scalajs.tools.tsimporter.parser
 
-import scala.tools.scalajs.tsimporter.Trees._
+import org.scalajs.tools.tsimporter.Trees._
 
 import java.io.File
 

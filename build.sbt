@@ -4,9 +4,9 @@ name := "TypeScript importer for Scala.js"
 
 version := "0.1-SNAPSHOT"
 
-mainClass := Some("scala.tools.scalajs.tsimporter.Main")
+mainClass := Some("org.scalajs.tools.tsimporter.Main")
 
-organization := "ch.epfl.lamp"
+organization := "org.scalajs.tools"
 
 scalacOptions ++= Seq(
     "-deprecation",

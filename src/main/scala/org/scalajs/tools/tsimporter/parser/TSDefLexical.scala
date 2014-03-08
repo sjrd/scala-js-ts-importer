@@ -1,9 +1,9 @@
 /* TypeScript importer for Scala.js
- * Copyright 2013 LAMP/EPFL
+ * Copyright 2013-2014 LAMP/EPFL
  * @author  Sébastien Doeraene
  */
 
-package scala.tools.scalajs.tsimporter.parser
+package org.scalajs.tools.tsimporter.parser
 
 import scala.util.parsing.input.CharArrayReader.EofCh
 import scala.util.parsing.combinator._
