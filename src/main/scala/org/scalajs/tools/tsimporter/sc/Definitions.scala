@@ -236,6 +236,8 @@ case class TypeRef(typeName: QualifiedName, targs: List[TypeRef] = Nil) {
 object TypeRef {
   import QualifiedName.{ scala, scala_js }
 
+  val ScalaAny = TypeRef(scala dot Name("Any"))
+
   val Any = TypeRef(scala_js dot Name("Any"))
   val Dynamic = TypeRef(scala_js dot Name("Dynamic"))
   val Number = TypeRef(scala_js dot Name("Number"))

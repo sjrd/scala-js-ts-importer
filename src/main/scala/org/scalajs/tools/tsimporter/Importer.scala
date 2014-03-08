@@ -199,7 +199,11 @@ class Importer(val output: java.io.PrintWriter) {
           val paramTypes =
             for (FunParam(_, _, TypeOrAny(tpe)) <- params)
               yield typeToScala(tpe)
-          val targs = paramTypes :+ typeToScala(resultType)
+          val resType = resultType match {
+            case TypeRefTree(CoreType("any"), Nil) => TypeRef.ScalaAny
+            case _ => typeToScala(resultType)
+          }
+          val targs = paramTypes :+ resType
 
           TypeRef(QualifiedName.Function(params.size), targs)
         }
