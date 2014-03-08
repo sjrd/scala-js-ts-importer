@@ -60,7 +60,7 @@ object Trees {
 
   // Declarations
 
-  case class ModuleDecl(name: Ident, members: List[DeclTree]) extends DeclTree
+  case class ModuleDecl(name: PropertyName, members: List[DeclTree]) extends DeclTree
 
   case class VarDecl(name: Ident, tpe: Option[TypeTree]) extends DeclTree
 

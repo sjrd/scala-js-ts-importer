@@ -73,7 +73,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   )
 
   lazy val ambientModuleDecl: Parser[DeclTree] =
-    "module" ~> rep1sep(identifier, ".") ~ moduleBody ^^ {
+    "module" ~> rep1sep(propertyName, ".") ~ moduleBody ^^ {
       case nameParts ~ body =>
         nameParts.init.foldRight(ModuleDecl(nameParts.last, body)) {
           (name, inner) => ModuleDecl(name, inner :: Nil)

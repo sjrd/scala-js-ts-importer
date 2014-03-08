@@ -27,7 +27,7 @@ class Importer(val output: java.io.PrintWriter) {
 
   private def processDecl(owner: ContainerSymbol, declaration: DeclTree) {
     declaration match {
-      case ModuleDecl(IdentName(name), innerDecls) =>
+      case ModuleDecl(PropertyNameName(name), innerDecls) =>
         assert(owner.isInstanceOf[PackageSymbol],
             s"Found package $name in non-package $owner")
         val sym = owner.asInstanceOf[PackageSymbol].getPackageOrCreate(name)
