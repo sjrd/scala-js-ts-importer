@@ -82,7 +82,7 @@ class Importer(val output: java.io.PrintWriter) {
 
     for (member <- members) member match {
       case CallMember(signature) =>
-        processDefDecl(owner, Name("apply"), signature)
+        processDefDecl(owner, Name("apply"), signature, protectName = false)
 
       case ConstructorMember(sig @ FunSignature(tparamsIgnored, params, Some(resultType)))
       if owner.isInstanceOf[ModuleSymbol] && resultType == companionClassRef =>
@@ -94,6 +94,7 @@ class Importer(val output: java.io.PrintWriter) {
       case PropertyMember(PropertyNameName(name), opt, tpe) =>
         if (name.name != "prototype") {
           val sym = owner.newField(name)
+          sym.protectName()
           sym.tpe = typeToScala(tpe)
         }
 
@@ -121,12 +122,14 @@ class Importer(val output: java.io.PrintWriter) {
   }
 
   private def processDefDecl(owner: ContainerSymbol, name: Name,
-      signature: FunSignature) {
+      signature: FunSignature, protectName: Boolean = true) {
     // Discard specialized signatures
     if (signature.params.exists(_.tpe.exists(_.isInstanceOf[ConstantType])))
       return
 
     val sym = owner.newMethod(name)
+    if (protectName)
+      sym.protectName()
 
     sym.tparams ++= typeParamsToScala(signature.tparams)
 
@@ -247,9 +250,6 @@ object Importer {
 
   private object PropertyNameName {
     @inline def unapply(propName: PropertyName) =
-      Some(Name(escapeApply(propName.name)))
+      Some(Name(propName.name))
   }
-
-  private def escapeApply(ident: String) =
-    if (ident == "apply") "$apply" else ident
 }

@@ -37,6 +37,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         if (isRootPackage) {
           pln"";
           pln"import scala.scalajs.js"
+          pln"import js.annotation._"
         }
 
         val oldJSNamespace = currentJSNamespace
@@ -58,7 +59,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
             pln"package object $thisPackage extends js.GlobalScope {"
           } else {
             val jsName = currentJSNamespace.init
-            pln"""@scala.scalajs.js.annotation.JSName("$jsName")"""
+            pln"""@JSName("$jsName")"""
             pln"package object $thisPackage extends js.Object {"
           }
           for (sym <- packageObjectMembers)
@@ -80,7 +81,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
         pln"";
         if (currentJSNamespace != "")
-          pln"""@scala.scalajs.js.annotation.JSName("$currentJSNamespace$name")"""
+          pln"""@JSName("$currentJSNamespace$name")"""
         p"$kw $name"
         if (!sym.tparams.isEmpty)
           p"[${sym.tparams}]"
@@ -96,12 +97,15 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
       case sym: ModuleSymbol =>
         pln"";
         if (currentJSNamespace != "")
-          pln"""@scala.scalajs.js.annotation.JSName("$currentJSNamespace$name")"""
+          pln"""@JSName("$currentJSNamespace$name")"""
         pln"object $name extends js.Object {"
         printMemberDecls(sym)
         pln"}"
 
       case sym: FieldSymbol =>
+        sym.jsName foreach { jsName =>
+          pln"""  @JSName("$jsName")"""
+        }
         pln"  var $name: ${sym.tpe} = ???"
 
       case sym: MethodSymbol =>
@@ -112,10 +116,10 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
             pln"  def this($params) = this()"
         } else {
           sym.jsName foreach { jsName =>
-            pln"""  @scala.scalajs.js.annotation.JSName("$jsName")"""
+            pln"""  @JSName("$jsName")"""
           }
           if (sym.isBracketAccess)
-            pln"""  @scala.scalajs.js.annotation.JSBracketAccess"""
+            pln"""  @JSBracketAccess"""
           p"  def $name"
           if (!sym.tparams.isEmpty)
             p"[${sym.tparams}]"

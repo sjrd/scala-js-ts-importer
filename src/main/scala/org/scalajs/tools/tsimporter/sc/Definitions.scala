@@ -54,6 +54,19 @@ class Symbol(val name: Name) {
     s"${this.getClass.getSimpleName}($name)}"
 }
 
+trait JSNameable extends Symbol {
+  var jsName: Option[String] = None
+
+  def protectName(): Unit = {
+    val n = name.name
+    if (jsName.isEmpty && (n.contains("$") || n == "apply"))
+      jsName = Some(n)
+  }
+
+  protected def jsNameStr =
+    jsName.fold("")(n => s"""@JSName("$n") """)
+}
+
 class CommentSymbol(val text: String) extends Symbol(Name("<comment>")) {
   override def toString() =
     s"/* $text */"
@@ -158,29 +171,26 @@ class ModuleSymbol(nme: Name) extends ContainerSymbol(nme) {
   override def toString() = s"object $name"
 }
 
-class FieldSymbol(nme: Name) extends Symbol(nme) {
+class FieldSymbol(nme: Name) extends Symbol(nme) with JSNameable {
   var tpe: TypeRef = TypeRef.Any
 
-  override def toString() = s"var $name: $tpe"
+  override def toString() = s"${jsNameStr}var $name: $tpe"
 }
 
-class MethodSymbol(nme: Name) extends Symbol(nme) {
+class MethodSymbol(nme: Name) extends Symbol(nme) with JSNameable {
   val tparams = new ListBuffer[TypeParamSymbol]
   val params = new ListBuffer[ParamSymbol]
   var resultType: TypeRef = TypeRef.Dynamic
 
-  var jsName: Option[String] = None
   var isBracketAccess: Boolean = false
 
   override def toString() = {
-    val jsNameStr =
-      jsName.fold("")(n => s"""@JSName("$n") """)
     val bracketAccessStr =
       if (isBracketAccess) "@JSBracketAccess " else ""
     val tparamsStr =
       if (tparams.isEmpty) ""
       else tparams.mkString("[", ", ", "]")
-    s"$jsNameStr${bracketAccessStr}def $name$tparamsStr(${params.mkString(", ")}): $resultType"
+    s"${jsNameStr}${bracketAccessStr}def $name$tparamsStr(${params.mkString(", ")}): $resultType"
   }
 
   override def equals(that: Any): Boolean = that match {
