@@ -81,10 +81,14 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     }
 
   lazy val moduleBody: Parser[List[DeclTree]] =
-    "{" ~> rep(moduleElementDecl) <~ "}"
+    "{" ~> rep(moduleElementDecl) <~ "}" ^^ (_.flatten)
 
-  lazy val moduleElementDecl: Parser[DeclTree] =
-    opt("export") ~> moduleElementDecl1
+  lazy val moduleElementDecl: Parser[Option[DeclTree]] = (
+      "export" ~> (
+          moduleElementDecl1 ^^ (Some(_))
+        | "=" ~> identifier <~ ";" ^^^ None)
+    | moduleElementDecl1 ^^ (Some(_))
+  )
 
   lazy val moduleElementDecl1: Parser[DeclTree] = (
       ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
