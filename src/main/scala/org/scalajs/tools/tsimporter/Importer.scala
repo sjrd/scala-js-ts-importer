@@ -108,6 +108,13 @@ class Importer(val output: java.io.PrintWriter) {
       case FunctionMember(PropertyNameName(name), opt, signature) =>
         processDefDecl(owner, name, signature)
 
+      case OverloadedMember(funs)=>
+        funs.foreach{
+          fun:FunctionMember =>
+            val FunctionMember(PropertyNameName(name), opt, signature)=fun
+            processDefDecl(owner, name, signature)
+        }
+
       case IndexMember(IdentName(indexName), indexType, valueType) =>
         val indexTpe = typeToScala(indexType)
         val valueTpe = typeToScala(valueType)

@@ -184,6 +184,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val objectType: Parser[TypeTree] =
     memberBlock ^^ ObjectType
 
+  lazy val overloadedFunctionSignature:Parser[List[FunSignature]] =
+    ":"~>"{" ~> rep(functionSignature <~ opt(";")) <~ "}"
+
   lazy val memberBlock: Parser[List[MemberTree]] =
     "{" ~> rep(typeMember <~ opt(";")) <~ "}"
 
@@ -203,6 +206,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     propertyName ~ optionalMarker >> {
       case name ~ optional => (
           functionSignature ^^ (FunctionMember(name, optional, _))
+        | overloadedFunctionSignature ^^ (OverloadedMember.fromOneName(name,_))
         | typeAnnotation ^^ (PropertyMember(name, optional, _))
       )
     }

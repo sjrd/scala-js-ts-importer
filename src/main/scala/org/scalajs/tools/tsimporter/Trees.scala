@@ -131,4 +131,13 @@ object Trees {
   case class PropertyMember(name: PropertyName, optional: Boolean, tpe: TypeTree) extends MemberTree
 
   case class FunctionMember(name: PropertyName, optional: Boolean, signature: FunSignature) extends MemberTree
+
+  case class OverloadedMember(functions: List[FunctionMember]) extends MemberTree
+  object OverloadedMember {
+    def fromOneName(name:PropertyName, funs:List[FunSignature])={
+      OverloadedMember(funs.map {
+        FunctionMember(name,true,_)
+      })
+    }
+  }
 }
