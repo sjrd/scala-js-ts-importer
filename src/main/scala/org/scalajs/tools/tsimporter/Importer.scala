@@ -93,9 +93,16 @@ class Importer(val output: java.io.PrintWriter) {
 
       case PropertyMember(PropertyNameName(name), opt, tpe) =>
         if (name.name != "prototype") {
-          val sym = owner.newField(name)
-          sym.protectName()
-          sym.tpe = typeToScala(tpe)
+          tpe match {
+            case ObjectType(members) if members.forall(_.isInstanceOf[CallMember]) =>
+              // alternative notation for overload methods - #3
+              for (CallMember(signature) <- members)
+                processDefDecl(owner, name, signature)
+            case _ =>
+              val sym = owner.newField(name)
+              sym.protectName()
+              sym.tpe = typeToScala(tpe)
+          }
         }
 
       case FunctionMember(PropertyNameName(name), opt, signature) =>
