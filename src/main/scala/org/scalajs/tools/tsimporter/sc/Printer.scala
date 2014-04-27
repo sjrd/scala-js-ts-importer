@@ -70,6 +70,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         currentJSNamespace = oldJSNamespace
 
       case sym: ClassSymbol =>
+        val sealedKw = if (sym.isSealed) "sealed " else ""
         val kw = if (sym.isTrait) "trait" else "class"
         val constructorStr =
           if (sym.isTrait) ""
@@ -80,9 +81,9 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           else sym.parents.toList
 
         pln"";
-        if (currentJSNamespace != "")
+        if (currentJSNamespace != "" && !sym.isTrait)
           pln"""@JSName("$currentJSNamespace$name")"""
-        p"$kw $name"
+        p"$sealedKw$kw $name"
         if (!sym.tparams.isEmpty)
           p"[${sym.tparams}]"
 

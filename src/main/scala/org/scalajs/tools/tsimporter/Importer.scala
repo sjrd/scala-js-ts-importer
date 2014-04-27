@@ -43,6 +43,23 @@ class Importer(val output: java.io.PrintWriter) {
         val sym = owner.getClassOrCreate(name)
         processMembersDecls(owner, sym, members)
 
+      case EnumDecl(TypeNameName(name), members) =>
+        // Type
+        val tsym = owner.getClassOrCreate(name)
+        tsym.isSealed = true
+
+        // Module
+        val sym = owner.getModuleOrCreate(name)
+        for (IdentName(name) <- members) {
+          val m = sym.newField(name)
+          m.protectName()
+          m.tpe = TypeRef(tsym.name)
+        }
+        val applySym = sym.newMethod(Name("apply"))
+        applySym.params += new ParamSymbol(Name("value"), TypeRef(tsym.name))
+        applySym.resultType = TypeRef.String
+        applySym.isBracketAccess = true
+
       case InterfaceDecl(TypeNameName(name), tparams, inheritance, members) =>
         val sym = owner.getClassOrCreate(name)
         for {

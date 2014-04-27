@@ -97,6 +97,8 @@ object Trees {
 
   case class TypeDecl(name: TypeName, tpe: TypeTree) extends DeclTree
 
+  case class EnumDecl(name: TypeName, members: List[Ident]) extends DeclTree
+
   case class InterfaceDecl(name: TypeName, tparams: List[TypeParam],
       inheritance: List[TypeRef], members: List[MemberTree]) extends DeclTree
 

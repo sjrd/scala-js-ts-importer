@@ -60,7 +60,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val ambientDeclaration1 = (
       ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
-    | ambientInterfaceDecl
+    | ambientEnumDecl | ambientInterfaceDecl
   )
 
   lazy val ambientModuleDecl: Parser[DeclTree] =
@@ -83,7 +83,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val moduleElementDecl1: Parser[DeclTree] = (
       ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
-    | ambientInterfaceDecl
+    | ambientEnumDecl | ambientInterfaceDecl
   )
 
   lazy val ambientVarDecl: Parser[DeclTree] =
@@ -91,6 +91,12 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val ambientFunctionDecl: Parser[DeclTree] =
     "function" ~> identifier ~ functionSignature <~ opt(";") ^^ FunctionDecl
+
+  lazy val ambientEnumDecl: Parser[DeclTree] =
+    "enum" ~> typeName ~ ("{" ~> ambientEnumBody <~ "}") ^^ EnumDecl
+
+  lazy val ambientEnumBody: Parser[List[Ident]] =
+    repsep(identifier <~ opt("=" ~ numericLit), ",") <~ opt(",")
 
   lazy val ambientInterfaceDecl: Parser[DeclTree] =
     "interface" ~> typeName ~ tparams ~ intfInheritance ~ memberBlock <~ opt(";") ^^ InterfaceDecl

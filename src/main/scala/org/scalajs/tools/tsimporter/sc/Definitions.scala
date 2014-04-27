@@ -159,8 +159,10 @@ class ClassSymbol(nme: Name) extends ContainerSymbol(nme) {
   val parents = new ListBuffer[TypeRef]
   var companionModule: ModuleSymbol = _
   var isTrait: Boolean = true
+  var isSealed: Boolean = false
 
   override def toString() = (
+      (if (isSealed) "sealed " else "") +
       (if (isTrait) s"trait $name" else s"class $name") +
       (if (tparams.isEmpty) "" else tparams.mkString("<", ", ", ">")))
 }
