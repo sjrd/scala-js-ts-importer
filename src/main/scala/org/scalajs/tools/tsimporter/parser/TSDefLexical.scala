@@ -65,7 +65,7 @@ class TSDefLexical extends Lexical with StdTokens with ImplicitConversions {
         case d3 ~ d2 ~ d1 ~ d0 => (4096*d3 + 256*d2 + 16*d1 + d0).toChar
       }
     | elem("", _ => true) ^^ {
-        case '0' => '\0'
+        case '0' => '\u0000'
         case 'b' => '\u0008'
         case 't' => '\u0009'
         case 'n' => '\u000A'
