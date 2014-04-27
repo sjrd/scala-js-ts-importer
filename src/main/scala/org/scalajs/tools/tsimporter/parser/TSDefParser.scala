@@ -60,7 +60,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val ambientDeclaration1 = (
       ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
-    | ambientEnumDecl | ambientInterfaceDecl
+    | ambientEnumDecl | ambientClassDecl | ambientInterfaceDecl
   )
 
   lazy val ambientModuleDecl: Parser[DeclTree] =
@@ -83,7 +83,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val moduleElementDecl1: Parser[DeclTree] = (
       ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
-    | ambientEnumDecl | ambientInterfaceDecl
+    | ambientEnumDecl | ambientClassDecl | ambientInterfaceDecl
   )
 
   lazy val ambientVarDecl: Parser[DeclTree] =
@@ -98,6 +98,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val ambientEnumBody: Parser[List[Ident]] =
     repsep(identifier <~ opt("=" ~ numericLit), ",") <~ opt(",")
 
+  lazy val ambientClassDecl: Parser[DeclTree] =
+    "class" ~> typeName ~ tparams ~ classParent ~ classImplements ~ memberBlock <~ opt(";") ^^ ClassDecl
+
   lazy val ambientInterfaceDecl: Parser[DeclTree] =
     "interface" ~> typeName ~ tparams ~ intfInheritance ~ memberBlock <~ opt(";") ^^ InterfaceDecl
 
@@ -108,6 +111,14 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val typeParam: Parser[TypeParam] =
     typeName ~ opt("extends" ~> typeRef) ^^ TypeParam
+
+  lazy val classParent =
+    opt("extends" ~> typeRef)
+
+  lazy val classImplements = (
+      "implements" ~> repsep(typeRef, ",")
+    | success(Nil)
+  )
 
   lazy val intfInheritance = (
       "extends" ~> repsep(typeRef, ",")
@@ -206,12 +217,20 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     ("[" ~> identifier ~ typeAnnotation <~ "]") ~ typeAnnotation ^^ IndexMember
 
   lazy val namedMember: Parser[MemberTree] =
-    propertyName ~ optionalMarker >> {
-      case name ~ optional => (
-          functionSignature ^^ (FunctionMember(name, optional, _))
-        | typeAnnotation ^^ (PropertyMember(name, optional, _))
+    maybeStaticPropName ~ optionalMarker >> {
+      case (name, static) ~ optional => (
+          functionSignature ^^ (FunctionMember(name, optional, _, static))
+        | typeAnnotation ^^ (PropertyMember(name, optional, _, static))
       )
     }
+
+  lazy val maybeStaticPropName: Parser[(PropertyName, Boolean)] = (
+      "static" ~> propertyName ^^ staticPropName
+    | propertyName ^^ nonStaticPropName
+  )
+
+  val staticPropName = (p: PropertyName) => (p, true)
+  val nonStaticPropName = (p: PropertyName) => (p, false)
 
   lazy val identifier =
     identLike ^^ Ident
@@ -220,7 +239,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     identLike ^^ TypeName
 
   lazy val identLike =
-    "declare" | "module" | "delete" | "continue" | "default" | ident
+    "declare" | "module" | "delete" | "continue" | "default" | "static" | ident
 
   lazy val propertyName: Parser[PropertyName] =
     identifier | stringLiteral

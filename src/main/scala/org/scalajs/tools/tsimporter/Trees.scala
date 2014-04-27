@@ -99,6 +99,10 @@ object Trees {
 
   case class EnumDecl(name: TypeName, members: List[Ident]) extends DeclTree
 
+  case class ClassDecl(name: TypeName, tparams: List[TypeParam],
+      parent: Option[TypeRef], implements: List[TypeRef],
+      membmers: List[MemberTree]) extends DeclTree
+
   case class InterfaceDecl(name: TypeName, tparams: List[TypeParam],
       inheritance: List[TypeRef], members: List[MemberTree]) extends DeclTree
 
@@ -130,7 +134,9 @@ object Trees {
 
   case class IndexMember(indexName: Ident, indexType: TypeTree, valueType: TypeTree) extends MemberTree
 
-  case class PropertyMember(name: PropertyName, optional: Boolean, tpe: TypeTree) extends MemberTree
+  case class PropertyMember(name: PropertyName, optional: Boolean,
+      tpe: TypeTree, static: Boolean) extends MemberTree
 
-  case class FunctionMember(name: PropertyName, optional: Boolean, signature: FunSignature) extends MemberTree
+  case class FunctionMember(name: PropertyName, optional: Boolean,
+      signature: FunSignature, static: Boolean) extends MemberTree
 }
