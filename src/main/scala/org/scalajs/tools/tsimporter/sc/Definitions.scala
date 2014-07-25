@@ -19,6 +19,8 @@ object Name {
   val scala = Name("scala")
   val scalajs = Name("scalajs")
   val js = Name("js")
+  val java = Name("java")
+  val lang = Name("lang")
 
   val EMPTY = Name("")
   val CONSTRUCTOR = Name("<init>")
@@ -43,6 +45,7 @@ object QualifiedName {
   val Root = QualifiedName()
   val scala = Root dot Name.scala
   val scala_js = scala dot Name.scalajs dot Name.js
+  val java_lang = Root dot Name.java dot Name.lang
 
   val Array = scala_js dot Name("Array")
   val FunctionBase = scala_js dot Name("Function")
@@ -246,15 +249,15 @@ case class TypeRef(typeName: QualifiedName, targs: List[TypeRef] = Nil) {
 }
 
 object TypeRef {
-  import QualifiedName.{ scala, scala_js }
+  import QualifiedName.{ scala, scala_js, java_lang }
 
   val ScalaAny = TypeRef(scala dot Name("Any"))
 
   val Any = TypeRef(scala_js dot Name("Any"))
   val Dynamic = TypeRef(scala_js dot Name("Dynamic"))
-  val Number = TypeRef(scala_js dot Name("Number"))
-  val Boolean = TypeRef(scala_js dot Name("Boolean"))
-  val String = TypeRef(scala_js dot Name("String"))
+  val Double = TypeRef(scala dot Name("Double"))
+  val Boolean = TypeRef(scala dot Name("Boolean"))
+  val String = TypeRef(java_lang dot Name("String"))
   val Object = TypeRef(scala_js dot Name("Object"))
   val Function = TypeRef(scala_js dot Name("Function"))
   val Unit = TypeRef(scala dot Name("Unit"))

@@ -280,7 +280,7 @@ class Importer(val output: java.io.PrintWriter) {
       case "any"     => if (anyAsDynamic) TypeRef.Dynamic else TypeRef.Any
       case "dynamic" => TypeRef.Dynamic
       case "void"    => TypeRef.Unit
-      case "number"  => TypeRef.Number
+      case "number"  => TypeRef.Double
       case "bool"    => TypeRef.Boolean
       case "boolean" => TypeRef.Boolean
       case "string"  => TypeRef.String

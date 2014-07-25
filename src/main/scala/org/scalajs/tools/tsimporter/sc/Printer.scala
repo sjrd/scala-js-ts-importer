@@ -176,6 +176,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         output.print("js.")
         output.print(name)
       case QualifiedName(Name.scala, name) => output.print(name)
+      case QualifiedName(Name.java, Name.lang, name) => output.print(name)
       case _ => output.print(x)
     }
   }
