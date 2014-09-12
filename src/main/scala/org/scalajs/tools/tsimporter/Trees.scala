@@ -106,7 +106,7 @@ object Trees {
   case class InterfaceDecl(name: TypeName, tparams: List[TypeParam],
       inheritance: List[TypeRef], members: List[MemberTree]) extends DeclTree
 
-  case class TypeRef(name: BaseTypeRef, tparams: List[TypeRef] = Nil) extends TypeTree
+  case class TypeRef(name: BaseTypeRef, tparams: List[TypeTree] = Nil) extends TypeTree
 
   sealed abstract class BaseTypeRef extends Tree
 

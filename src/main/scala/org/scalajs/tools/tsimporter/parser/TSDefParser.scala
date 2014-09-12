@@ -168,19 +168,24 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val typeAnnotation =
     ":" ~> typeDesc
 
-  lazy val typeDesc: Parser[TypeTree] = (
+  lazy val typeDesc: Parser[TypeTree] =
+    baseTypeDesc ~ rep("[" ~ "]") ^^ {
+      case base ~ arrayDims =>
+        (base /: arrayDims) {
+          (elem, _) => ArrayType(elem)
+        }
+    }
+
+  lazy val baseTypeDesc: Parser[TypeTree] = (
       typeRef
     | objectType
     | functionType
   )
 
   lazy val typeRef: Parser[TypeRef] =
-    baseTypeRef ~ opt(typeArgs) ~ rep("[" ~ "]") ^^ {
-      case base ~ optTargs ~ arrayDims =>
-        val withArgs = TypeRef(base, optTargs getOrElse Nil)
-        (withArgs /: arrayDims) {
-          (elem, _) => ArrayType(elem)
-        }
+    baseTypeRef ~ opt(typeArgs) ^^ {
+      case base ~ optTargs =>
+        TypeRef(base, optTargs getOrElse Nil)
     }
 
   lazy val baseTypeRef: Parser[BaseTypeRef] =
@@ -189,8 +194,8 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       else QualifiedTypeName(parts.init map Ident, TypeName(parts.last))
     }
 
-  lazy val typeArgs: Parser[List[TypeRef]] =
-    "<" ~> rep1sep(typeRef, ",") <~ ">"
+  lazy val typeArgs: Parser[List[TypeTree]] =
+    "<" ~> rep1sep(typeDesc, ",") <~ ">"
 
   lazy val functionType: Parser[TypeTree] =
     tparams ~ ("(" ~> repsep(functionParam, ",") <~ ")") ~ ("=>" ~> resultType) ^^ {
@@ -255,10 +260,10 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     else TypeName(name)
 
   object ArrayType {
-    def apply(elem: TypeRef): TypeRef =
+    def apply(elem: TypeTree): TypeRef =
       TypeRef(TypeName("Array"), List(elem))
 
-    def unapply(typeRef: TypeRef) = typeRef match {
+    def unapply(typeRef: TypeRef): Option[TypeTree] = typeRef match {
       case TypeRef(TypeName("Array"), List(elem)) => Some(elem)
       case _ => None
     }
