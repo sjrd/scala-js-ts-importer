@@ -238,13 +238,15 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   val nonStaticPropName = (p: PropertyName) => (p, false)
 
   lazy val identifier =
-    identLike ^^ Ident
+    identifierName ^^ Ident
 
   lazy val typeName =
-    identLike ^^ TypeName
+    identifierName ^^ TypeName
 
-  lazy val identLike =
-    "declare" | "module" | "delete" | "continue" | "default" | "static" | ident
+  lazy val identifierName = accept("IdentifierName", {
+    case lexical.Identifier(chars)                                  => chars
+    case lexical.Keyword(chars) if chars.forall(Character.isLetter) => chars
+  })
 
   lazy val propertyName: Parser[PropertyName] =
     identifier | stringLiteral
