@@ -3,7 +3,7 @@
 This tool reads type definitions files written for
 [TypeScript](http://www.typescriptlang.org/) (.d.ts files) and rewrites them to
 .scala files usable with
-[Scala.js](http://lampwww.epfl.ch/~doeraene/scala-js/).
+[Scala.js](http://www.scala-js.org/).
 
 The process is not 100 % accurate, so manual editing is often needed
 afterwards. This can be improved, but not to perfection, because the features
