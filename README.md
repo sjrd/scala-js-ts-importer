@@ -10,6 +10,10 @@ afterwards. This can be improved, but not to perfection, because the features
 offered by the type systems of TypeScript and Scala.js differ in some subtle
 ways.
 
+## Usage
+
+    $ sbt run somelib.d.ts SomeLib.scala
+
 ## License
 
 The TypeScript Importer for Scala.js is distributed under the
