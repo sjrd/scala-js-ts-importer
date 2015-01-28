@@ -107,7 +107,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         sym.jsName foreach { jsName =>
           pln"""  @JSName("$jsName")"""
         }
-        pln"  var $name: ${sym.tpe} = ???"
+        pln"  var $name: ${sym.tpe} = js.native"
 
       case sym: MethodSymbol =>
         val params = sym.params
@@ -124,7 +124,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           p"  def $name"
           if (!sym.tparams.isEmpty)
             p"[${sym.tparams}]"
-          pln"($params): ${sym.resultType} = ???"
+          pln"($params): ${sym.resultType} = js.native"
         }
 
       case sym: ParamSymbol =>
