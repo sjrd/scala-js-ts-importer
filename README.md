@@ -12,7 +12,7 @@ ways.
 
 ## Usage
 
-    $ sbt run somelib.d.ts SomeLib.scala
+    $ sbt 'run somelib.d.ts SomeLib.scala'
 
 ## License
 
