@@ -106,6 +106,12 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         printMemberDecls(sym)
         pln"}"
 
+      case sym: TypeAliasSymbol =>
+        p"  type $name"
+        if (!sym.tparams.isEmpty)
+          p"[${sym.tparams}]"
+        pln" = ${sym.alias}"
+
       case sym: FieldSymbol =>
         sym.jsName foreach { jsName =>
           pln"""  @JSName("$jsName")"""

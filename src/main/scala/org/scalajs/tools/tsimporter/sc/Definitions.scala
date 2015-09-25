@@ -122,6 +122,12 @@ class ContainerSymbol(nme: Name) extends Symbol(nme) {
     }
   }
 
+  def newTypeAlias(name: Name): TypeAliasSymbol = {
+    val result = new TypeAliasSymbol(name)
+    members += result
+    result
+  }
+
   def newField(name: Name): FieldSymbol = {
     val result = new FieldSymbol(name)
     members += result
@@ -176,6 +182,15 @@ class ModuleSymbol(nme: Name) extends ContainerSymbol(nme) {
   var companionClass: ClassSymbol = _
 
   override def toString() = s"object $name"
+}
+
+class TypeAliasSymbol(nme: Name) extends Symbol(nme) {
+  val tparams = new ListBuffer[TypeParamSymbol]
+  var alias: TypeRef = TypeRef.Any
+
+  override def toString() = (
+      (s"type $name") +
+      (if (tparams.isEmpty) "" else tparams.mkString("<", ", ", ">")))
 }
 
 class FieldSymbol(nme: Name) extends Symbol(nme) with JSNameable {

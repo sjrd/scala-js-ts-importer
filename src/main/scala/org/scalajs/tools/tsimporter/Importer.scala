@@ -88,6 +88,11 @@ class Importer(val output: java.io.PrintWriter) {
         sym.tparams ++= typeParamsToScala(tparams)
         processMembersDecls(owner, sym, members)
 
+      case TypeAliasDecl(TypeNameName(name), tparams, alias) =>
+        val sym = owner.newTypeAlias(name)
+        sym.tparams ++= typeParamsToScala(tparams)
+        sym.alias = typeToScala(alias)
+
       case VarDecl(IdentName(name), TypeOrAny(tpe)) =>
         val sym = owner.newField(name)
         sym.tpe = typeToScala(tpe)

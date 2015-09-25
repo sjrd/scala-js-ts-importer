@@ -39,7 +39,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       "public", "static", "yield",
 
       // Additional keywords of TypeScript
-      "declare", "module"
+      "declare", "module", "type"
   )
 
   lexical.delimiters ++= List(
@@ -84,6 +84,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val moduleElementDecl1: Parser[DeclTree] = (
       ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
     | ambientEnumDecl | ambientClassDecl | ambientInterfaceDecl
+    | typeAliasDecl
   )
 
   lazy val ambientVarDecl: Parser[DeclTree] =
@@ -103,6 +104,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val ambientInterfaceDecl: Parser[DeclTree] =
     "interface" ~> typeName ~ tparams ~ intfInheritance ~ memberBlock <~ opt(";") ^^ InterfaceDecl
+
+  lazy val typeAliasDecl: Parser[DeclTree] =
+    "type" ~> typeName ~ tparams ~ ("=" ~> typeDesc) <~ opt(";") ^^ TypeAliasDecl
 
   lazy val tparams = (
       "<" ~> rep1sep(typeParam, ",") <~ ">"
