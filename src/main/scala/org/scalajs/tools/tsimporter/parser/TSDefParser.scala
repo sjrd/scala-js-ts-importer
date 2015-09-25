@@ -207,7 +207,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     memberBlock ^^ ObjectType
 
   lazy val memberBlock: Parser[List[MemberTree]] =
-    "{" ~> rep(typeMember <~ opt(";")) <~ "}"
+    "{" ~> rep(typeMember <~ opt(";" | ",")) <~ "}"
 
   lazy val typeMember: Parser[MemberTree] =
     callMember | constructorMember | indexMember | namedMember
