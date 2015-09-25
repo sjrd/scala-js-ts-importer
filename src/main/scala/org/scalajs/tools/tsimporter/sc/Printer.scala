@@ -82,6 +82,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           else sym.parents.toList
 
         pln"";
+        pln"@js.native"
         if (currentJSNamespace != "" && !sym.isTrait)
           pln"""@JSName("$currentJSNamespace$name")"""
         p"$sealedKw$kw $name"
@@ -98,6 +99,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
       case sym: ModuleSymbol =>
         pln"";
+        pln"@js.native"
         if (currentJSNamespace != "")
           pln"""@JSName("$currentJSNamespace$name")"""
         pln"object $name extends js.Object {"
