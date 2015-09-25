@@ -44,7 +44,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lexical.delimiters ++= List(
       "{", "}", "(", ")", "[", "]", "<", ">",
-      ".", ";", ",", "?", ":", "=",
+      ".", ";", ",", "?", ":", "=", "|",
       // TypeScript-specific
       "...", "=>"
   )
@@ -169,6 +169,11 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     ":" ~> typeDesc
 
   lazy val typeDesc: Parser[TypeTree] =
+    rep1sep(singleTypeDesc, "|") ^^ {
+      _.reduceLeft(UnionType)
+    }
+
+  lazy val singleTypeDesc: Parser[TypeTree] =
     baseTypeDesc ~ rep("[" ~ "]") ^^ {
       case base ~ arrayDims =>
         (base /: arrayDims) {
@@ -180,6 +185,8 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       typeRef
     | objectType
     | functionType
+    | typeQuery
+    | "(" ~> typeDesc <~ ")"
   )
 
   lazy val typeRef: Parser[TypeRef] =
@@ -201,6 +208,11 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     tparams ~ ("(" ~> repsep(functionParam, ",") <~ ")") ~ ("=>" ~> resultType) ^^ {
       case tparams ~ params ~ resultType =>
         FunctionType(FunSignature(tparams, params, Some(resultType)))
+    }
+
+  lazy val typeQuery: Parser[TypeTree] =
+    "typeof" ~> rep1sep(ident, ".") ^^ { parts =>
+      TypeQuery(QualifiedIdent(parts.init.map(Ident), Ident(parts.last)))
     }
 
   lazy val objectType: Parser[TypeTree] =

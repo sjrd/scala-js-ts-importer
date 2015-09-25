@@ -58,6 +58,8 @@ object Trees {
     }
   }
 
+  case class QualifiedIdent(qualifier: List[Ident], name: Ident) extends Tree
+
   // Declarations
 
   case class ModuleDecl(name: PropertyName, members: List[DeclTree]) extends DeclTree
@@ -123,6 +125,10 @@ object Trees {
   case class ObjectType(members: List[MemberTree]) extends TypeTree
 
   case class FunctionType(signature: FunSignature) extends TypeTree
+
+  case class UnionType(left: TypeTree, right: TypeTree) extends TypeTree
+
+  case class TypeQuery(expr: QualifiedIdent) extends TypeTree
 
   case class RepeatedType(underlying: TypeTree) extends TypeTree
 

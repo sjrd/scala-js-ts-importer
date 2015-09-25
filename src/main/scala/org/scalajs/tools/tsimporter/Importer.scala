@@ -264,6 +264,13 @@ class Importer(val output: java.io.PrintWriter) {
           TypeRef(QualifiedName.Function(params.size), targs)
         }
 
+      case UnionType(left, right) =>
+        TypeRef.Union(typeToScala(left), typeToScala(right))
+
+      case TypeQuery(expr) =>
+        TypeRef.Singleton(QualifiedName((expr.qualifier :+ expr.name).map(
+            ident => Name(ident.name)): _*))
+
       case RepeatedType(underlying) =>
         TypeRef(Name.REPEATED, List(typeToScala(underlying)))
 

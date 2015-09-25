@@ -38,6 +38,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           pln"";
           pln"import scala.scalajs.js"
           pln"import js.annotation._"
+          pln"import js.|"
         }
 
         val oldJSNamespace = currentJSNamespace
@@ -159,6 +160,12 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
     tpe match {
       case TypeRef(typeName, Nil) =>
         p"$typeName"
+
+      case TypeRef.Union(left, right) =>
+        p"$left | $right"
+
+      case TypeRef.Singleton(termRef) =>
+        p"$termRef.type"
 
       case TypeRef.Repeated(underlying) =>
         p"$underlying*"

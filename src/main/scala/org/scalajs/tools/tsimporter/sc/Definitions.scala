@@ -25,6 +25,7 @@ object Name {
   val EMPTY = Name("")
   val CONSTRUCTOR = Name("<init>")
   val REPEATED = Name("*")
+  val SINGLETON = Name("<typeof>")
 }
 
 case class QualifiedName(parts: Name*) {
@@ -50,6 +51,7 @@ object QualifiedName {
   val Array = scala_js dot Name("Array")
   val FunctionBase = scala_js dot Name("Function")
   def Function(arity: Int) = scala_js dot Name("Function"+arity)
+  val Union = scala_js dot Name("|")
 }
 
 class Symbol(val name: Name) {
@@ -261,6 +263,30 @@ object TypeRef {
   val Object = TypeRef(scala_js dot Name("Object"))
   val Function = TypeRef(scala_js dot Name("Function"))
   val Unit = TypeRef(scala dot Name("Unit"))
+
+  object Union {
+    def apply(left: TypeRef, right: TypeRef): TypeRef =
+      TypeRef(QualifiedName.Union, List(left, right))
+
+    def unapply(typeRef: TypeRef): Option[(TypeRef, TypeRef)] = typeRef match {
+      case TypeRef(QualifiedName.Union, List(left, right)) =>
+        Some((left, right))
+
+      case _ => None
+    }
+  }
+
+  object Singleton {
+    def apply(underlying: QualifiedName): TypeRef =
+      TypeRef(QualifiedName(Name.SINGLETON), List(TypeRef(underlying)))
+
+    def unapply(typeRef: TypeRef): Option[QualifiedName] = typeRef match {
+      case TypeRef(QualifiedName(Name.SINGLETON), List(TypeRef(underlying, Nil))) =>
+        Some(underlying)
+
+      case _ => None
+    }
+  }
 
   object Repeated {
     def apply(underlying: TypeRef): TypeRef =
