@@ -49,6 +49,7 @@ object QualifiedName {
   val java_lang = Root dot Name.java dot Name.lang
 
   val Array = scala_js dot Name("Array")
+  val Dictionary = scala_js dot Name("Dictionary")
   val FunctionBase = scala_js dot Name("Function")
   def Function(arity: Int) = scala_js dot Name("Function"+arity)
   val Union = scala_js dot Name("|")
