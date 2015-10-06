@@ -280,6 +280,9 @@ class Importer(val output: java.io.PrintWriter) {
         TypeRef.Singleton(QualifiedName((expr.qualifier :+ expr.name).map(
             ident => Name(ident.name)): _*))
 
+      case TupleType(targs) =>
+          TypeRef(QualifiedName.Tuple(targs.length), targs map typeToScala)
+
       case RepeatedType(underlying) =>
         TypeRef(Name.REPEATED, List(typeToScala(underlying)))
 

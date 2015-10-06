@@ -131,6 +131,8 @@ object Trees {
 
   case class UnionType(left: TypeTree, right: TypeTree) extends TypeTree
 
+  case class TupleType(tparams: List[TypeTree]) extends TypeTree
+
   case class TypeQuery(expr: QualifiedIdent) extends TypeTree
 
   case class RepeatedType(underlying: TypeTree) extends TypeTree
