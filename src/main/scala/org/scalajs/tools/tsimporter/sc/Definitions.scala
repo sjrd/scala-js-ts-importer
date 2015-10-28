@@ -216,11 +216,13 @@ class MethodSymbol(nme: Name) extends Symbol(nme) with JSNameable {
     s"${jsNameStr}${bracketAccessStr}def $name$tparamsStr(${params.mkString(", ")}): $resultType"
   }
 
+  def paramTypes = params.map(_.tpe)
+
   override def equals(that: Any): Boolean = that match {
     case that: MethodSymbol =>
       (this.name == that.name &&
           this.tparams == that.tparams &&
-          this.params == that.params &&
+          this.paramTypes == that.paramTypes &&
           this.resultType == that.resultType)
     case _ =>
       false
@@ -255,7 +257,8 @@ class ParamSymbol(nme: Name) extends Symbol(nme) {
 
   override def equals(that: Any): Boolean = that match {
     case that: ParamSymbol =>
-      this.name == that.name
+      (this.name == that.name &&
+          this.tpe == that.tpe)
     case _ =>
       false
   }
