@@ -190,6 +190,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     | objectType
     | functionType
     | typeQuery
+    | tupleType
     | "(" ~> typeDesc <~ ")"
   )
 
@@ -217,6 +218,11 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val typeQuery: Parser[TypeTree] =
     "typeof" ~> rep1sep(ident, ".") ^^ { parts =>
       TypeQuery(QualifiedIdent(parts.init.map(Ident), Ident(parts.last)))
+    }
+
+  lazy val tupleType: Parser[TypeTree] =
+    "[" ~> rep1sep(typeDesc, ",") <~ "]" ^^ { parts =>
+      TupleType(parts)
     }
 
   lazy val objectType: Parser[TypeTree] =
