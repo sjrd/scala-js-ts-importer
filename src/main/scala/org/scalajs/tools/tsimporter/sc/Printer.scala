@@ -23,11 +23,8 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
       case sym: PackageSymbol =>
         val isRootPackage = name == Name.EMPTY
 
-        val (topLevels, packageObjectMembers) =
-          sym.members.partition(canBeTopLevel)
-
         val parentPackage :+ thisPackage =
-          if (isRootPackage) outputPackage.split("\\.").toList
+          if (isRootPackage) outputPackage.split("\\.").toList.map(Name(_))
           else List(name)
 
         if (!parentPackage.isEmpty) {
@@ -45,26 +42,36 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         if (!isRootPackage)
           currentJSNamespace += name.name + "."
 
-        if (!topLevels.isEmpty) {
+        if (!sym.members.isEmpty) {
+          val (topLevels, packageObjectMembers) =
+            sym.members.partition(canBeTopLevel)
+
           pln"";
           pln"package $thisPackage {"
+
           for (sym <- topLevels)
             printSymbol(sym)
-          pln"";
-          pln"}"
-        }
 
-        if (!packageObjectMembers.isEmpty) {
-          pln"";
-          if (currentJSNamespace == "") {
-            pln"package object $thisPackage extends js.GlobalScope {"
-          } else {
-            val jsName = currentJSNamespace.init
-            pln"""@JSName("$jsName")"""
-            pln"package object $thisPackage extends js.Object {"
+          if (!packageObjectMembers.isEmpty) {
+            val packageObjectName =
+              Name(thisPackage.name.head.toUpper + thisPackage.name.tail)
+
+            pln"";
+            if (currentJSNamespace == "") {
+              pln"@js.native"
+              pln"object $packageObjectName extends js.GlobalScope {"
+            } else {
+              val jsName = currentJSNamespace.init
+              pln"""@JSName("$jsName")"""
+              pln"@js.native"
+              pln"object $packageObjectName extends js.Object {"
+            }
+            for (sym <- packageObjectMembers)
+              printSymbol(sym)
+            pln"}"
           }
-          for (sym <- packageObjectMembers)
-            printSymbol(sym)
+
+          pln"";
           pln"}"
         }
 
