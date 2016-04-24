@@ -39,7 +39,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       "public", "static", "yield",
 
       // Additional keywords of TypeScript
-      "declare", "module", "type"
+      "declare", "module", "type", "namespace"
   )
 
   lexical.delimiters ++= List(
@@ -64,7 +64,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   )
 
   lazy val ambientModuleDecl: Parser[DeclTree] =
-    "module" ~> rep1sep(propertyName, ".") ~ moduleBody ^^ {
+    ("module" | "namespace") ~> rep1sep(propertyName, ".") ~ moduleBody ^^ {
       case nameParts ~ body =>
         nameParts.init.foldRight(ModuleDecl(nameParts.last, body)) {
           (name, inner) => ModuleDecl(name, inner :: Nil)
