@@ -56,12 +56,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     rep(ambientDeclaration)
 
   lazy val ambientDeclaration: Parser[DeclTree] =
-    opt("declare") ~> ambientDeclaration1
-
-  lazy val ambientDeclaration1 = (
-      ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
-    | ambientEnumDecl | ambientClassDecl | ambientInterfaceDecl
-  )
+    opt("declare") ~> opt("export") ~> moduleElementDecl1
 
   lazy val ambientModuleDecl: Parser[DeclTree] =
     ("module" | "namespace") ~> rep1sep(propertyName, ".") ~ moduleBody ^^ {
