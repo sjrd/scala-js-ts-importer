@@ -23,7 +23,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lexical.reserved ++= List(
       // Value keywords
-      "true", "false", "null", "undefined",
+      "true", "false",
 
       // Current JavaScript keywords
       "break", "case", "catch", "continue", "debugger", "default", "delete",
@@ -272,7 +272,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     stringLit ^^ StringLiteral
 
   private val isCoreTypeName =
-    Set("any", "void", "number", "bool", "boolean", "string")
+    Set("any", "void", "number", "bool", "boolean", "string", "null", "undefined")
 
   def typeNameToTypeRef(name: String): BaseTypeRef =
     if (isCoreTypeName(name)) CoreType(name)
