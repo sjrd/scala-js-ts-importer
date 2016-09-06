@@ -283,6 +283,7 @@ object TypeRef {
   val Object = TypeRef(scala_js dot Name("Object"))
   val Function = TypeRef(scala_js dot Name("Function"))
   val Unit = TypeRef(scala dot Name("Unit"))
+  val Null = TypeRef(scala dot Name("Null"))
 
   object Union {
     def apply(left: TypeRef, right: TypeRef): TypeRef =

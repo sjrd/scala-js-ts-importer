@@ -23,7 +23,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lexical.reserved ++= List(
       // Value keywords
-      "true", "false", "null", "undefined",
+      "true", "false",
 
       // Current JavaScript keywords
       "break", "case", "catch", "continue", "debugger", "default", "delete",
@@ -56,12 +56,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     rep(ambientDeclaration)
 
   lazy val ambientDeclaration: Parser[DeclTree] =
-    opt("declare") ~> ambientDeclaration1
-
-  lazy val ambientDeclaration1 = (
-      ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
-    | ambientEnumDecl | ambientClassDecl | ambientInterfaceDecl
-  )
+    opt("declare") ~> opt("export") ~> moduleElementDecl1
 
   lazy val ambientModuleDecl: Parser[DeclTree] =
     ("module" | "namespace") ~> rep1sep(propertyName, ".") ~ moduleBody ^^ {
@@ -277,7 +272,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     stringLit ^^ StringLiteral
 
   private val isCoreTypeName =
-    Set("any", "void", "number", "bool", "boolean", "string")
+    Set("any", "void", "number", "bool", "boolean", "string", "null", "undefined")
 
   def typeNameToTypeRef(name: String): BaseTypeRef =
     if (isCoreTypeName(name)) CoreType(name)

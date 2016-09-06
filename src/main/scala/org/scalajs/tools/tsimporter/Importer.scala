@@ -296,13 +296,15 @@ class Importer(val output: java.io.PrintWriter) {
       anyAsDynamic: Boolean = false): TypeRef = {
 
     tpe.name match {
-      case "any"     => if (anyAsDynamic) TypeRef.Dynamic else TypeRef.Any
-      case "dynamic" => TypeRef.Dynamic
-      case "void"    => TypeRef.Unit
-      case "number"  => TypeRef.Double
-      case "bool"    => TypeRef.Boolean
-      case "boolean" => TypeRef.Boolean
-      case "string"  => TypeRef.String
+      case "any"       => if (anyAsDynamic) TypeRef.Dynamic else TypeRef.Any
+      case "dynamic"   => TypeRef.Dynamic
+      case "void"      => TypeRef.Unit
+      case "number"    => TypeRef.Double
+      case "bool"      => TypeRef.Boolean
+      case "boolean"   => TypeRef.Boolean
+      case "string"    => TypeRef.String
+      case "null"      => TypeRef.Null
+      case "undefined" => TypeRef.Unit
     }
   }
 }
