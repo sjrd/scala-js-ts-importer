@@ -97,7 +97,7 @@ class Importer(val output: java.io.PrintWriter) {
         val sym = owner.newField(name)
         sym.tpe = typeToScala(tpe)
 
-      case FunctionDecl(IdentName(name), signature) =>
+      case FunctionDecl(IdentName(name), signature, _) =>
         processDefDecl(owner, name, signature)
 
       case _ =>

@@ -43,7 +43,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   )
 
   lexical.delimiters ++= List(
-      "{", "}", "(", ")", "[", "]", "<", ">",
+      "{", "}", "(", ")", "[", "]", "<", ">", "<=", ">=", "<<", ">>", ">>>",
       ".", ";", ",", "?", ":", "=", "|",
       // TypeScript-specific
       "...", "=>"
@@ -86,7 +86,94 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     "var" ~> identifier ~ optTypeAnnotation <~ opt(";") ^^ VarDecl
 
   lazy val ambientFunctionDecl: Parser[DeclTree] =
-    "function" ~> identifier ~ functionSignature <~ opt(";") ^^ FunctionDecl
+    "function" ~> identifier ~ functionSignature ~ functionBody <~ opt(";") ^^ FunctionDecl
+
+  lazy val functionBody: Parser[TermTree] =
+    blockStatement
+
+  lazy val blockStatement: Parser[TermTree] =
+    "{" ~> rep(statement <~ opt(";")) <~ "}" ^^ Block
+
+  lazy val statement: Parser[TermTree] = (
+      variableStatement
+    | returnStat
+  )
+
+  lazy val variableStatement: Parser[TermTree] =
+    varKw ~> identifier ~ optTypeDesc ~ optVarInit ^^ VarDef
+
+  lazy val returnStat: Parser[TermTree] =
+    "return" ~> opt(expression) ^^ Return
+
+  lazy val varKw = "var" | "let" | "const"
+
+  lazy val optVarInit: Parser[Option[TermTree]] =
+    opt("=" ~> expression)
+
+  lazy val expression: Parser[TermTree] =
+    compExpr
+
+  lazy val compExpr: Parser[TermTree] =
+    chainl1(orExpr, compOp)
+
+  lazy val compOp: Parser[(TermTree, TermTree) => TermTree] = (
+      "==" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.Buggy_==, lhs, rhs) }
+    | "!=" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.Buggy_!=, lhs, rhs) }
+    | "===" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.===, lhs, rhs) }
+    | "!==" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.!==, lhs, rhs) }
+    | "<" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.<, lhs, rhs) }
+    | "<=" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.<=, lhs, rhs) }
+    | ">" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.>, lhs, rhs) }
+    | ">=" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.>=, lhs, rhs) }
+  )
+
+  lazy val orExpr: Parser[TermTree] =
+    rep1sep(xorExpr, "|") ^^ { _.reduceLeft((lhs, rhs) => BinaryOp(BinaryOp.|, lhs, rhs)) }
+
+  lazy val xorExpr: Parser[TermTree] =
+    rep1sep(andExpr, "^") ^^ { _.reduceLeft((lhs, rhs) => BinaryOp(BinaryOp.^, lhs, rhs)) }
+
+  lazy val andExpr: Parser[TermTree] =
+    rep1sep(shiftExpr, "&") ^^ { _.reduceLeft((lhs, rhs) => BinaryOp(BinaryOp.&, lhs, rhs)) }
+
+  lazy val shiftExpr: Parser[TermTree] =
+    chainl1(plusExpr, shiftOp)
+
+  lazy val shiftOp: Parser[(TermTree, TermTree) => TermTree] = (
+      "<<" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.<<, lhs, rhs) }
+    | ">>" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.>>, lhs, rhs) }
+    | ">>>" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.>>>, lhs, rhs) }
+  )
+
+  lazy val plusExpr: Parser[TermTree] =
+    chainl1(mulExpr, plusOp)
+
+  lazy val plusOp: Parser[(TermTree, TermTree) => TermTree] = (
+      "+" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.+, lhs, rhs) }
+    | "-" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.-, lhs, rhs) }
+  )
+
+  lazy val mulExpr: Parser[TermTree] =
+    chainl1(unaryOpExpr, mulOp)
+
+  lazy val mulOp: Parser[(TermTree, TermTree) => TermTree] = (
+      "*" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.*, lhs, rhs) }
+    | "/" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp./, lhs, rhs) }
+    | "%" ^^^ { (lhs: TermTree, rhs: TermTree) => BinaryOp(BinaryOp.%, lhs, rhs) }
+  )
+
+  lazy val unaryOpExpr: Parser[TermTree] = (
+      "+" ~> unaryOpExpr ^^ { arg => UnaryOp(UnaryOp.+, arg) }
+    | "-" ~> unaryOpExpr ^^ { arg => UnaryOp(UnaryOp.-, arg) }
+    | "~" ~> unaryOpExpr ^^ { arg => UnaryOp(UnaryOp.~, arg) }
+    | simpleExpr
+  )
+
+  lazy val simpleExpr: Parser[TermTree] = (
+      identifier ^^ VarRef
+    | "true" ^^^ BooleanLiteral(true)
+    | "(" ~> expression <~ ")"
+  )
 
   lazy val ambientEnumDecl: Parser[DeclTree] =
     "enum" ~> typeName ~ ("{" ~> ambientEnumBody <~ "}") ^^ EnumDecl
@@ -95,7 +182,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     repsep(identifier <~ opt("=" ~ numericLit), ",") <~ opt(",")
 
   lazy val ambientClassDecl: Parser[DeclTree] =
-    "class" ~> typeName ~ tparams ~ classParent ~ classImplements ~ memberBlock <~ opt(";") ^^ ClassDecl
+    "class" ~> (typeName.map(Some(_))) ~ tparams ~ classParent ~ classImplements ~ memberBlock <~ opt(";") ^^ ClassDecl
 
   lazy val ambientInterfaceDecl: Parser[DeclTree] =
     "interface" ~> typeName ~ tparams ~ intfInheritance ~ memberBlock <~ opt(";") ^^ InterfaceDecl
@@ -166,6 +253,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val typeAnnotation =
     ":" ~> typeDesc
+
+  lazy val optTypeDesc: Parser[Option[TypeTree]] =
+    opt(typeDesc)
 
   lazy val typeDesc: Parser[TypeTree] =
     rep1sep(singleTypeDesc, "|") ^^ {

@@ -26,6 +26,139 @@ object Trees {
   sealed trait TypeTree extends Tree
   sealed trait MemberTree extends Tree
 
+  case class Block(stmts: List[TermTree]) extends TermTree
+
+  case class BlockExpr(stmts: List[TermTree], expr: TermTree) extends TermTree
+
+  case class VarDef(name: Ident, tpe: Option[TypeTree],
+      value: Option[TermTree]) extends TermTree
+
+  case class If(cond: TermTree, thenp: TermTree, elsep: TermTree) extends TermTree
+
+  case class While(cond: TermTree, body: TermTree) extends TermTree
+
+  case class DoWhile(body: TermTree, cond: TermTree) extends TermTree
+
+  case class ForIn(varName: Ident, obj: TermTree, body: TermTree) extends TermTree
+
+  case class ForOf(varName: Ident, iterable: TermTree, body: TermTree) extends TermTree
+
+  case class Continue() extends TermTree
+
+  case class Break() extends TermTree
+
+  case class Return(expr: Option[TermTree]) extends TermTree
+
+  case class Switch(scrutinee: TermTree, cases: List[(TermTree, TermTree)],
+      defaultCase: Option[TermTree]) extends TermTree
+
+  case class Throw(expr: TermTree) extends TermTree
+
+  case class TryCatch(body: TermTree, exVar: Ident, handler: TermTree) extends TermTree
+
+  case class TryFinally(body: TermTree, finalizer: TermTree) extends TermTree
+
+  case class IfExpr(cond: TermTree, thenp: TermTree, elsep: TermTree) extends TermTree
+
+  case class This() extends TermTree
+
+  case class VarRef(ident: Ident) extends TermTree
+
+  case class TemplateString(funName: Option[Ident], content: String) extends TermTree
+
+  case class Super() extends TermTree
+
+  case class ObjectConstr(fields: List[FieldDef]) extends TermTree
+
+  sealed trait FieldDef extends Tree
+
+  case class NamedField(name: TermTree, value: TermTree) extends FieldDef
+  case class GetterDef(name: TermTree, body: TermTree) extends FieldDef
+  case class SetterDef(name: TermTree, param: FunParam, body: TermTree) extends FieldDef
+  // and FunctionDecl
+
+  case class ArrayConstr(elems: List[TermTree]) extends TermTree
+
+  case class Spread(array: TermTree) extends TermTree
+
+  case class FunExpr(signature: FunSignature, body: TermTree, arrow: Boolean) extends TermTree
+
+  case class DotSelect(qual: TermTree, item: Ident) extends TermTree
+
+  case class BracketSelect(qual: TermTree, item: TermTree) extends TermTree
+
+  case class New(ctor: TermTree, targs: List[TypeRef],
+      args: List[TermTree]) extends TermTree
+
+  case class FunCall(fun: TermTree, targs: List[TypeRef],
+      args: List[TermTree]) extends TermTree
+
+  case class Cast(expr: TermTree, tpe: TypeRef) extends TermTree
+
+  case class UnaryOp(op: UnaryOp.Code, arg: TermTree) extends TermTree
+
+  object UnaryOp {
+    /** Codes are the same as in the IR. */
+    type Code = Int
+
+    final val + = 1
+    final val - = 2
+    final val ~ = 3
+    final val ! = 4
+
+    final val Pre_++ = 5
+    final val Pre_-- = 6
+    final val Post_++ = 7
+    final val Post_-- = 8
+
+    final val typeof = 9
+
+    final val void = 10
+  }
+
+  case class BinaryOp(op: BinaryOp.Code, lhs: TermTree, rhs: TermTree) extends TermTree
+
+  object BinaryOp {
+    type Code = Int
+
+    final val === = 1
+    final val !== = 2
+
+    final val + = 3
+    final val - = 4
+    final val * = 5
+    final val / = 6
+    final val % = 7
+
+    final val |   = 8
+    final val &   = 9
+    final val ^   = 10
+    final val <<  = 11
+    final val >>  = 12
+    final val >>> = 13
+
+    final val <  = 14
+    final val <= = 15
+    final val >  = 16
+    final val >= = 17
+
+    final val && = 18
+    final val || = 19
+
+    final val in         = 20
+    final val instanceof = 21
+
+    final val Buggy_== = 22
+    final val Buggy_!= = 23
+  }
+
+  /** `+=` and the like. */
+  case class OpAssign(op: BinaryOp.Code, lhs: TermTree, rhs: TermTree) extends TermTree
+
+  case class Delete(qual: TermTree, item: TermTree) extends TermTree
+
+
+
   // Identifiers and properties
 
   sealed trait PropertyName extends TermTree {
@@ -66,7 +199,8 @@ object Trees {
 
   case class VarDecl(name: Ident, tpe: Option[TypeTree]) extends DeclTree
 
-  case class FunctionDecl(name: Ident, signature: FunSignature) extends DeclTree
+  case class FunctionDecl(name: Ident, signature: FunSignature, body: TermTree)
+      extends DeclTree with FieldDef
 
   // Function signature
 
@@ -101,9 +235,9 @@ object Trees {
 
   case class EnumDecl(name: TypeName, members: List[Ident]) extends DeclTree
 
-  case class ClassDecl(name: TypeName, tparams: List[TypeParam],
+  case class ClassDecl(name: Option[TypeName], tparams: List[TypeParam],
       parent: Option[TypeRef], implements: List[TypeRef],
-      membmers: List[MemberTree]) extends DeclTree
+      membmers: List[MemberTree]) extends DeclTree with TermTree
 
   case class InterfaceDecl(name: TypeName, tparams: List[TypeParam],
       inheritance: List[TypeRef], members: List[MemberTree]) extends DeclTree
