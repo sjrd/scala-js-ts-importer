@@ -33,6 +33,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
       // Future reserved keywords - some used in TypeScript
       "class", "const", "enum", "export", "extends", "import", "super",
+      "readonly",
 
       // Future reserved keywords in Strict mode - some used in TypeScript
       "implements", "interface", "let", "package", "private", "protected",
@@ -79,11 +80,14 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val moduleElementDecl1: Parser[DeclTree] = (
       ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
     | ambientEnumDecl | ambientClassDecl | ambientInterfaceDecl
-    | typeAliasDecl
+    | ambientConstDecl | typeAliasDecl
   )
 
   lazy val ambientVarDecl: Parser[DeclTree] =
     "var" ~> identifier ~ optTypeAnnotation <~ opt(";") ^^ VarDecl
+
+  lazy val ambientConstDecl: Parser[DeclTree] =
+    "const" ~> identifier ~ optTypeAnnotation <~ opt(";") ^^ ConstDecl
 
   lazy val ambientFunctionDecl: Parser[DeclTree] =
     "function" ~> identifier ~ functionSignature <~ opt(";") ^^ FunctionDecl
@@ -239,20 +243,22 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     ("[" ~> identifier ~ typeAnnotation <~ "]") ~ typeAnnotation ^^ IndexMember
 
   lazy val namedMember: Parser[MemberTree] =
-    maybeStaticPropName ~ optionalMarker >> {
-      case (name, static) ~ optional => (
-          functionSignature ^^ (FunctionMember(name, optional, _, static))
-        | typeAnnotation ^^ (PropertyMember(name, optional, _, static))
+    modifiers ~ propertyName ~ optionalMarker >> {
+      case mods ~ name ~ optional => (
+          functionSignature ^^ (FunctionMember(name, optional, _, mods))
+        | typeAnnotation ^^ (PropertyMember(name, optional, _, mods))
       )
     }
 
-  lazy val maybeStaticPropName: Parser[(PropertyName, Boolean)] = (
-      "static" ~> propertyName ^^ staticPropName
-    | propertyName ^^ nonStaticPropName
-  )
+  lazy val modifiers: Parser[Modifiers] =
+    rep(modifier).map(_.toSet)
 
-  val staticPropName = (p: PropertyName) => (p, true)
-  val nonStaticPropName = (p: PropertyName) => (p, false)
+  lazy val modifier: Parser[Modifier] = (
+      "static" ^^^ Modifier.Static
+    | "public" ^^^ Modifier.Public
+    | "readonly" ^^^ Modifier.ReadOnly
+    | "protected" ^^^ Modifier.Protected
+  )
 
   lazy val identifier =
     identifierName ^^ Ident

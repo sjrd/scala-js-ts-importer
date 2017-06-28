@@ -26,6 +26,20 @@ object Trees {
   sealed trait TypeTree extends Tree
   sealed trait MemberTree extends Tree
 
+  // Modifiers
+
+  abstract sealed class Modifier
+
+  object Modifier {
+    case object Public extends Modifier
+    case object Protected extends Modifier
+    case object Static extends Modifier
+    case object ReadOnly extends Modifier
+    case object Const extends Modifier
+  }
+
+  type Modifiers = Set[Modifier]
+
   // Identifiers and properties
 
   sealed trait PropertyName extends TermTree {
@@ -65,6 +79,8 @@ object Trees {
   case class ModuleDecl(name: PropertyName, members: List[DeclTree]) extends DeclTree
 
   case class VarDecl(name: Ident, tpe: Option[TypeTree]) extends DeclTree
+
+  case class ConstDecl(name: Ident, tpe: Option[TypeTree]) extends DeclTree
 
   case class FunctionDecl(name: Ident, signature: FunSignature) extends DeclTree
 
@@ -146,8 +162,8 @@ object Trees {
   case class IndexMember(indexName: Ident, indexType: TypeTree, valueType: TypeTree) extends MemberTree
 
   case class PropertyMember(name: PropertyName, optional: Boolean,
-      tpe: TypeTree, static: Boolean) extends MemberTree
+      tpe: TypeTree, modifiers: Modifiers) extends MemberTree
 
   case class FunctionMember(name: PropertyName, optional: Boolean,
-      signature: FunSignature, static: Boolean) extends MemberTree
+      signature: FunSignature, modifiers: Modifiers) extends MemberTree
 }

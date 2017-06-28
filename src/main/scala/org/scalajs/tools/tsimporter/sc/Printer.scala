@@ -6,6 +6,7 @@
 package org.scalajs.tools.tsimporter.sc
 
 import java.io.PrintWriter
+import org.scalajs.tools.tsimporter.Trees.Modifier
 
 class Printer(private val output: PrintWriter, outputPackage: String) {
   import Printer._
@@ -123,7 +124,14 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         sym.jsName foreach { jsName =>
           pln"""  @JSName("$jsName")"""
         }
-        pln"  var $name: ${sym.tpe} = js.native"
+        val access =
+          if (sym.modifiers(Modifier.Protected)) "protected "
+          else ""
+        val decl =
+          if (sym.modifiers(Modifier.Const)) "val"
+          else if (sym.modifiers(Modifier.ReadOnly)) "def"
+          else "var"
+        pln"  $access$decl $name: ${sym.tpe} = js.native"
 
       case sym: MethodSymbol =>
         val params = sym.params
