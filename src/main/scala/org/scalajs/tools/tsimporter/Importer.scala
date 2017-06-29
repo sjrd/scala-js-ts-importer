@@ -51,7 +51,7 @@ class Importer(val output: java.io.PrintWriter) {
         // Module
         val sym = owner.getModuleOrCreate(name)
         for (IdentName(name) <- members) {
-          val m = sym.newField(name)
+          val m = sym.newField(name, Set.empty)
           m.protectName()
           m.tpe = TypeRef(tsym.name)
         }
@@ -94,7 +94,11 @@ class Importer(val output: java.io.PrintWriter) {
         sym.alias = typeToScala(alias)
 
       case VarDecl(IdentName(name), TypeOrAny(tpe)) =>
-        val sym = owner.newField(name)
+        val sym = owner.newField(name, Set.empty)
+        sym.tpe = typeToScala(tpe)
+
+      case ConstDecl(IdentName(name), TypeOrAny(tpe)) =>
+        val sym = owner.newField(name, Set(Modifier.Const))
         sym.tpe = typeToScala(tpe)
 
       case FunctionDecl(IdentName(name), signature) =>
@@ -130,22 +134,23 @@ class Importer(val output: java.io.PrintWriter) {
         processDefDecl(classSym, Name.CONSTRUCTOR,
             FunSignature(Nil, params, Some(TypeRefTree(CoreType("void")))))
 
-      case PropertyMember(PropertyNameName(name), opt, tpe, true) =>
+      case PropertyMember(PropertyNameName(name), opt, tpe, mods) if mods(Modifier.Static) =>
         assert(owner.isInstanceOf[ClassSymbol],
             s"Cannot process static member $name in module definition")
         val module = enclosing.getModuleOrCreate(owner.name)
-        processPropertyDecl(module, name, tpe)
+        processPropertyDecl(module, name, tpe, mods)
 
-      case PropertyMember(PropertyNameName(name), opt, tpe, _) =>
-        processPropertyDecl(owner, name, tpe)
+      case PropertyMember(PropertyNameName(name), opt, tpe, mods) =>
+        processPropertyDecl(owner, name, tpe, mods)
 
-      case FunctionMember(PropertyName("constructor"), _, signature, false)
-      if owner.isInstanceOf[ClassSymbol] =>
+      case FunctionMember(PropertyName("constructor"), _, signature, modifiers)
+          if owner.isInstanceOf[ClassSymbol] && !modifiers(Modifier.Static) =>
         owner.asInstanceOf[ClassSymbol].isTrait = false
         processDefDecl(owner, Name.CONSTRUCTOR,
             FunSignature(Nil, signature.params, Some(TypeRefTree(CoreType("void")))))
 
-      case FunctionMember(PropertyNameName(name), opt, signature, true) =>
+      case FunctionMember(PropertyNameName(name), opt, signature, modifiers)
+          if modifiers(Modifier.Static) =>
         assert(owner.isInstanceOf[ClassSymbol],
             s"Cannot process static member $name in module definition")
         val module = enclosing.getModuleOrCreate(owner.name)
@@ -175,7 +180,7 @@ class Importer(val output: java.io.PrintWriter) {
   }
 
   private def processPropertyDecl(owner: ContainerSymbol, name: Name,
-      tpe: TypeTree, protectName: Boolean = true) {
+      tpe: TypeTree, modifiers: Modifiers, protectName: Boolean = true) {
     if (name.name != "prototype") {
       tpe match {
         case ObjectType(members) if members.forall(_.isInstanceOf[CallMember]) =>
@@ -183,7 +188,7 @@ class Importer(val output: java.io.PrintWriter) {
           for (CallMember(signature) <- members)
             processDefDecl(owner, name, signature, protectName)
         case _ =>
-          val sym = owner.newField(name)
+          val sym = owner.newField(name, modifiers)
           if (protectName)
             sym.protectName()
           sym.tpe = typeToScala(tpe)

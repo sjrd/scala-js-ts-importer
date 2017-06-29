@@ -10,6 +10,7 @@ import scala.language.implicitConversions
 import scala.collection.mutable._
 
 import org.scalajs.tools.tsimporter.Utils
+import org.scalajs.tools.tsimporter.Trees.{ Modifier, Modifiers }
 
 case class Name(name: String) {
   override def toString() = Utils.scalaEscape(name)
@@ -130,8 +131,8 @@ class ContainerSymbol(nme: Name) extends Symbol(nme) {
     result
   }
 
-  def newField(name: Name): FieldSymbol = {
-    val result = new FieldSymbol(name)
+  def newField(name: Name, modifiers: Modifiers): FieldSymbol = {
+    val result = new FieldSymbol(name, modifiers)
     members += result
     result
   }
@@ -195,10 +196,10 @@ class TypeAliasSymbol(nme: Name) extends Symbol(nme) {
       (if (tparams.isEmpty) "" else tparams.mkString("<", ", ", ">")))
 }
 
-class FieldSymbol(nme: Name) extends Symbol(nme) with JSNameable {
+class FieldSymbol(nme: Name, val modifiers: Modifiers) extends Symbol(nme) with JSNameable {
   var tpe: TypeRef = TypeRef.Any
 
-  override def toString() = s"${jsNameStr}var $name: $tpe"
+  override def toString() = s"${jsNameStr}${if (modifiers(Modifier.ReadOnly)) "val" else "var"} $name: $tpe"
 }
 
 class MethodSymbol(nme: Name) extends Symbol(nme) with JSNameable {
