@@ -38,9 +38,18 @@ object Uri extends js.Object {
 }
 
 @js.native
+trait IEditorOptions extends js.Object {
+  var ariaLabel: String = js.native
+  var rulers: js.Array[Double] = js.native
+  var selectionClipboard: Boolean = js.native
+  var lineNumbers: String | js.Function1[Double, String] = js.native
+}
+
+@js.native
 @JSGlobal("monaco")
 object Monaco extends js.Object {
   val id: String = js.native
+  type BuiltinTheme = String
   val CursorMoveByUnit: js.Any = js.native
 }
 
