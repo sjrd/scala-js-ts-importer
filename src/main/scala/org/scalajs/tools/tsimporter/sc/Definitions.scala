@@ -287,15 +287,12 @@ object TypeRef {
   val Null = TypeRef(scala dot Name("Null"))
 
   object Union {
-    def apply(left: TypeRef, right: TypeRef): TypeRef =
-      if (left == right)
-        left
-      else
-        TypeRef(QualifiedName.Union, List(left, right))
+    def apply(types: List[TypeRef]): TypeRef =
+      TypeRef(QualifiedName.Union, types)
 
-    def unapply(typeRef: TypeRef): Option[(TypeRef, TypeRef)] = typeRef match {
-      case TypeRef(QualifiedName.Union, List(left, right)) =>
-        Some((left, right))
+    def unapply(typeRef: TypeRef): Option[List[TypeRef]] = typeRef match {
+      case TypeRef(QualifiedName.Union, types) =>
+        Some(types)
 
       case _ => None
     }

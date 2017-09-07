@@ -282,7 +282,15 @@ class Importer(val output: java.io.PrintWriter) {
         }
 
       case UnionType(left, right) =>
-        TypeRef.Union(typeToScala(left), typeToScala(right))
+        def visit(tpe: TypeTree, visited: List[TypeRef]): List[TypeRef] =
+          tpe match {
+            case UnionType(left, right) =>
+              visit(right, visit(left, visited))
+            case _ =>
+              visited ++ List(typeToScala(tpe))
+          }
+
+        TypeRef.Union(visit(tpe, Nil).distinct)
 
       case TypeQuery(expr) =>
         TypeRef.Singleton(QualifiedName((expr.qualifier :+ expr.name).map(

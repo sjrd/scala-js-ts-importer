@@ -36,5 +36,6 @@ declare module monaco {
       rulers?: number[];
       selectionClipboard?: boolean;
       lineNumbers?: 'on' | 'off' | 'relative' | ((lineNumber: number) => string);
+      readable?: 'yes' | boolean | 'restricted';
   }
 }

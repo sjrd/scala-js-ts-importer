@@ -184,8 +184,9 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
       case TypeRef(typeName, Nil) =>
         p"$typeName"
 
-      case TypeRef.Union(left, right) =>
-        p"$left | $right"
+      case TypeRef.Union(types) =>
+        implicit val withPipe = ListElemSeparator.Pipe
+        p"$types"
 
       case TypeRef.Singleton(termRef) =>
         p"$termRef.type"
@@ -217,6 +218,7 @@ object Printer {
 
   private object ListElemSeparator {
     val Comma = new ListElemSeparator(", ")
+    val Pipe = new ListElemSeparator(" | ")
     val WithKeyword = new ListElemSeparator(" with ")
   }
 

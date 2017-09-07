@@ -43,6 +43,7 @@ trait IEditorOptions extends js.Object {
   var rulers: js.Array[Double] = js.native
   var selectionClipboard: Boolean = js.native
   var lineNumbers: String | js.Function1[Double, String] = js.native
+  var readable: String | Boolean = js.native
 }
 
 @js.native
