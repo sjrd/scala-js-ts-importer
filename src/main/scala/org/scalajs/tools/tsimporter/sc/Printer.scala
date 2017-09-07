@@ -63,8 +63,8 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
               pln"object $packageObjectName extends js.GlobalScope {"
             } else {
               val jsName = currentJSNamespace.init
-              pln"""@JSName("$jsName")"""
               pln"@js.native"
+              pln"""@JSGlobal("$jsName")"""
               pln"object $packageObjectName extends js.Object {"
             }
             for (sym <- packageObjectMembers)
@@ -92,7 +92,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         pln"";
         pln"@js.native"
         if (currentJSNamespace != "" && !sym.isTrait)
-          pln"""@JSName("$currentJSNamespace$name")"""
+          pln"""@JSGlobal("$currentJSNamespace$name")"""
         p"$sealedKw$kw $name"
         if (!sym.tparams.isEmpty)
           p"[${sym.tparams}]"
@@ -109,7 +109,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         pln"";
         pln"@js.native"
         if (currentJSNamespace != "")
-          pln"""@JSName("$currentJSNamespace$name")"""
+          pln"""@JSGlobal("$currentJSNamespace$name")"""
         pln"object $name extends js.Object {"
         printMemberDecls(sym)
         pln"}"
