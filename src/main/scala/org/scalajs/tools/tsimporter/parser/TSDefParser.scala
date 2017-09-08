@@ -188,6 +188,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       typeRef
     | objectType
     | functionType
+    | stringType
     | typeQuery
     | tupleType
     | "(" ~> typeDesc <~ ")"
@@ -213,6 +214,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       case tparams ~ params ~ resultType =>
         FunctionType(FunSignature(tparams, params, Some(resultType)))
     }
+
+  lazy val stringType: Parser[TypeTree] =
+    stringLiteral ^^ ConstantType
 
   lazy val typeQuery: Parser[TypeTree] =
     "typeof" ~> rep1sep(ident, ".") ^^ { parts =>

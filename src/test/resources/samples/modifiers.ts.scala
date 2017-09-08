@@ -8,7 +8,7 @@ package importedjs {
 package monaco {
 
 @js.native
-@JSName("monaco.Emitter")
+@JSGlobal("monaco.Emitter")
 class Emitter[T] extends js.Object {
   def event: IEvent[T] = js.native
   def fire(event: T = ???): Unit = js.native
@@ -16,14 +16,14 @@ class Emitter[T] extends js.Object {
 }
 
 @js.native
-@JSName("monaco.EditorType")
+@JSGlobal("monaco.EditorType")
 object EditorType extends js.Object {
   var ICodeEditor: String = js.native
   var IDiffEditor: String = js.native
 }
 
 @js.native
-@JSName("monaco.Uri")
+@JSGlobal("monaco.Uri")
 class Uri extends js.Object {
   def scheme: String = js.native
   def authority: String = js.native
@@ -31,16 +31,26 @@ class Uri extends js.Object {
 }
 
 @js.native
-@JSName("monaco.Uri")
+@JSGlobal("monaco.Uri")
 object Uri extends js.Object {
   def isUri(thing: js.Any): Boolean = js.native
   def parse(value: String): Uri = js.native
 }
 
-@JSName("monaco")
 @js.native
+trait IEditorOptions extends js.Object {
+  var ariaLabel: String = js.native
+  var rulers: js.Array[Double] = js.native
+  var selectionClipboard: Boolean = js.native
+  var lineNumbers: String | js.Function1[Double, String] = js.native
+  var readable: String | Boolean = js.native
+}
+
+@js.native
+@JSGlobal("monaco")
 object Monaco extends js.Object {
   val id: String = js.native
+  type BuiltinTheme = String
   val CursorMoveByUnit: js.Any = js.native
 }
 

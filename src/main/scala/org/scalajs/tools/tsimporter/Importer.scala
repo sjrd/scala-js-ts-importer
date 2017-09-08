@@ -250,6 +250,9 @@ class Importer(val output: java.io.PrintWriter) {
         }
         TypeRef(baseTypeRef, targs map typeToScala)
 
+      case ConstantType(StringLiteral(_)) =>
+        TypeRef.String
+
       case ObjectType(List(IndexMember(_, TypeRefTree(CoreType("string"), _), valueType))) =>
         val valueTpe = typeToScala(valueType)
         TypeRef(QualifiedName.Dictionary, List(valueTpe))
@@ -279,7 +282,16 @@ class Importer(val output: java.io.PrintWriter) {
         }
 
       case UnionType(left, right) =>
-        TypeRef.Union(typeToScala(left), typeToScala(right))
+        def visit(tpe: TypeTree, visited: List[TypeRef]): List[TypeRef] = {
+          tpe match {
+            case UnionType(left, right) =>
+              visit(left, visit(right, visited))
+            case _ =>
+              typeToScala(tpe) :: visited
+          }
+        }
+
+        TypeRef.Union(visit(tpe, Nil).distinct)
 
       case TypeQuery(expr) =>
         TypeRef.Singleton(QualifiedName((expr.qualifier :+ expr.name).map(
