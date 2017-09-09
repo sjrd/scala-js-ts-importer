@@ -8,6 +8,10 @@ package importedjs {
 package monaco {
 
 @js.native
+trait IEvent[T] extends js.Object {
+}
+
+@js.native
 @JSGlobal("monaco.Emitter")
 class Emitter[T] extends js.Object {
   def event: IEvent[T] = js.native

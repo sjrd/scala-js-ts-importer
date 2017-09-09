@@ -2,6 +2,8 @@ declare module monaco {
 
   const id: string;
 
+  interface IEvent<T> {}
+
   export class Emitter<T> {
       constructor();
       public readonly event: IEvent<T>;

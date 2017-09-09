@@ -6,7 +6,7 @@ import scala.io.Source
 
 class ImporterSpec extends FunSpec {
   describe("Main.main") {
-    val inputDirectory = new File("src/test/resources/samples")
+    val inputDirectory = new File("samples")
 
     val outputDir = new File("target/tsimporter-test")
     Option(outputDir.listFiles()).foreach(_.foreach(_.delete()))

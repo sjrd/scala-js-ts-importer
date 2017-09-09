@@ -19,3 +19,6 @@ val `scala-js-ts-importer` = project.in(file("."))
       "org.scalatest" %% "scalatest" % "3.0.4" % Test
     )
   )
+
+val samples = project
+  .enablePlugins(ScalaJSPlugin)
