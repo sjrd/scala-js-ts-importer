@@ -267,8 +267,12 @@ class ParamSymbol(nme: Name) extends Symbol(nme) {
 }
 
 case class TypeRef(typeName: QualifiedName, targs: List[TypeRef] = Nil) {
-  override def toString() =
-    s"$typeName[${targs.mkString(", ")}]"
+  override def toString() = {
+    if (targs.isEmpty)
+      typeName.toString
+    else
+      s"$typeName[${targs.mkString(", ")}]"
+  }
 }
 
 object TypeRef {
