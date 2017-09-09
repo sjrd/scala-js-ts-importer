@@ -7,7 +7,7 @@ package org.scalajs.tools.tsimporter.sc
 
 import scala.language.implicitConversions
 
-import scala.collection.mutable._
+import scala.collection.mutable.ListBuffer
 
 import org.scalajs.tools.tsimporter.Utils
 import org.scalajs.tools.tsimporter.Trees.{ Modifier, Modifiers }
@@ -220,6 +220,15 @@ class MethodSymbol(nme: Name) extends Symbol(nme) with JSNameable {
 
   def paramTypes = params.map(_.tpe)
 
+  def needsOverride: Boolean = {
+    def noParams = tparams.isEmpty && params.isEmpty
+    name match {
+      case Name("toString") => noParams // Any return type will trigger the error
+      case Name("clone")    => noParams // Any return type will trigger the error
+      case _                => false
+    }
+  }
+
   override def equals(that: Any): Boolean = that match {
     case that: MethodSymbol =>
       (this.name == that.name &&
@@ -267,8 +276,12 @@ class ParamSymbol(nme: Name) extends Symbol(nme) {
 }
 
 case class TypeRef(typeName: QualifiedName, targs: List[TypeRef] = Nil) {
-  override def toString() =
-    s"$typeName[${targs.mkString(", ")}]"
+  override def toString() = {
+    if (targs.isEmpty)
+      typeName.toString
+    else
+      s"$typeName[${targs.mkString(", ")}]"
+  }
 }
 
 object TypeRef {

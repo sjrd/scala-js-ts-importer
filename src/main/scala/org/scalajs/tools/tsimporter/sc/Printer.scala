@@ -58,8 +58,9 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
               Name(thisPackage.name.head.toUpper + thisPackage.name.tail)
 
             pln"";
-            if (currentJSNamespace == "") {
+            if (currentJSNamespace.isEmpty) {
               pln"@js.native"
+              pln"@JSGlobal"
               pln"object $packageObjectName extends js.GlobalScope {"
             } else {
               val jsName = currentJSNamespace.init
@@ -91,8 +92,12 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
         pln"";
         pln"@js.native"
-        if (currentJSNamespace != "" && !sym.isTrait)
-          pln"""@JSGlobal("$currentJSNamespace$name")"""
+        if (!sym.isTrait) {
+          if (currentJSNamespace.isEmpty)
+            pln"@JSGlobal"
+          else
+            pln"""@JSGlobal("$currentJSNamespace${name.name}")"""
+        }
         p"$sealedKw$kw $name"
         if (!sym.tparams.isEmpty)
           p"[${sym.tparams}]"
@@ -108,8 +113,10 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
       case sym: ModuleSymbol =>
         pln"";
         pln"@js.native"
-        if (currentJSNamespace != "")
-          pln"""@JSGlobal("$currentJSNamespace$name")"""
+        if (currentJSNamespace.isEmpty)
+          pln"@JSGlobal"
+        else
+          pln"""@JSGlobal("$currentJSNamespace${name.name}")"""
         pln"object $name extends js.Object {"
         printMemberDecls(sym)
         pln"}"
@@ -145,7 +152,9 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           }
           if (sym.isBracketAccess)
             pln"""  @JSBracketAccess"""
-          p"  def $name"
+          val modifiers =
+            if (sym.needsOverride) "override " else ""
+          p"  ${modifiers}def $name"
           if (!sym.tparams.isEmpty)
             p"[${sym.tparams}]"
           pln"($params): ${sym.resultType} = js.native"
