@@ -13,7 +13,7 @@ trait Thenable[T] extends js.Object {
 }
 
 @js.native
-@JSGlobal("then.`then`")
+@JSGlobal("then.then")
 class `then` extends js.Object {
 }
 

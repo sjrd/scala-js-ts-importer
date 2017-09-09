@@ -96,7 +96,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           if (currentJSNamespace.isEmpty)
             pln"@JSGlobal"
           else
-            pln"""@JSGlobal("$currentJSNamespace$name")"""
+            pln"""@JSGlobal("$currentJSNamespace${name.name}")"""
         }
         p"$sealedKw$kw $name"
         if (!sym.tparams.isEmpty)
@@ -116,7 +116,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         if (currentJSNamespace.isEmpty)
           pln"@JSGlobal"
         else
-          pln"""@JSGlobal("$currentJSNamespace$name")"""
+          pln"""@JSGlobal("$currentJSNamespace${name.name}")"""
         pln"object $name extends js.Object {"
         printMemberDecls(sym)
         pln"}"
