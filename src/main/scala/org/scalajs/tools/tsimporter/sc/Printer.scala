@@ -152,7 +152,9 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           }
           if (sym.isBracketAccess)
             pln"""  @JSBracketAccess"""
-          p"  def $name"
+          val modifiers =
+            if (sym.needsOverride) "override " else ""
+          p"  ${modifiers}def $name"
           if (!sym.tparams.isEmpty)
             p"[${sym.tparams}]"
           pln"($params): ${sym.resultType} = js.native"

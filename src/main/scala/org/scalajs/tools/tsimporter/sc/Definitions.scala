@@ -220,6 +220,15 @@ class MethodSymbol(nme: Name) extends Symbol(nme) with JSNameable {
 
   def paramTypes = params.map(_.tpe)
 
+  def needsOverride: Boolean = {
+    def noParams = tparams.isEmpty && params.isEmpty
+    name match {
+      case Name("toString") => noParams // Any return type will trigger the error
+      case Name("clone")    => noParams // Any return type will trigger the error
+      case _                => false
+    }
+  }
+
   override def equals(that: Any): Boolean = that match {
     case that: MethodSymbol =>
       (this.name == that.name &&
