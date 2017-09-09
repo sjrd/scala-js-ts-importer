@@ -7,7 +7,7 @@ package org.scalajs.tools.tsimporter.sc
 
 import scala.language.implicitConversions
 
-import scala.collection.mutable._
+import scala.collection.mutable.ListBuffer
 
 import org.scalajs.tools.tsimporter.Utils
 import org.scalajs.tools.tsimporter.Trees.{ Modifier, Modifiers }
