@@ -1,4 +1,4 @@
-declare module monaco {
+declare module modifiers {
 
   const id: string;
 
