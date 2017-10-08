@@ -162,6 +162,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val resultType: Parser[TypeTree] = (
       ("void" ^^^ TypeRef(CoreType("void")))
+    | ("never" ^^^ TypeRef(CoreType("never")))
     | typeDesc
   )
 
@@ -282,7 +283,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     stringLit ^^ StringLiteral
 
   private val isCoreTypeName =
-    Set("any", "void", "number", "bool", "boolean", "string", "null", "undefined")
+    Set("any", "void", "number", "bool", "boolean", "string", "null", "undefined", "never")
 
   def typeNameToTypeRef(name: String): BaseTypeRef =
     if (isCoreTypeName(name)) CoreType(name)
