@@ -12,11 +12,4 @@ declare module nevertype {
       value(queryVal: string | number): never;
   }
 
-  export class RangeQuery2 extends ValueTermQueryBase {
-      /**
-       * @override
-       * @throws {Error} This method cannot be called on RangeQuery
-       */
-      value(): never;
-  }
 }
