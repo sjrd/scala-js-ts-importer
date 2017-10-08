@@ -4,6 +4,8 @@ declare module nevertype {
       never: never;
 
       value(queryVal: string | number): string;
+
+      method(foo: never): Array<never>;
   }
 
   export class RangeQuery extends ValueTermQueryBase {

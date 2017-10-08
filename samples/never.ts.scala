@@ -12,6 +12,7 @@ package nevertype {
 class ValueTermQueryBase extends js.Object {
   var never: Nothing = js.native
   def value(queryVal: String | Double): String = js.native
+  def method(foo: Nothing): js.Array[Nothing] = js.native
 }
 
 @js.native
