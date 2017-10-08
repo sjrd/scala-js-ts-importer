@@ -315,6 +315,9 @@ class Importer(val output: java.io.PrintWriter) {
       case RepeatedType(underlying) =>
         TypeRef(Name.REPEATED, List(typeToScala(underlying)))
 
+      case PolymorphicThisType =>
+        TypeRef.ThisType
+
       case _ =>
         // ???
         TypeRef.Any
