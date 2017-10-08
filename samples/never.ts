@@ -1,6 +1,8 @@
 declare module nevertype {
 
   export class ValueTermQueryBase {
+      never: never;
+
       value(queryVal: string | number): string;
   }
 

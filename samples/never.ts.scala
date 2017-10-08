@@ -10,6 +10,7 @@ package nevertype {
 @js.native
 @JSGlobal("nevertype.ValueTermQueryBase")
 class ValueTermQueryBase extends js.Object {
+  var never: Nothing = js.native
   def value(queryVal: String | Double): String = js.native
 }
 
