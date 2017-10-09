@@ -162,7 +162,6 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val resultType: Parser[TypeTree] = (
       ("void" ^^^ TypeRef(CoreType("void")))
-    | ("never" ^^^ TypeRef(CoreType("never")))
     | typeDesc
   )
 
