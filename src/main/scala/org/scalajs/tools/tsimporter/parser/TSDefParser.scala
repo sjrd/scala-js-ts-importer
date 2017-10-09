@@ -282,7 +282,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     stringLit ^^ StringLiteral
 
   private val isCoreTypeName =
-    Set("any", "void", "number", "bool", "boolean", "string", "null", "undefined")
+    Set("any", "void", "number", "bool", "boolean", "string", "null", "undefined", "never")
 
   def typeNameToTypeRef(name: String): BaseTypeRef =
     if (isCoreTypeName(name)) CoreType(name)

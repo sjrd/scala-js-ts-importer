@@ -322,6 +322,7 @@ class Importer(val output: java.io.PrintWriter) {
       case "string"    => TypeRef.String
       case "null"      => TypeRef.Null
       case "undefined" => TypeRef.Unit
+      case "never"     => TypeRef.Nothing
     }
   }
 }
