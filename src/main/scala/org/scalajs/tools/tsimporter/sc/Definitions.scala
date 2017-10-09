@@ -299,7 +299,9 @@ object TypeRef {
   val Unit = TypeRef(scala dot Name("Unit"))
   val Null = TypeRef(scala dot Name("Null"))
   val Nothing = TypeRef(scala dot Name("Nothing"))
-  val ThisType = TypeRef(scala dot Name("this") dot Name("type"))
+  val ThisType = TypeRef(new Name("this.type") {
+    override def toString(): String = "this.type"
+  })
 
   object Union {
     def apply(types: List[TypeRef]): TypeRef =

@@ -190,9 +190,6 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
   def printTypeRef(tpe: TypeRef) {
     tpe match {
-      case TypeRef.ThisType =>
-        p"this.type"
-
       case TypeRef(typeName, Nil) =>
         p"$typeName"
 
