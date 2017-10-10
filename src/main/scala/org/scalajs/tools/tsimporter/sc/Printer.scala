@@ -197,6 +197,9 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         implicit val withPipe = ListElemSeparator.Pipe
         p"$types"
 
+      case TypeRef.This =>
+        p"this.type"
+
       case TypeRef.Singleton(termRef) =>
         p"$termRef.type"
 

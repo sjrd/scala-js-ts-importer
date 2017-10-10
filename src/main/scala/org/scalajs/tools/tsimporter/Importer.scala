@@ -316,7 +316,7 @@ class Importer(val output: java.io.PrintWriter) {
         TypeRef(Name.REPEATED, List(typeToScala(underlying)))
 
       case PolymorphicThisType =>
-        TypeRef.ThisType
+        TypeRef.This
 
       case _ =>
         // ???
