@@ -61,6 +61,7 @@ object Uri extends js.Object {
 @JSGlobal("modifiers")
 object Modifiers extends js.Object {
   val id: String = js.native
+  def name: String = js.native
 }
 
 }

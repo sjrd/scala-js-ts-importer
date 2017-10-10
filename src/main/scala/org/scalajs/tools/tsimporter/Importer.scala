@@ -109,6 +109,10 @@ class Importer(val output: java.io.PrintWriter) {
         val sym = owner.newField(name, Set(Modifier.Const))
         sym.tpe = typeToScala(tpe)
 
+      case LetDecl(IdentName(name), TypeOrAny(tpe)) =>
+        val sym = owner.newField(name, Set(Modifier.ReadOnly))
+        sym.tpe = typeToScala(tpe)
+
       case FunctionDecl(IdentName(name), signature) =>
         processDefDecl(owner, name, signature)
 

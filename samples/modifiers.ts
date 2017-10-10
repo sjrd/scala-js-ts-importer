@@ -2,6 +2,8 @@ declare module modifiers {
 
   const id: string;
 
+  let name: string;
+
   interface IEvent<T> {}
 
   export class Emitter<T> {
