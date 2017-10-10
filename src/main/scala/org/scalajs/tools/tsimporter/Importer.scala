@@ -39,6 +39,14 @@ class Importer(val output: java.io.PrintWriter) {
         val sym = owner.getModuleOrCreate(name)
         processMembersDecls(owner, sym, members)
 
+      case ConstDecl(IdentName(name), Some(tpe @ ObjectType(members))) =>
+        val sym = owner.getModuleOrCreate(name)
+        processMembersDecls(owner, sym, members)
+
+      case LetDecl(IdentName(name), Some(tpe @ ObjectType(members))) =>
+        val sym = owner.getModuleOrCreate(name)
+        processMembersDecls(owner, sym, members)
+
       case TypeDecl(TypeNameName(name), tpe @ ObjectType(members)) =>
         val sym = owner.getClassOrCreate(name)
         processMembersDecls(owner, sym, members)

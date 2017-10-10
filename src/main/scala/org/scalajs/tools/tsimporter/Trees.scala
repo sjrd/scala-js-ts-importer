@@ -82,6 +82,8 @@ object Trees {
 
   case class ConstDecl(name: Ident, tpe: Option[TypeTree]) extends DeclTree
 
+  case class LetDecl(name: Ident, tpe: Option[TypeTree]) extends DeclTree
+
   case class FunctionDecl(name: Ident, signature: FunSignature) extends DeclTree
 
   // Function signature

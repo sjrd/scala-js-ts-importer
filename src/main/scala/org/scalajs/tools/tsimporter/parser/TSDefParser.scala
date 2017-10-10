@@ -80,11 +80,14 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val moduleElementDecl1: Parser[DeclTree] = (
       ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
     | ambientEnumDecl | ambientClassDecl | ambientInterfaceDecl
-    | ambientConstDecl | typeAliasDecl
+    | ambientConstDecl | ambientLetDecl | typeAliasDecl
   )
 
   lazy val ambientVarDecl: Parser[DeclTree] =
     "var" ~> identifier ~ optTypeAnnotation <~ opt(";") ^^ VarDecl
+
+  lazy val ambientLetDecl: Parser[DeclTree] =
+    "let" ~> identifier ~ optTypeAnnotation <~ opt(";") ^^ LetDecl
 
   lazy val ambientConstDecl: Parser[DeclTree] =
     "const" ~> identifier ~ optTypeAnnotation <~ opt(";") ^^ ConstDecl
