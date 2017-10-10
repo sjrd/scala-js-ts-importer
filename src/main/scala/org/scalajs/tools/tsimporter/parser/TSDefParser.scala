@@ -47,7 +47,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       "{", "}", "(", ")", "[", "]", "<", ">",
       ".", ";", ",", "?", ":", "=", "|", "*",
       // TypeScript-specific
-      "...", "=>"
+      "...", "=>", "&"
   )
 
   def parseDefinitions(input: Reader[Char]) =
@@ -190,8 +190,16 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     ":" ~> typeDesc
 
   lazy val typeDesc: Parser[TypeTree] =
-    rep1sep(singleTypeDesc, "|") ^^ {
+    unionTypeDesc
+
+  lazy val unionTypeDesc: Parser[TypeTree] =
+    rep1sep(intersectionTypeDesc, "|") ^^ {
       _.reduceLeft(UnionType)
+    }
+
+  lazy val intersectionTypeDesc: Parser[TypeTree] =
+    rep1sep(singleTypeDesc, "&") ^^ {
+      _.reduceLeft(IntersectionType)
     }
 
   lazy val singleTypeDesc: Parser[TypeTree] =

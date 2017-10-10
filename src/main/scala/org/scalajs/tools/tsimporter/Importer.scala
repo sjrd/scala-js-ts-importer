@@ -295,6 +295,17 @@ class Importer(val output: java.io.PrintWriter) {
           TypeRef(QualifiedName.Function(params.size), targs)
         }
 
+      case IntersectionType(left, right) =>
+        def visit(tpe: TypeTree, visited: List[TypeRef]): List[TypeRef] = {
+          tpe match {
+            case IntersectionType(left, right) =>
+              visit(left, visit(right, visited))
+            case _ =>
+              typeToScala(tpe) :: visited
+          }
+        }
+        TypeRef.Intersection(visit(tpe, Nil).distinct)
+
       case UnionType(left, right) =>
         def visit(tpe: TypeTree, visited: List[TypeRef]): List[TypeRef] = {
           tpe match {

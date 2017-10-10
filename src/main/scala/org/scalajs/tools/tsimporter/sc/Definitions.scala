@@ -314,6 +314,18 @@ object TypeRef {
     }
   }
 
+  object Intersection {
+    def apply(types: List[TypeRef]): TypeRef =
+      TypeRef(QualifiedName.Root, types)
+
+    def unapply(typeRef: TypeRef): Option[List[TypeRef]] = typeRef match {
+      case TypeRef(QualifiedName.Root, types) =>
+        Some(types)
+
+      case _ => None
+    }
+  }
+
   object Singleton {
     def apply(underlying: QualifiedName): TypeRef =
       TypeRef(QualifiedName(Name.SINGLETON), List(TypeRef(underlying)))
