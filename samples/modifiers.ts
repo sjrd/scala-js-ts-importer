@@ -16,6 +16,11 @@ declare module modifiers {
       IDiffEditor: string;
   };
 
+  export let EditorType2: {
+      ICodeEditor: string;
+      IDiffEditor: string;
+  };
+
   export const CursorMoveByUnit: {
       Line: string;
       WrappedLine: string;

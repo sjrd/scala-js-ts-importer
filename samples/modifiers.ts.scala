@@ -27,6 +27,22 @@ object EditorType extends js.Object {
 }
 
 @js.native
+@JSGlobal("modifiers.EditorType2")
+object EditorType2 extends js.Object {
+  val ICodeEditor: String = js.native
+  val IDiffEditor: String = js.native
+}
+
+@js.native
+@JSGlobal("modifiers.CursorMoveByUnit")
+object CursorMoveByUnit extends js.Object {
+  val Line: String = js.native
+  val WrappedLine: String = js.native
+  val Character: String = js.native
+  val HalfLine: String = js.native
+}
+
+@js.native
 @JSGlobal("modifiers.Uri")
 class Uri extends js.Object {
   def scheme: String = js.native
@@ -45,7 +61,6 @@ object Uri extends js.Object {
 @JSGlobal("modifiers")
 object Modifiers extends js.Object {
   val id: String = js.native
-  val CursorMoveByUnit: js.Any = js.native
 }
 
 }
