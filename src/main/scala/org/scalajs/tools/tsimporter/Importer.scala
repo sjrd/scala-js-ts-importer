@@ -39,6 +39,14 @@ class Importer(val output: java.io.PrintWriter) {
         val sym = owner.getModuleOrCreate(name)
         processMembersDecls(owner, sym, members)
 
+      case ConstDecl(IdentName(name), Some(tpe @ ObjectType(members))) =>
+        val sym = owner.getModuleOrCreate(name)
+        processMembersDecls(owner, sym, members)
+
+      case LetDecl(IdentName(name), Some(tpe @ ObjectType(members))) =>
+        val sym = owner.getModuleOrCreate(name)
+        processMembersDecls(owner, sym, members)
+
       case TypeDecl(TypeNameName(name), tpe @ ObjectType(members)) =>
         val sym = owner.getClassOrCreate(name)
         processMembersDecls(owner, sym, members)
@@ -99,6 +107,10 @@ class Importer(val output: java.io.PrintWriter) {
 
       case ConstDecl(IdentName(name), TypeOrAny(tpe)) =>
         val sym = owner.newField(name, Set(Modifier.Const))
+        sym.tpe = typeToScala(tpe)
+
+      case LetDecl(IdentName(name), TypeOrAny(tpe)) =>
+        val sym = owner.newField(name, Set(Modifier.ReadOnly))
         sym.tpe = typeToScala(tpe)
 
       case FunctionDecl(IdentName(name), signature) =>

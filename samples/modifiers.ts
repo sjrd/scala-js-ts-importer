@@ -2,6 +2,8 @@ declare module modifiers {
 
   const id: string;
 
+  let name: string;
+
   interface IEvent<T> {}
 
   export class Emitter<T> {
@@ -12,6 +14,11 @@ declare module modifiers {
   }
 
   export var EditorType: {
+      ICodeEditor: string;
+      IDiffEditor: string;
+  };
+
+  export let EditorType2: {
       ICodeEditor: string;
       IDiffEditor: string;
   };
