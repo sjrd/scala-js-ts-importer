@@ -155,6 +155,8 @@ object Trees {
 
   case class RepeatedType(underlying: TypeTree) extends TypeTree
 
+  object PolymorphicThisType extends TypeTree
+
   // Type members
 
   case class CallMember(signature: FunSignature) extends MemberTree

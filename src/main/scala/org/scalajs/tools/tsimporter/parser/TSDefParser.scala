@@ -194,6 +194,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     | stringType
     | typeQuery
     | tupleType
+    | thisType
     | "(" ~> typeDesc <~ ")"
   )
 
@@ -220,6 +221,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val stringType: Parser[TypeTree] =
     stringLiteral ^^ ConstantType
+
+  lazy val thisType: Parser[TypeTree] =
+    "this" ^^^ PolymorphicThisType
 
   lazy val typeQuery: Parser[TypeTree] =
     "typeof" ~> rep1sep(ident, ".") ^^ { parts =>

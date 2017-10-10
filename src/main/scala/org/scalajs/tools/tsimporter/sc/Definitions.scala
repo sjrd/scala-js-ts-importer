@@ -27,6 +27,7 @@ object Name {
   val CONSTRUCTOR = Name("<init>")
   val REPEATED = Name("*")
   val SINGLETON = Name("<typeof>")
+  val THIS = Name("<this>")
 }
 
 case class QualifiedName(parts: Name*) {
@@ -299,6 +300,7 @@ object TypeRef {
   val Unit = TypeRef(scala dot Name("Unit"))
   val Null = TypeRef(scala dot Name("Null"))
   val Nothing = TypeRef(scala dot Name("Nothing"))
+  val This = Singleton(QualifiedName(Name.THIS))
 
   object Union {
     def apply(types: List[TypeRef]): TypeRef =
