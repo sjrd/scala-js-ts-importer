@@ -29,17 +29,17 @@ object EditorType extends js.Object {
 @js.native
 @JSGlobal("modifiers.EditorType2")
 object EditorType2 extends js.Object {
-  val ICodeEditor: String = js.native
-  val IDiffEditor: String = js.native
+  var ICodeEditor: String = js.native
+  var IDiffEditor: String = js.native
 }
 
 @js.native
 @JSGlobal("modifiers.CursorMoveByUnit")
 object CursorMoveByUnit extends js.Object {
-  val Line: String = js.native
-  val WrappedLine: String = js.native
-  val Character: String = js.native
-  val HalfLine: String = js.native
+  var Line: String = js.native
+  var WrappedLine: String = js.native
+  var Character: String = js.native
+  var HalfLine: String = js.native
 }
 
 @js.native
