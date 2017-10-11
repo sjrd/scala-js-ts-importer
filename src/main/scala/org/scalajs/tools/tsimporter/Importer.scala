@@ -116,6 +116,8 @@ class Importer(val output: java.io.PrintWriter) {
       case FunctionDecl(IdentName(name), signature) =>
         processDefDecl(owner, name, signature)
 
+      case ImportDecl => // Ignore imports
+
       case _ =>
         owner.members += new CommentSymbol("??? "+declaration)
     }

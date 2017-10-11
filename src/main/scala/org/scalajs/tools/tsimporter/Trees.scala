@@ -86,6 +86,8 @@ object Trees {
 
   case class FunctionDecl(name: Ident, signature: FunSignature) extends DeclTree
 
+  case object ImportDecl extends DeclTree
+
   // Function signature
 
   case class FunSignature(tparams: List[TypeParam], params: List[FunParam],
