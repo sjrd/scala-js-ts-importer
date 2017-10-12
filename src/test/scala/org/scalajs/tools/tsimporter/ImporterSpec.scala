@@ -20,7 +20,7 @@ class ImporterSpec extends FunSpec {
         val expected = new File(inputDirectory, input.getName + ".scala")
         val output = new File(outputDir, input.getName + ".scala")
 
-        Main.main(Array(input.getAbsolutePath, output.getAbsolutePath))
+        Main.main(Array(input.getAbsolutePath, output.getAbsolutePath, input.getName.takeWhile(_ != '.')))
 
         assert(output.exists())
         assert(contentOf(output) == contentOf(expected))
