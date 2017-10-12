@@ -3,7 +3,7 @@ import scala.scalajs.js
 import js.annotation._
 import js.|
 
-package importedjs {
+package modifiers {
 
 package modifiers {
 

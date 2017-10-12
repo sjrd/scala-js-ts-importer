@@ -3,7 +3,7 @@ import scala.scalajs.js
 import js.annotation._
 import js.|
 
-package importedjs {
+package jsglobal {
 
 @js.native
 @JSGlobal
@@ -45,7 +45,7 @@ object Nested extends js.Object {
 
 @js.native
 @JSGlobalScope
-object Importedjs extends js.Object {
+object Jsglobal extends js.Object {
   val globalConst: String = js.native
   def globalVar: String = js.native
   def globalFunc(): String = js.native
