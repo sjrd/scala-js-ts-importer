@@ -60,8 +60,8 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
             pln"";
             if (currentJSNamespace.isEmpty) {
               pln"@js.native"
-              pln"@JSGlobal"
-              pln"object $packageObjectName extends js.GlobalScope {"
+              pln"@JSGlobalScope"
+              pln"object $packageObjectName extends js.Object {"
             } else {
               val jsName = currentJSNamespace.init
               pln"@js.native"

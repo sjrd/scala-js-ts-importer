@@ -15,3 +15,7 @@ declare module nested {
         static isCirce(thing: any): boolean;
     }
 }
+
+declare const globalConst: String;
+declare let globalVar: String;
+declare function globalFunc(): String;

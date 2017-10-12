@@ -43,4 +43,12 @@ object Nested extends js.Object {
 
 }
 
+@js.native
+@JSGlobalScope
+object Importedjs extends js.Object {
+  val globalConst: String = js.native
+  def globalVar: String = js.native
+  def globalFunc(): String = js.native
+}
+
 }
