@@ -179,9 +179,11 @@ class ClassSymbol(nme: Name) extends ContainerSymbol(nme) {
   var companionModule: ModuleSymbol = _
   var isTrait: Boolean = true
   var isSealed: Boolean = false
+  var isAbstract: Boolean = false
 
   override def toString() = (
       (if (isSealed) "sealed " else "") +
+      (if (isAbstract) "abstract" else "") +
       (if (isTrait) s"trait $name" else s"class $name") +
       (if (tparams.isEmpty) "" else tparams.mkString("<", ", ", ">")))
 }

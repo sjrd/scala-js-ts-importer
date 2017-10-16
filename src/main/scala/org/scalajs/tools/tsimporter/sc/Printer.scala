@@ -81,6 +81,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
       case sym: ClassSymbol =>
         val sealedKw = if (sym.isSealed) "sealed " else ""
+        val abstractKw = if (sym.isAbstract) "abstract " else ""
         val kw = if (sym.isTrait) "trait" else "class"
         val constructorStr =
           if (sym.isTrait) ""
@@ -98,7 +99,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           else
             pln"""@JSGlobal("$currentJSNamespace${name.name}")"""
         }
-        p"$sealedKw$kw $name"
+        p"$sealedKw$abstractKw$kw $name"
         if (!sym.tparams.isEmpty)
           p"[${sym.tparams}]"
 

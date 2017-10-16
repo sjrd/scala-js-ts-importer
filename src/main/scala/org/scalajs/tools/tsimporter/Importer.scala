@@ -71,8 +71,9 @@ class Importer(val output: java.io.PrintWriter) {
         applySym.resultType = TypeRef.String
         applySym.isBracketAccess = true
 
-      case ClassDecl(TypeNameName(name), tparams, parent, implements, members) =>
+      case ClassDecl(TypeNameName(name), tparams, parent, implements, members, isAbstract) =>
         val sym = owner.getClassOrCreate(name)
+        sym.isAbstract = isAbstract
         sym.isTrait = false
         parent.foreach(sym.parents += typeToScala(_))
         for {

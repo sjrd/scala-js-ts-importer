@@ -133,7 +133,7 @@ object Trees {
 
   case class ClassDecl(name: TypeName, tparams: List[TypeParam],
       parent: Option[TypeRef], implements: List[TypeRef],
-      membmers: List[MemberTree]) extends DeclTree
+      members: List[MemberTree], isAbstract: Boolean) extends DeclTree
 
   case class InterfaceDecl(name: TypeName, tparams: List[TypeParam],
       inheritance: List[TypeRef], members: List[MemberTree]) extends DeclTree
