@@ -28,6 +28,7 @@ object Name {
   val REPEATED = Name("*")
   val SINGLETON = Name("<typeof>")
   val THIS = Name("<this>")
+  val INTERSECTION = Name("<with>")
 }
 
 case class QualifiedName(parts: Name*) {
@@ -56,6 +57,7 @@ object QualifiedName {
   def Function(arity: Int) = scala_js dot Name("Function"+arity)
   def Tuple(arity: Int) = scala_js dot Name("Tuple"+arity)
   val Union = scala_js dot Name("|")
+  val Intersection = QualifiedName(Name.INTERSECTION)
 }
 
 class Symbol(val name: Name) {
@@ -308,6 +310,18 @@ object TypeRef {
 
     def unapply(typeRef: TypeRef): Option[List[TypeRef]] = typeRef match {
       case TypeRef(QualifiedName.Union, types) =>
+        Some(types)
+
+      case _ => None
+    }
+  }
+
+  object Intersection {
+    def apply(types: List[TypeRef]): TypeRef =
+      TypeRef(QualifiedName.Intersection, types)
+
+    def unapply(typeRef: TypeRef): Option[List[TypeRef]] = typeRef match {
+      case TypeRef(QualifiedName.Intersection, types) =>
         Some(types)
 
       case _ => None
