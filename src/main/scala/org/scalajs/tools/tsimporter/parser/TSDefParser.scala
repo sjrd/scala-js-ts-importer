@@ -45,7 +45,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lexical.delimiters ++= List(
       "{", "}", "(", ")", "[", "]", "<", ">",
-      ".", ";", ",", "?", ":", "=", "|",
+      ".", ";", ",", "?", ":", "=", "|", "*",
       // TypeScript-specific
       "...", "=>"
   )
@@ -83,6 +83,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       ambientModuleDecl | ambientVarDecl | ambientFunctionDecl
     | ambientEnumDecl | ambientClassDecl | ambientInterfaceDecl
     | ambientConstDecl | ambientLetDecl | typeAliasDecl
+    | importDecl
   )
 
   lazy val ambientVarDecl: Parser[DeclTree] =
@@ -111,6 +112,18 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val typeAliasDecl: Parser[DeclTree] =
     "type" ~> typeName ~ tparams ~ ("=" ~> typeDesc) <~ opt(";") ^^ TypeAliasDecl
+
+  lazy val importDecl: Parser[DeclTree] =
+    "import" ~> opt(
+      (
+          identifier
+        |  "{" ~ importIdentifierSeq ~ "}"
+        | "*" ~ lexical.Identifier("as") ~ identifier
+      ) ~ lexical.Identifier("from")
+    ) ~ stringLiteral <~ ";" ^^^ ImportDecl
+
+  lazy val importIdentifierSeq =
+    rep1sep(identifier ~ opt(lexical.Identifier("as") ~ identifier), ",")
 
   lazy val tparams = (
       "<" ~> rep1sep(typeParam, ",") <~ ">"
