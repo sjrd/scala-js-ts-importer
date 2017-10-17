@@ -45,9 +45,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lexical.delimiters ++= List(
       "{", "}", "(", ")", "[", "]", "<", ">",
-      ".", ";", ",", "?", ":", "=", "|", "*",
+      ".", ";", ",", "?", ":", "=", "|", "&", "*",
       // TypeScript-specific
-      "...", "=>", "&"
+      "...", "=>"
   )
 
   def parseDefinitions(input: Reader[Char]) =
