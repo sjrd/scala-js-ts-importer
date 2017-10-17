@@ -198,7 +198,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         p"$types"
 
       case TypeRef.Intersection(types) =>
-        implicit val withPipe = ListElemSeparator.WithKeyword
+        implicit val withWith = ListElemSeparator.WithKeyword
         p"$types"
 
       case TypeRef.This =>
