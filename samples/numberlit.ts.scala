@@ -3,7 +3,7 @@ import scala.scalajs.js
 import js.annotation._
 import js.|
 
-package importedjs {
+package numberlit {
 
 package numberlit {
 
@@ -17,6 +17,7 @@ trait Machine extends js.Object {
 @JSGlobal("numberlit")
 object Numberlit extends js.Object {
   type HttpStatuscode = Int
+  def floating(prob: Double): Double | Int = js.native
 }
 
 }
