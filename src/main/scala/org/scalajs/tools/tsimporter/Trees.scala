@@ -36,6 +36,7 @@ object Trees {
     case object Static extends Modifier
     case object ReadOnly extends Modifier
     case object Const extends Modifier
+    case object Abstract extends Modifier
   }
 
   type Modifiers = Set[Modifier]

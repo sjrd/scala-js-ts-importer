@@ -143,7 +143,10 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           if (sym.modifiers(Modifier.Const)) "val"
           else if (sym.modifiers(Modifier.ReadOnly)) "def"
           else "var"
-        pln"  $access$decl $name: ${sym.tpe} = js.native"
+        p"  $access$decl $name: ${sym.tpe}"
+        if (!sym.modifiers(Modifier.Abstract))
+          p" = js.native"
+        pln""
 
       case sym: MethodSymbol =>
         val params = sym.params
@@ -162,7 +165,10 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           p"  ${modifiers}def $name"
           if (!sym.tparams.isEmpty)
             p"[${sym.tparams}]"
-          pln"($params): ${sym.resultType} = js.native"
+          p"($params): ${sym.resultType}"
+          if (!sym.modifiers(Modifier.Abstract))
+            p" = js.native"
+          pln""
         }
 
       case sym: ParamSymbol =>

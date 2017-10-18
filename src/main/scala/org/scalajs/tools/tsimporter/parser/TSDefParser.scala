@@ -314,6 +314,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     | "public" ^^^ Modifier.Public
     | "readonly" ^^^ Modifier.ReadOnly
     | "protected" ^^^ Modifier.Protected
+    | lexical.Identifier("abstract") ^^^ Modifier.Abstract
   )
 
   lazy val identifier =

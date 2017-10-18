@@ -8,8 +8,8 @@ package `abstract` {
 @js.native
 @JSGlobal
 abstract class AbstractClass extends js.Object {
-  var property: String = js.native
-  def method(): Unit = js.native
+  var abstractField: String
+  def abstractMethod(): Unit
 }
 
 }

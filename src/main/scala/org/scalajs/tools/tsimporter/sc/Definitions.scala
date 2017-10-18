@@ -142,8 +142,8 @@ class ContainerSymbol(nme: Name) extends Symbol(nme) {
     result
   }
 
-  def newMethod(name: Name): MethodSymbol = {
-    val result = new MethodSymbol(name)
+  def newMethod(name: Name, modifiers: Modifiers): MethodSymbol = {
+    val result = new MethodSymbol(name, modifiers)
     members += result
     result
   }
@@ -210,7 +210,7 @@ class FieldSymbol(nme: Name, val modifiers: Modifiers) extends Symbol(nme) with 
   override def toString() = s"${jsNameStr}${if (modifiers(Modifier.ReadOnly)) "val" else "var"} $name: $tpe"
 }
 
-class MethodSymbol(nme: Name) extends Symbol(nme) with JSNameable {
+class MethodSymbol(nme: Name, val modifiers: Modifiers) extends Symbol(nme) with JSNameable {
   val tparams = new ListBuffer[TypeParamSymbol]
   val params = new ListBuffer[ParamSymbol]
   var resultType: TypeRef = TypeRef.Dynamic
