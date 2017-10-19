@@ -174,4 +174,6 @@ object Trees {
 
   case class FunctionMember(name: PropertyName, optional: Boolean,
       signature: FunSignature, modifiers: Modifiers) extends MemberTree
+
+  case object PrivateMember extends MemberTree
 }

@@ -37,6 +37,9 @@ declare module modifiers {
       readonly scheme: string;
       readonly authority: string;
       readonly path: string;
+      private cache;
+      private updateCache();
+      private static resolve(): String;
   }
 
 }

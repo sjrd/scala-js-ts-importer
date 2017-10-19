@@ -265,7 +265,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     "{" ~> rep(typeMember <~ opt(";" | ",")) <~ "}"
 
   lazy val typeMember: Parser[MemberTree] =
-    callMember | constructorMember | indexMember | namedMember
+    callMember | constructorMember | indexMember | namedMember | privateMember
 
   lazy val callMember: Parser[MemberTree] =
     functionSignature ^^ CallMember
@@ -283,6 +283,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
         | typeAnnotation ^^ (PropertyMember(name, optional, _, mods))
       )
     }
+
+  lazy val privateMember =
+    "private" ~> opt("static") ~> propertyName ~ opt(functionSignature) ^^^ PrivateMember
 
   lazy val modifiers: Parser[Modifiers] =
     rep(modifier).map(_.toSet)

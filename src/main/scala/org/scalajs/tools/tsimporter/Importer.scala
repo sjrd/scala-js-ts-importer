@@ -188,6 +188,8 @@ class Importer(val output: java.io.PrintWriter) {
         setterSym.resultType = TypeRef.Unit
         setterSym.isBracketAccess = true
 
+      case PrivateMember => // ignore
+
       case _ =>
         owner.members += new CommentSymbol("??? "+member)
     }
