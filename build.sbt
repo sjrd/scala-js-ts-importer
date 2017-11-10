@@ -16,6 +16,7 @@ val `scala-js-ts-importer` = project.in(file("."))
   .settings(
     resolvers += "jitpack" at "https://jitpack.io",
     description := "TypeScript importer for Scala.js",
+    mainClass := Some("org.scalajs.tools.tsimporter.Main"),
     scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.3",
@@ -24,7 +25,7 @@ val `scala-js-ts-importer` = project.in(file("."))
       "com.github.scopt" %% "scopt" % "3.7.0",
       "org.scalatest" %%% "scalatest" % "3.0.4" % Test
     ),
-    scalaJSUseMainModuleInitializer := false
+    scalaJSUseMainModuleInitializer := true
   )
   .enablePlugins(ScalaJSPlugin)
 
