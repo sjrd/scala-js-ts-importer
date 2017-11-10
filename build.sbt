@@ -1,7 +1,9 @@
+import sbt.Keys.resolvers
+
 inThisBuild(Def.settings(
   organization := "org.scalajs.tools",
   version := "0.1-SNAPSHOT",
-  scalaVersion := "2.12.3",
+  scalaVersion := "2.12.4",
   scalacOptions ++= Seq(
     "-deprecation",
     "-unchecked",
@@ -12,14 +14,18 @@ inThisBuild(Def.settings(
 
 val `scala-js-ts-importer` = project.in(file("."))
   .settings(
+    resolvers += "jitpack" at "https://jitpack.io",
     description := "TypeScript importer for Scala.js",
     mainClass := Some("org.scalajs.tools.tsimporter.Main"),
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6",
+      "org.scala-js" %%% "scalajs-dom" % "0.9.3",
+      "blog.codeninja" % "scala-js-vue" % "2.4.2",
+      "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.0.6",
       "com.github.scopt" %% "scopt" % "3.7.0",
-      "org.scalatest" %% "scalatest" % "3.0.4" % Test
-    )
+      "org.scalatest" %%% "scalatest" % "3.0.4" % Test
+    ),
+    scalaJSUseMainModuleInitializer := true
   )
-
-val samples = project
   .enablePlugins(ScalaJSPlugin)
+
