@@ -1,73 +1,90 @@
-/* TypeScript importer for Scala.js
- * Copyright 2013-2014 LAMP/EPFL
- * @author  Sébastien Doeraene
- */
-
 package org.scalajs.tools.tsimporter
 
-import java.io.{ Console => _, Reader => _, _ }
+import java.io.{PrintWriter, StringWriter}
 
-import scala.collection.immutable.PagedSeq
+import blog.codeninja.scalajs.vue._
+import org.scalajs.tools.tsimporter.Trees._
+import org.scalajs.tools.tsimporter.parser.TSDefParser
 
-import Trees._
-
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.scalajs.js
 import scala.util.parsing.input._
-import parser.TSDefParser
+import scala.util.{Failure, Success}
 
-/** Entry point for the TypeScript importer of Scala.js */
+
+class Data( var sourceTypeScript: String,
+             var isLoading: Boolean,
+            var output: ScalaOutput) extends js.Object {
+}
+
+class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
+
 object Main {
-  def main(args: Array[String]) {
-    if (args.length < 2) {
-      Console.err.println("""
-        |Usage: scalajs-ts-importer <input.d.ts> <output.scala> [<package>]
-        |  <input.d.ts>     TypeScript type definition file to read
-        |  <output.scala>   Output Scala.js file
-        |  <package>        Package name for the output (defaults to "importedjs")
-      """.stripMargin.trim)
-      System.exit(1)
-    }
+  var vue: Vue = _
 
-    val inputFileName = args(0)
-    val outputFileName = args(1)
-    val outputPackage = if (args.length > 2) args(2) else "importedjs"
+  def main(args: Array[String]): Unit = {
+    vue = new Vue(
+      js.Dynamic.literal(
+        el = "#app",
 
-    val definitions = parseDefinitions(readerForFile(inputFileName))
+        data = new Data(
+          sourceTypeScript = "",
+          isLoading = false,
+          output = new ScalaOutput(
+            text = "",
+            hasError = false
+          )
+        ),
 
-    val output = new PrintWriter(new BufferedWriter(
-        new FileWriter(outputFileName)))
-    try {
-      process(definitions, output, outputPackage)
-    } finally {
-      output.close()
+        methods = js.Dynamic.literal(
+          translate = translate: js.ThisFunction0[Data, _]
+        )
+      )
+    )
+  }
+
+  def translate(data: Data): Unit = {
+    data.isLoading = true
+
+    import scala.scalajs.js.timers._
+
+    setTimeout(100) { // note the absence of () =>
+      val outputPackage = "foo"
+      for {
+        reader <- Future.successful(new CharSequenceReader(data.sourceTypeScript))
+        output <- parseDefinitions(reader).transformWith {
+          case Failure(exception) =>
+            Future.successful(new ScalaOutput(exception.toString, hasError = true))
+          case Success(tree) =>
+            val writer = new StringWriter()
+            process(tree, new PrintWriter(writer), outputPackage)
+            Future.successful(new ScalaOutput(writer.getBuffer.toString, hasError = false))
+        }
+      } {
+        data.isLoading = false
+        data.output = output
+      }
     }
   }
 
+
   private def process(definitions: List[DeclTree], output: PrintWriter,
-      outputPackage: String) {
+                      outputPackage: String): Unit = {
     new Importer(output)(definitions, outputPackage)
   }
 
-  private def parseDefinitions(reader: Reader[Char]): List[DeclTree] = {
+  private def parseDefinitions(reader: Reader[Char]): Future[List[DeclTree]] = {
     val parser = new TSDefParser
     parser.parseDefinitions(reader) match {
       case parser.Success(rawCode, _) =>
-        rawCode
+        Future.successful(rawCode)
 
       case parser.NoSuccess(msg, next) =>
-        Console.err.println(
-            "Parse error at %s\n".format(next.pos.toString) +
-            msg + "\n" +
-            next.pos.longString)
-        sys.exit(2)
+        Future.failed(new Exception(
+          s"""Parse error at ${next.pos.toString}
+             |$msg
+             |${next.pos.longString}""".stripMargin))
     }
-  }
-
-  /** Builds a [[scala.util.parsing.input.PagedSeqReader]] for a file
-   *
-   *  @param fileName name of the file to be read
-   */
-  private def readerForFile(fileName: String) = {
-    new PagedSeqReader(PagedSeq.fromReader(
-        new BufferedReader(new FileReader(fileName))))
   }
 }
