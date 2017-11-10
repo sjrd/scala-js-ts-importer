@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        main {
+            margin-left: 210px;
+        }
+
+        #toc {
+            z-index: 100;
+        }
+
+        textarea.code {
+            font-family: monospace;
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="ui left fixed vertical red inverted menu" id="toc">
+        <div class="item">
+            <h1 class="ui inverted large header">TypeScript Type Definition Importer for Scala.js</h1>
+
+        </div>
+        <a class="red item">Github <i class="github icon"></i></a>
+        <div class="teal item">
+            <div class="header">
+                Examples
+            </div>
+            <div class="vertical menu">
+                <a class="item">Underscore</a>
+                <a class="item">React</a>
+                <a class="item">Vue</a>
+                <a class="item">Elastic-builder</a>
+            </div>
+        </div>
+    </div>
+
+
+    <main>
+        <div class="ui fluid container">
+            <div class="ui basic segment">
+                <div class="ui dimmer" :class="{'active': isLoading}">
+                    <div class="ui text loader">Importing</div>
+                </div>
+
+                <div class="ui form">
+                    <div class="two fields">
+                        <div class="field">
+                            <label>TypeScript</label>
+                            <textarea class="code"
+                                      placeholder="// paste *.d.ts (TypeScript's type definitions)"
+                                      rows="30"
+                                      v-model="sourceTypeScript"
+                                      v-on:keyup.enter="translate"
+                                      v-on:change="translate"
+                            ></textarea>
+                        </div>
+                        <div class="field " :class="{'error': output.hasError, 'success': !output.hasError}">
+                            <label>Scala.js</label>
+                            <textarea class="code"
+                                      rows="30" readonly
+                                      v-model="output.text"
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+</div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.js"></script>
+<script src="target/scala-2.12/scala-js-ts-importer-fastopt.js"></script>
+<script src="target/scala-2.12/scala-js-ts-importer-jsdeps.js"></script>
+</html>
