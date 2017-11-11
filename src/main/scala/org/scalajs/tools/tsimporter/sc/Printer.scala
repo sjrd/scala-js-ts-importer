@@ -30,10 +30,10 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
         if (!parentPackage.isEmpty) {
           pln"package ${parentPackage.mkString(".")}"
+          pln"";
         }
 
         if (isRootPackage) {
-          pln"";
           pln"import scala.scalajs.js"
           pln"import js.annotation._"
           pln"import js.|"
