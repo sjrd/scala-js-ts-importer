@@ -49,7 +49,11 @@ object Main {
         hasError = false
       ),
       samples = js.Array(
-        new Sample("elasticsearch", "elasticsearch")
+        new Sample("elasticsearch", "elasticsearch"),
+        new Sample("rx-core", "RxJS-Core"),
+        new Sample("google-app-script.base", "Google Apps Script (Base)"),
+        new Sample("zip-js", "zip.js"),
+        new Sample("jpm", "Firefox Addon SDK (jpm)")
       )
     )
 
