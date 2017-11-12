@@ -52,6 +52,17 @@
     <main>
         <div class="ui fluid container">
             <div class="ui basic segment">
+                <h5 class="ui header">Configuration</h5>
+
+                <div class="ui labeled fluid input">
+                    <div class="ui label">
+                        package
+                    </div>
+                    <input placeholder="foo.bar" type="text" v-model="input.outputPackage">
+                </div>
+            </div>
+
+            <div class="ui basic segment">
                 <div class="ui dimmer" :class="{'active': isLoading}">
                     <div class="ui text loader">Importing</div>
                 </div>
@@ -63,7 +74,7 @@
                             <textarea class="code"
                                       placeholder="// paste *.d.ts (TypeScript's type definitions)"
                                       rows="30"
-                                      v-model="sourceTypeScript"
+                                      v-model="input.source"
                                       v-on:keyup.enter="translate"
                                       v-on:change="translate"
                             ></textarea>

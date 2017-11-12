@@ -28,7 +28,7 @@ object WorkerMain {
   }
 
   def onMessage(msg: dom.MessageEvent) = {
-    val s = msg.data.asInstanceOf[String]
+    val s = msg.data.asInstanceOf[Input]
     WorkerGlobal.postMessage(s"[Worker] Received message")
 
     val so = translate(s)
@@ -36,13 +36,13 @@ object WorkerMain {
     WorkerGlobal.postMessage(s"[Worker] Sent result")
   }
 
-  private def translate(sourceTypeScript: String): ScalaOutput = {
-    val reader = new CharSequenceReader(sourceTypeScript)
-    parseDefinitions(reader)
+  private def translate(input: Input): ScalaOutput = {
+    val reader = new CharSequenceReader(input.source)
+    val outputPackage = input.outputPackage.filter(_.nonEmpty).getOrElse("foo")
+    parseDefinitions(reader, outputPackage)
   }
 
-  private def parseDefinitions(reader: Reader[Char]): ScalaOutput = {
-    val outputPackage = "foo"
+  private def parseDefinitions(reader: Reader[Char], outputPackage: String): ScalaOutput = {
     val parser = new TSDefParser
     parser.parseDefinitions(reader) match {
       case parser.Success(tree, _) =>
