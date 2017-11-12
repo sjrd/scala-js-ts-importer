@@ -10,11 +10,12 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
-class Data(var sourceTypeScript: String,
+class Data(var input: Input,
            var isLoading: Boolean,
            var output: ScalaOutput) extends js.Object {
 }
 
+class Input(var source: String, var outputPackage: js.UndefOr[String]) extends js.Object
 class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
 
 @JSExportTopLevel("Main")
@@ -35,7 +36,10 @@ object Main {
     val worker = new Worker("worker.js")
 
     val data = new Data(
-      sourceTypeScript = "",
+      input = new Input(
+        source = "",
+        outputPackage = ""
+      ),
       isLoading = false,
       output = new ScalaOutput(
         text = "",
@@ -62,7 +66,7 @@ object Main {
         translate = js.ThisFunction.fromFunction1 { data: Data =>
           console.info("[Main] send to worker")
           data.isLoading = true
-          worker.postMessage(data.sourceTypeScript)
+          worker.postMessage(data.input)
         }
       )
     ))
