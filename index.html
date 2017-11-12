@@ -49,10 +49,7 @@
                 Examples
             </div>
             <div class="vertical menu">
-                <a class="item">Underscore</a>
-                <a class="item">React</a>
-                <a class="item">Vue</a>
-                <a class="item">Elastic-builder</a>
+                <a class="item" v-for="sample in samples" v-on:click="loadSample(sample)">{{sample.label}}</a>
             </div>
         </div>
     </div>
