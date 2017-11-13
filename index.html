@@ -50,7 +50,7 @@
 <div id="app" class="full-height">
     <div class="ui left fixed vertical red inverted menu" id="toc">
         <div class="item">
-            <h1 class="ui inverted large header">TypeScript Type Definition Importer for Scala.js</h1>
+            <h1 class="ui inverted large header">Type Definition Importer for Scala.js</h1>
 
         </div>
         <a class="red item">Github <i class="github icon"></i></a>
@@ -85,9 +85,15 @@
                 <div class="ui form full-height">
                     <div class="two fields full-height">
                         <div class="field full-height">
-                            <label>TypeScript</label>
+                            <h1 class="ui header">
+                                <img class="ui big image" src="src/main/resources/icon-typescript.png" >
+                                <div class="content">
+                                    TypeScript
+                                    <div class="sub header">Put some type description files (*.d.ts).</div>
+                                </div>
+                            </h1>
                             <textarea class="code "
-                                      placeholder="// paste *.d.ts (TypeScript's type definitions)"
+                                      placeholder="export const FOO: number;"
                                       rows="30"
                                       v-model="input.source"
                                       v-on:keyup.enter="translate"
@@ -95,9 +101,16 @@
                             ></textarea>
                         </div>
                         <div class="field full-height" :class="{'error': output.hasError, 'success': !output.hasError}">
-                            <label>Scala.js</label>
+                            <h1 class="ui header">
+                                <img class="ui big image" src="src/main/resources/icon-scalajs.png"  />
+                                <div class="content">
+                                    Scala.js
+                                    <div class="sub header">Get the results.</div>
+                                </div>
+                            </h1>
                             <textarea class="code"
                                       rows="30" readonly
+                                      placeholder="..."
                                       v-model="output.text"
                             ></textarea>
                         </div>
