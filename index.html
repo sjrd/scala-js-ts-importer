@@ -35,6 +35,9 @@
             background: -ms-linear-gradient(top, rgba(41,78,128,1) 0%, rgba(224,61,59,1) 100%);
             background: linear-gradient(to bottom, rgba(41,78,128,1) 0%, rgba(224,61,59,1) 100%);
         }
+        #toc .ordered.list .item{
+            list-style-type: decimal;
+        }
         textarea.code {
             height: calc(100% - 140px);
             font-family: monospace;
@@ -50,11 +53,11 @@
 <div id="app" class="full-height">
     <div class="ui left fixed vertical red inverted menu" id="toc">
         <div class="item">
-            <h1 class="ui inverted large header">Type Definition Importer for Scala.js</h1>
-
+            <h1 class="ui inverted large header">
+                Type Definition Importer for Scala.js
+            </h1>
         </div>
-        <a class="red item">Github <i class="github icon"></i></a>
-        <div class="teal item">
+        <div class="item">
             <div class="header">
                 Examples
             </div>
@@ -62,6 +65,15 @@
                 <a class="item" v-for="sample in samples" v-on:click="loadSample(sample)">{{sample.label}}</a>
             </div>
         </div>
+        <div class="item">
+            <div class="header">Notes</div>
+            <div class="vertical menu">
+                <div class="item">Manual editing is often needed, since the type system offered by TypeScript and Scala differ in subtle ways. </div>
+            </div>
+        </div>
+        <a class="item" href="#">Github <i class="github alternate icon"></i></a>
+        <a class="item" href="https://twitter.com/smogami">Web App by @smogami<i class="twitter icon"></i></a>
+        <a class="item" href="https://scala-lang.org/license/">Scala License <i class="external icon"></i></a>
     </div>
 
     <main class="full-height">
