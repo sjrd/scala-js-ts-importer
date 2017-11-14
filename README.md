@@ -1,18 +1,9 @@
-# Importer from TypeScript type definitions to Scala.js
+# Web UI for Importer from TypeScript type definitions to Scala.js
 
-This tool reads type definitions files written for
-[TypeScript](http://www.typescriptlang.org/) (.d.ts files) and rewrites them to
-.scala files usable with
-[Scala.js](http://www.scala-js.org/).
+This branch is to create a simple Web UI for https://github.com/sjrd/scala-js-ts-importer so that users give it a try to
+importer.
 
-The process is not 100 % accurate, so manual editing is often needed
-afterwards. This can be improved, but not to perfection, because the features
-offered by the type systems of TypeScript and Scala.js differ in some subtle
-ways.
-
-## Usage
-
-    $ sbt 'run somelib.d.ts SomeLib.scala'
+The Web UI is hosted on http://exoego.net/scala-js-ts-importer/
 
 ## License
 
