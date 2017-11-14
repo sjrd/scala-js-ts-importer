@@ -1,0 +1,39 @@
+.full-height {
+    height: 100%;
+}
+main {
+    margin-left: 210px;
+}
+#configuration {
+    position: fixed;
+    top: 0;
+    height: 100px;
+    width:calc(100% - 210px)
+}
+#editor{
+    position: fixed;
+    top:100px;
+    width:calc(100% - 210px);
+}
+#toc {
+    z-index: 100;
+
+    /* Gradating background from TypeScript-blue to Scala-red */
+    background: rgba(41,78,128,1);
+    background: -moz-linear-gradient(top, rgba(41,78,128,1) 0%, rgba(224,61,59,1) 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(41,78,128,1)), color-stop(100%, rgba(224,61,59,1)));
+    background: -webkit-linear-gradient(top, rgba(41,78,128,1) 0%, rgba(224,61,59,1) 100%);
+    background: -o-linear-gradient(top, rgba(41,78,128,1) 0%, rgba(224,61,59,1) 100%);
+    background: -ms-linear-gradient(top, rgba(41,78,128,1) 0%, rgba(224,61,59,1) 100%);
+    background: linear-gradient(to bottom, rgba(41,78,128,1) 0%, rgba(224,61,59,1) 100%);
+}
+#toc .ordered.list .item{
+    list-style-type: decimal;
+}
+textarea.code {
+    height: calc(100% - 140px);
+    font-family: monospace;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+}
