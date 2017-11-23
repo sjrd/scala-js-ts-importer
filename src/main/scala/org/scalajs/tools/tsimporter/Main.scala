@@ -54,6 +54,7 @@ object Main {
         hasError = false
       ),
       samples = js.Array(
+        new Sample("electron", "electron"),
         new Sample("elasticsearch", "elasticsearch"),
         new Sample("rx-core", "RxJS-Core"),
         new Sample("google-app-script.base", "Google Apps Script (Base)"),
