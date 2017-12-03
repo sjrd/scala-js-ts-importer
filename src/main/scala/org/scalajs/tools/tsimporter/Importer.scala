@@ -35,6 +35,9 @@ class Importer(val output: java.io.PrintWriter) {
         for (innerDecl <- innerDecls)
           processDecl(sym, innerDecl)
 
+      case TopLevelExportDecl(IdentName(name)) =>
+        // print nothing, since the value specified by the identifier is printed elsewhere.
+
       case VarDecl(IdentName(name), Some(tpe @ ObjectType(members))) =>
         val sym = owner.getModuleOrCreate(name)
         processMembersDecls(owner, sym, members)
