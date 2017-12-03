@@ -31,14 +31,18 @@ object Main {
     val outputFileName = args(1)
     val outputPackage = if (args.length > 2) args(2) else "importedjs"
 
-    val definitions = parseDefinitions(readerForFile(inputFileName))
 
-    val output = new PrintWriter(new BufferedWriter(
-        new FileWriter(outputFileName)))
-    try {
-      process(definitions, output, outputPackage)
-    } finally {
-      output.close()
+    parseDefinitions(readerForFile(inputFileName)) match {
+      case Some(definitions) =>
+        val output = new PrintWriter(new BufferedWriter(
+            new FileWriter(outputFileName)))
+        try {
+          process(definitions, output, outputPackage)
+        } finally {
+          output.close()
+        }
+      case None =>
+        sys.exit(2)
     }
   }
 
@@ -47,18 +51,18 @@ object Main {
     new Importer(output)(definitions, outputPackage)
   }
 
-  private def parseDefinitions(reader: Reader[Char]): List[DeclTree] = {
+  private def parseDefinitions(reader: Reader[Char]): Option[List[DeclTree]] = {
     val parser = new TSDefParser
     parser.parseDefinitions(reader) match {
       case parser.Success(rawCode, _) =>
-        rawCode
+        Some(rawCode)
 
       case parser.NoSuccess(msg, next) =>
         Console.err.println(
             "Parse error at %s\n".format(next.pos.toString) +
             msg + "\n" +
             next.pos.longString)
-        sys.exit(2)
+        None
     }
   }
 
