@@ -40,7 +40,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       "public", "static", "yield",
 
       // Additional keywords of TypeScript
-      "declare", "module", "type", "namespace"
+      "declare", "module", "type", "namespace", "keyof"
   )
 
   lexical.delimiters ++= List(
@@ -203,10 +203,11 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     }
 
   lazy val singleTypeDesc: Parser[TypeTree] =
-    baseTypeDesc ~ rep("[" ~ "]") ^^ {
+    baseTypeDesc ~ rep("[" ~> opt(typeDesc) <~ "]") ^^ {
       case base ~ arrayDims =>
         (base /: arrayDims) {
-          (elem, _) => ArrayType(elem)
+          case (elem, None) => ArrayType(elem)
+          case (elem, Some(index)) => IndexedAccessType(elem, index)
         }
     }
 
@@ -218,6 +219,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     | typeQuery
     | tupleType
     | thisType
+    | indexTypeQuery
     | "(" ~> typeDesc <~ ")"
   )
 
@@ -247,6 +249,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val thisType: Parser[TypeTree] =
     "this" ^^^ PolymorphicThisType
+
+  lazy val indexTypeQuery: Parser[TypeTree] =
+    "keyof" ~> typeDesc ^^ IndexedQueryType
 
   lazy val typeQuery: Parser[TypeTree] =
     "typeof" ~> rep1sep(ident, ".") ^^ { parts =>

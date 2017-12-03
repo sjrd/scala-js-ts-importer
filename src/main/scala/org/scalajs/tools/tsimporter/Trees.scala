@@ -159,6 +159,9 @@ object Trees {
 
   case class RepeatedType(underlying: TypeTree) extends TypeTree
 
+  case class IndexedQueryType(underlying: TypeTree) extends TypeTree
+  case class IndexedAccessType(objectType: TypeTree, name: TypeTree) extends TypeTree
+
   object PolymorphicThisType extends TypeTree
 
   // Type members
