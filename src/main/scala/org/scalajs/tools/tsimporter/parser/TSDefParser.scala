@@ -325,9 +325,13 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     stringLit ^^ StringLiteral
 
   lazy val numberLiteral: Parser[NumberLiteral] =
-    numericLit ^^ {s =>
+    numericLit ^^ { s =>
       val d = s.toDouble
-      NumberLiteral(d, !s.contains(".") && d.isValidInt)
+      if (!s.contains(".") && d.isValidInt) {
+        IntLiteral(d.toInt)
+      } else {
+        DoubleLiteral(d)
+      }
     }
 
   private val isCoreTypeName =

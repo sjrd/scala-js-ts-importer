@@ -270,12 +270,11 @@ class Importer(val output: java.io.PrintWriter) {
       case ConstantType(StringLiteral(_)) =>
         TypeRef.String
 
-      case ConstantType(NumberLiteral(d, isValidInt)) =>
-        if (isValidInt) {
-          TypeRef.Int
-        } else {
-          TypeRef.Double
-        }
+      case ConstantType(IntLiteral(i)) =>
+        TypeRef.Int
+
+      case ConstantType(DoubleLiteral(d)) =>
+        TypeRef.Double
 
       case ObjectType(List(IndexMember(_, TypeRefTree(CoreType("string"), _), valueType))) =>
         val valueTpe = typeToScala(valueType)

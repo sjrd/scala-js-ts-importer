@@ -109,7 +109,11 @@ object Trees {
 
   case class BooleanLiteral(value: Boolean) extends Literal
 
-  case class NumberLiteral(value: Double, isValidInt: Boolean) extends Literal
+  sealed trait NumberLiteral extends Literal
+
+  case class IntLiteral(value: Int) extends NumberLiteral
+
+  case class DoubleLiteral(value: Double) extends NumberLiteral
 
   case class StringLiteral(value: String) extends Literal with PropertyName {
     override def name = value
