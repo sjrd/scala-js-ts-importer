@@ -42,7 +42,7 @@ object Main {
           output.close()
         }
       case None =>
-        sys.exit(2)
+        System.exit(2)
     }
   }
 
