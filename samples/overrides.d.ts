@@ -10,7 +10,7 @@ declare module overrides {
     toString(): string;
   }
 
-  export class B extends BLike {
+  export class B implements BLike {
     equals(other: any): boolean;
     clone(): BLike;
     toString(): string;

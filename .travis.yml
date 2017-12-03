@@ -5,7 +5,9 @@ scala: 2.12.3
 
 jdk: oraclejdk8
 
-script: sbt ++$TRAVIS_SCALA_VERSION samples/compile test
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION samples/compile test
+  - $(npm bin)/tsc samples/*.ts
 
 before_cache:
   # See http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
@@ -13,7 +15,14 @@ before_cache:
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
 
+install:
+  - . $HOME/.nvm/nvm.sh
+  - nvm install stable
+  - nvm use stable
+  - npm install typescript
+
 cache:
   directories:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot
+    - node_modules
