@@ -18,8 +18,8 @@ before_cache:
 install:
   - . $HOME/.nvm/nvm.sh
   - nvm install stable
-  - nvm use stable
-  - npm install typescript
+  - nvm use 8
+  - npm install typescript@2.6.2
 
 cache:
   directories:
