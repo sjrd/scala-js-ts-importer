@@ -270,8 +270,8 @@ class Importer(val output: java.io.PrintWriter) {
       case ConstantType(StringLiteral(_)) =>
         TypeRef.String
 
-      case ConstantType(NumberLiteral(d, hasFloating)) =>
-        if (!hasFloating && d.isValidInt) {
+      case ConstantType(NumberLiteral(d, isValidInt)) =>
+        if (isValidInt) {
           TypeRef.Int
         } else {
           TypeRef.Double
