@@ -17,6 +17,7 @@ object ObjectType extends js.Object {
 object NumericKeyObjectType extends js.Object {
   var `0`: Double = js.native
   var `1`: Double = js.native
+  var `2.1`: Double = js.native
 }
 
 }
