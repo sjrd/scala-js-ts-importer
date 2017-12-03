@@ -323,7 +323,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   })
 
   lazy val propertyName: Parser[PropertyName] =
-    identifier | stringLiteral
+    identifier | stringLiteral | numberLiteral
 
   lazy val stringLiteral: Parser[StringLiteral] =
     stringLit ^^ StringLiteral
