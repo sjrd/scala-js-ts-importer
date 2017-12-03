@@ -31,18 +31,24 @@ object Main {
     val outputFileName = args(1)
     val outputPackage = if (args.length > 2) args(2) else "importedjs"
 
+    if (!importTsFile(inputFileName, outputFileName, outputPackage)) {
+      System.exit(2)
+    }
+}
 
+  def importTsFile(inputFileName: String, outputFileName: String, outputPackage: String): Boolean = {
     parseDefinitions(readerForFile(inputFileName)) match {
       case Some(definitions) =>
         val output = new PrintWriter(new BufferedWriter(
             new FileWriter(outputFileName)))
         try {
           process(definitions, output, outputPackage)
+          true
         } finally {
           output.close()
         }
       case None =>
-        System.exit(2)
+        false
     }
   }
 
