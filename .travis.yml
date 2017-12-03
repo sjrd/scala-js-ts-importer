@@ -7,7 +7,7 @@ jdk: oraclejdk8
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION samples/compile test
-  - $(npm bin)/tsc samples/*.ts
+  - $(npm bin)/tsc samples/*.d.ts
 
 before_cache:
   # See http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
