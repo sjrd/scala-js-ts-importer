@@ -258,6 +258,7 @@ class Importer(val output: java.io.PrintWriter) {
         val baseTypeRef = base match {
           case TypeName("Array") => QualifiedName.Array
           case TypeName("Function") => QualifiedName.FunctionBase
+          case TypeName("object") => QualifiedName.Object
           case TypeNameName(name) => QualifiedName(name)
           case QualifiedTypeName(qualifier, TypeNameName(name)) =>
             val qual1 = qualifier map (x => Name(x.name))

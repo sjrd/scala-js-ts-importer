@@ -54,6 +54,7 @@ object QualifiedName {
   val Array = scala_js dot Name("Array")
   val Dictionary = scala_js dot Name("Dictionary")
   val FunctionBase = scala_js dot Name("Function")
+  val Object = scala_js dot Name("Object")
   def Function(arity: Int) = scala_js dot Name("Function"+arity)
   def Tuple(arity: Int) = scala_js dot Name("Tuple"+arity)
   val Union = scala_js dot Name("|")
