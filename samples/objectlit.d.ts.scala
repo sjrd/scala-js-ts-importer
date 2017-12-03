@@ -12,4 +12,11 @@ object ObjectType extends js.Object {
   var age: Double = js.native
 }
 
+@js.native
+@JSGlobal
+object NumericKeyObjectType extends js.Object {
+  var `0`: Double = js.native
+  var `1`: Double = js.native
+}
+
 }
