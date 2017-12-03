@@ -270,6 +270,12 @@ class Importer(val output: java.io.PrintWriter) {
       case ConstantType(StringLiteral(_)) =>
         TypeRef.String
 
+      case ConstantType(IntLiteral(i)) =>
+        TypeRef.Int
+
+      case ConstantType(DoubleLiteral(d)) =>
+        TypeRef.Double
+
       case ObjectType(List(IndexMember(_, TypeRefTree(CoreType("string"), _), valueType))) =>
         val valueTpe = typeToScala(valueType)
         TypeRef(QualifiedName.Dictionary, List(valueTpe))

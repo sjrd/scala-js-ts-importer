@@ -296,6 +296,7 @@ object TypeRef {
   val Any = TypeRef(scala_js dot Name("Any"))
   val Dynamic = TypeRef(scala_js dot Name("Dynamic"))
   val Double = TypeRef(scala dot Name("Double"))
+  val Int = TypeRef(scala dot Name("Int"))
   val Boolean = TypeRef(scala dot Name("Boolean"))
   val String = TypeRef(java_lang dot Name("String"))
   val Object = TypeRef(scala_js dot Name("Object"))
