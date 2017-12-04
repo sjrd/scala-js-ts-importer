@@ -206,7 +206,7 @@ class Importer(val output: java.io.PrintWriter) {
         case ObjectType(members) =>
           val module = enclosing.getModuleOrCreate(owner.name)
           module.isGlobal = false
-          val classSym = module.getClassOrCreate(name)
+          val classSym = module.getClassOrCreate(name.capitalize)
           processMembersDecls(module, classSym, members)
           val sym = owner.newField(name, modifiers)
           sym.tpe = TypeRef(QualifiedName(module.name, classSym.name))

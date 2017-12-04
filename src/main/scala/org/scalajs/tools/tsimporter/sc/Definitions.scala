@@ -14,6 +14,7 @@ import org.scalajs.tools.tsimporter.Trees.{ Modifier, Modifiers }
 
 case class Name(name: String) {
   override def toString() = Utils.scalaEscape(name)
+  def capitalize = Name(name.capitalize)
 }
 
 object Name {
