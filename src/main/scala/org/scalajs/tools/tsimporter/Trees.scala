@@ -111,11 +111,15 @@ object Trees {
 
   case class BooleanLiteral(value: Boolean) extends Literal
 
-  sealed trait NumberLiteral extends Literal
+  sealed trait NumberLiteral extends Literal with PropertyName
 
-  case class IntLiteral(value: Int) extends NumberLiteral
+  case class IntLiteral(value: Int) extends NumberLiteral {
+    override def name = value.toString
+  }
 
-  case class DoubleLiteral(value: Double) extends NumberLiteral
+  case class DoubleLiteral(value: Double) extends NumberLiteral {
+    override def name = value.toString
+  }
 
   case class StringLiteral(value: String) extends Literal with PropertyName {
     override def name = value
