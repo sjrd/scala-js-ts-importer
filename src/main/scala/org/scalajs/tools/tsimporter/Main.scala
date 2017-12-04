@@ -31,14 +31,25 @@ object Main {
     val outputFileName = args(1)
     val outputPackage = if (args.length > 2) args(2) else "importedjs"
 
-    val definitions = parseDefinitions(readerForFile(inputFileName))
+    importTsFile(inputFileName, outputFileName, outputPackage) match {
+      case Right(()) =>
+        ()
+      case Left(message) =>
+        Console.err.println(message)
+        System.exit(2)
+    }
+}
 
-    val output = new PrintWriter(new BufferedWriter(
-        new FileWriter(outputFileName)))
-    try {
-      process(definitions, output, outputPackage)
-    } finally {
-      output.close()
+  def importTsFile(inputFileName: String, outputFileName: String, outputPackage: String): Either[String, Unit] = {
+    parseDefinitions(readerForFile(inputFileName)).map { definitions =>
+      val output = new PrintWriter(new BufferedWriter(
+          new FileWriter(outputFileName)))
+      try {
+        process(definitions, output, outputPackage)
+        Right(())
+      } finally {
+        output.close()
+      }
     }
   }
 
@@ -47,18 +58,17 @@ object Main {
     new Importer(output)(definitions, outputPackage)
   }
 
-  private def parseDefinitions(reader: Reader[Char]): List[DeclTree] = {
+  private def parseDefinitions(reader: Reader[Char]): Either[String, List[DeclTree]] = {
     val parser = new TSDefParser
     parser.parseDefinitions(reader) match {
       case parser.Success(rawCode, _) =>
-        rawCode
+        Right(rawCode)
 
       case parser.NoSuccess(msg, next) =>
-        Console.err.println(
+        Left(
             "Parse error at %s\n".format(next.pos.toString) +
             msg + "\n" +
             next.pos.longString)
-        sys.exit(2)
     }
   }
 
