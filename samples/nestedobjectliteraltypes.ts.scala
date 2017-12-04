@@ -12,16 +12,14 @@ trait Info extends js.Object {
   var settings: Info.Settings = js.native
 }
 
-@js.native
-object Info extends js.Object {
+object Info {
 
 @js.native
 trait Settings extends js.Object {
   var state: Settings.State = js.native
 }
 
-@js.native
-object Settings extends js.Object {
+object Settings {
 
 @js.native
 trait State extends js.Object {

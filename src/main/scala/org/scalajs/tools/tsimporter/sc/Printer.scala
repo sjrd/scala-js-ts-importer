@@ -112,14 +112,16 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
       case sym: ModuleSymbol =>
         pln"";
-        pln"@js.native"
         if (sym.isGlobal) {
+          pln"@js.native"
           if (currentJSNamespace.isEmpty)
             pln"@JSGlobal"
           else
             pln"""@JSGlobal("$currentJSNamespace${name.name}")"""
+          pln"object $name extends js.Object {"
+        } else {
+          pln"object $name {"
         }
-        pln"object $name extends js.Object {"
         printMemberDecls(sym)
         pln"}"
 
