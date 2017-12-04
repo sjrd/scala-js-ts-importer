@@ -14,6 +14,7 @@ import org.scalajs.tools.tsimporter.Trees.{ Modifier, Modifiers }
 
 case class Name(name: String) {
   override def toString() = Utils.scalaEscape(name)
+  def capitalize = Name(name.capitalize)
 }
 
 object Name {
@@ -187,6 +188,7 @@ class ClassSymbol(nme: Name) extends ContainerSymbol(nme) {
 
 class ModuleSymbol(nme: Name) extends ContainerSymbol(nme) {
   var companionClass: ClassSymbol = _
+  var isGlobal: Boolean = true
 
   override def toString() = s"object $name"
 }
