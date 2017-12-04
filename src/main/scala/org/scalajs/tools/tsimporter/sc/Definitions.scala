@@ -186,6 +186,7 @@ class ClassSymbol(nme: Name) extends ContainerSymbol(nme) {
 
 class ModuleSymbol(nme: Name) extends ContainerSymbol(nme) {
   var companionClass: ClassSymbol = _
+  var isGlobal: Boolean = true
 
   override def toString() = s"object $name"
 }

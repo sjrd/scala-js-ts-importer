@@ -37,19 +37,19 @@ class Importer(val output: java.io.PrintWriter) {
 
       case VarDecl(IdentName(name), Some(tpe @ ObjectType(members))) =>
         val sym = owner.getModuleOrCreate(name)
-        processMembersDecls(owner, owner, sym, members)
+        processMembersDecls(owner, sym, members)
 
       case ConstDecl(IdentName(name), Some(tpe @ ObjectType(members))) =>
         val sym = owner.getModuleOrCreate(name)
-        processMembersDecls(owner, owner, sym, members)
+        processMembersDecls(owner, sym, members)
 
       case LetDecl(IdentName(name), Some(tpe @ ObjectType(members))) =>
         val sym = owner.getModuleOrCreate(name)
-        processMembersDecls(owner, owner, sym, members)
+        processMembersDecls(owner, sym, members)
 
       case TypeDecl(TypeNameName(name), tpe @ ObjectType(members)) =>
         val sym = owner.getClassOrCreate(name)
-        processMembersDecls(owner, owner, sym, members)
+        processMembersDecls(owner, sym, members)
 
       case EnumDecl(TypeNameName(name), members) =>
         // Type
@@ -79,7 +79,7 @@ class Importer(val output: java.io.PrintWriter) {
           sym.parents += parent
         }
         sym.tparams ++= typeParamsToScala(tparams)
-        processMembersDecls(owner, owner, sym, members)
+        processMembersDecls(owner, sym, members)
         if (!sym.members.exists(_.name == Name.CONSTRUCTOR)) {
           processDefDecl(sym, Name.CONSTRUCTOR,
               FunSignature(Nil, Nil, Some(TypeRefTree(CoreType("void")))))
@@ -94,7 +94,7 @@ class Importer(val output: java.io.PrintWriter) {
           sym.parents += parent
         }
         sym.tparams ++= typeParamsToScala(tparams)
-        processMembersDecls(owner, owner, sym, members)
+        processMembersDecls(owner, sym, members)
 
       case TypeAliasDecl(TypeNameName(name), tparams, alias) =>
         val sym = owner.newTypeAlias(name)
@@ -123,8 +123,7 @@ class Importer(val output: java.io.PrintWriter) {
     }
   }
 
-  private def processMembersDecls(
-      moduleRoot: ContainerSymbol, enclosing: ContainerSymbol,
+  private def processMembersDecls(enclosing: ContainerSymbol,
       owner: ContainerSymbol, members: List[MemberTree]) {
 
     val OwnerName = owner.name
@@ -153,10 +152,10 @@ class Importer(val output: java.io.PrintWriter) {
         assert(owner.isInstanceOf[ClassSymbol],
             s"Cannot process static member $name in module definition")
         val module = enclosing.getModuleOrCreate(owner.name)
-        processPropertyDecl(moduleRoot, module, name, tpe, mods)
+        processPropertyDecl(enclosing, module, name, tpe, mods)
 
       case PropertyMember(PropertyNameName(name), opt, tpe, mods) =>
-        processPropertyDecl(moduleRoot, owner, name, tpe, mods)
+        processPropertyDecl(enclosing, owner, name, tpe, mods)
 
       case FunctionMember(PropertyName("constructor"), _, signature, modifiers)
           if owner.isInstanceOf[ClassSymbol] && !modifiers(Modifier.Static) =>
@@ -196,7 +195,7 @@ class Importer(val output: java.io.PrintWriter) {
     }
   }
 
-  private def processPropertyDecl(moduleRoot: ContainerSymbol, owner: ContainerSymbol, name: Name,
+  private def processPropertyDecl(enclosing: ContainerSymbol, owner: ContainerSymbol, name: Name,
       tpe: TypeTree, modifiers: Modifiers, protectName: Boolean = true) {
     if (name.name != "prototype") {
       tpe match {
@@ -205,12 +204,12 @@ class Importer(val output: java.io.PrintWriter) {
           for (CallMember(signature) <- members)
             processDefDecl(owner, name, signature, protectName)
         case ObjectType(members) =>
-          val inner = moduleRoot.newAnonMemberName()
-          val nested = moduleRoot.getClassOrCreate(Name(inner))
-          processMembersDecls(moduleRoot, owner, nested, members)
-
+          val module = enclosing.getModuleOrCreate(owner.name)
+          module.isGlobal = false
+          val classSym = module.getClassOrCreate(name)
+          processMembersDecls(module, classSym, members)
           val sym = owner.newField(name, modifiers)
-          sym.tpe = typeToScala(TypeRefTree(TypeName(inner)))
+          sym.tpe = TypeRef(QualifiedName(module.name, classSym.name))
         case _ =>
           val sym = owner.newField(name, modifiers)
           if (protectName)
