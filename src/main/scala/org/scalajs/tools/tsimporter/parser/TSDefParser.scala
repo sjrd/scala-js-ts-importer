@@ -40,7 +40,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       "public", "static", "yield",
 
       // Additional keywords of TypeScript
-      "declare", "module", "type", "namespace"
+      "declare", "module", "type", "namespace", "keyof"
   )
 
   lexical.delimiters ++= List(
@@ -72,6 +72,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val moduleBody: Parser[List[DeclTree]] =
     "{" ~> rep(moduleElementDecl) <~ "}" ^^ (_.flatten)
 
+  lazy val topLevelExportDecl: Parser[DeclTree] =
+    "=" ~> identifier <~ ";" ^^ TopLevelExportDecl
+
   lazy val moduleElementDecl: Parser[Option[DeclTree]] = (
       "export" ~> (
           moduleElementDecl1 ^^ (Some(_))
@@ -84,6 +87,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     | ambientEnumDecl | ambientClassDecl | ambientInterfaceDecl
     | ambientConstDecl | ambientLetDecl | typeAliasDecl
     | importDecl
+    | topLevelExportDecl
   )
 
   lazy val ambientVarDecl: Parser[DeclTree] =
@@ -173,6 +177,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val paramType: Parser[TypeTree] = (
       typeDesc
     | stringLiteral ^^ ConstantType
+    | numberLiteral ^^ ConstantType
   )
 
   lazy val optResultType =
@@ -203,10 +208,11 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     }
 
   lazy val singleTypeDesc: Parser[TypeTree] =
-    baseTypeDesc ~ rep("[" ~ "]") ^^ {
+    baseTypeDesc ~ rep("[" ~> opt(typeDesc) <~ "]") ^^ {
       case base ~ arrayDims =>
         (base /: arrayDims) {
-          (elem, _) => ArrayType(elem)
+          case (elem, None) => ArrayType(elem)
+          case (elem, Some(index)) => IndexedAccessType(elem, index)
         }
     }
 
@@ -215,9 +221,11 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     | objectType
     | functionType
     | stringType
+    | numberType
     | typeQuery
     | tupleType
     | thisType
+    | indexTypeQuery
     | "(" ~> typeDesc <~ ")"
   )
 
@@ -245,8 +253,14 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val stringType: Parser[TypeTree] =
     stringLiteral ^^ ConstantType
 
+  lazy val numberType: Parser[TypeTree] =
+    numberLiteral ^^ ConstantType
+
   lazy val thisType: Parser[TypeTree] =
     "this" ^^^ PolymorphicThisType
+
+  lazy val indexTypeQuery: Parser[TypeTree] =
+    "keyof" ~> typeDesc ^^ IndexedQueryType
 
   lazy val typeQuery: Parser[TypeTree] =
     "typeof" ~> rep1sep(ident, ".") ^^ { parts =>
@@ -309,10 +323,20 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   })
 
   lazy val propertyName: Parser[PropertyName] =
-    identifier | stringLiteral
+    identifier | stringLiteral | numberLiteral
 
   lazy val stringLiteral: Parser[StringLiteral] =
     stringLit ^^ StringLiteral
+
+  lazy val numberLiteral: Parser[NumberLiteral] =
+    numericLit ^^ { s =>
+      val d = s.toDouble
+      if (!s.contains(".") && d.isValidInt) {
+        IntLiteral(d.toInt)
+      } else {
+        DoubleLiteral(d)
+      }
+    }
 
   private val isCoreTypeName =
     Set("any", "void", "number", "bool", "boolean", "string", "null", "undefined", "never")

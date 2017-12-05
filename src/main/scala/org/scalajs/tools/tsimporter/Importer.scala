@@ -35,6 +35,9 @@ class Importer(val output: java.io.PrintWriter) {
         for (innerDecl <- innerDecls)
           processDecl(sym, innerDecl)
 
+      case TopLevelExportDecl(IdentName(name)) =>
+        // print nothing, since the value specified by the identifier is printed elsewhere.
+
       case VarDecl(IdentName(name), Some(tpe @ ObjectType(members))) =>
         val sym = owner.getModuleOrCreate(name)
         processMembersDecls(owner, sym, members)
@@ -152,10 +155,10 @@ class Importer(val output: java.io.PrintWriter) {
         assert(owner.isInstanceOf[ClassSymbol],
             s"Cannot process static member $name in module definition")
         val module = enclosing.getModuleOrCreate(owner.name)
-        processPropertyDecl(module, name, tpe, mods)
+        processPropertyDecl(enclosing, module, name, tpe, mods)
 
       case PropertyMember(PropertyNameName(name), opt, tpe, mods) =>
-        processPropertyDecl(owner, name, tpe, mods)
+        processPropertyDecl(enclosing, owner, name, tpe, mods)
 
       case FunctionMember(PropertyName("constructor"), _, signature, modifiers)
           if owner.isInstanceOf[ClassSymbol] && !modifiers(Modifier.Static) =>
@@ -195,7 +198,7 @@ class Importer(val output: java.io.PrintWriter) {
     }
   }
 
-  private def processPropertyDecl(owner: ContainerSymbol, name: Name,
+  private def processPropertyDecl(enclosing: ContainerSymbol, owner: ContainerSymbol, name: Name,
       tpe: TypeTree, modifiers: Modifiers, protectName: Boolean = true) {
     if (name.name != "prototype") {
       tpe match {
@@ -203,6 +206,13 @@ class Importer(val output: java.io.PrintWriter) {
           // alternative notation for overload methods - #3
           for (CallMember(signature) <- members)
             processDefDecl(owner, name, signature, protectName)
+        case ObjectType(members) =>
+          val module = enclosing.getModuleOrCreate(owner.name)
+          module.isGlobal = false
+          val classSym = module.getClassOrCreate(name.capitalize)
+          processMembersDecls(module, classSym, members)
+          val sym = owner.newField(name, modifiers)
+          sym.tpe = TypeRef(QualifiedName(module.name, classSym.name))
         case _ =>
           val sym = owner.newField(name, modifiers)
           if (protectName)
@@ -258,6 +268,7 @@ class Importer(val output: java.io.PrintWriter) {
         val baseTypeRef = base match {
           case TypeName("Array") => QualifiedName.Array
           case TypeName("Function") => QualifiedName.FunctionBase
+          case TypeName("object") => QualifiedName.Object
           case TypeNameName(name) => QualifiedName(name)
           case QualifiedTypeName(qualifier, TypeNameName(name)) =>
             val qual1 = qualifier map (x => Name(x.name))
@@ -268,6 +279,12 @@ class Importer(val output: java.io.PrintWriter) {
 
       case ConstantType(StringLiteral(_)) =>
         TypeRef.String
+
+      case ConstantType(IntLiteral(i)) =>
+        TypeRef.Int
+
+      case ConstantType(DoubleLiteral(d)) =>
+        TypeRef.Double
 
       case ObjectType(List(IndexMember(_, TypeRefTree(CoreType("string"), _), valueType))) =>
         val valueTpe = typeToScala(valueType)
@@ -329,6 +346,9 @@ class Importer(val output: java.io.PrintWriter) {
 
       case RepeatedType(underlying) =>
         TypeRef(Name.REPEATED, List(typeToScala(underlying)))
+
+      case IndexedQueryType(_) =>
+        TypeRef.String
 
       case PolymorphicThisType =>
         TypeRef.This

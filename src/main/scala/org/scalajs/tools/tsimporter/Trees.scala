@@ -88,6 +88,8 @@ object Trees {
 
   case object ImportDecl extends DeclTree
 
+  case class TopLevelExportDecl(name: Ident) extends DeclTree
+
   // Function signature
 
   case class FunSignature(tparams: List[TypeParam], params: List[FunParam],
@@ -109,7 +111,15 @@ object Trees {
 
   case class BooleanLiteral(value: Boolean) extends Literal
 
-  case class NumberLiteral(value: Double) extends Literal
+  sealed trait NumberLiteral extends Literal with PropertyName
+
+  case class IntLiteral(value: Int) extends NumberLiteral {
+    override def name = value.toString
+  }
+
+  case class DoubleLiteral(value: Double) extends NumberLiteral {
+    override def name = value.toString
+  }
 
   case class StringLiteral(value: String) extends Literal with PropertyName {
     override def name = value
@@ -158,6 +168,9 @@ object Trees {
   case class TypeQuery(expr: QualifiedIdent) extends TypeTree
 
   case class RepeatedType(underlying: TypeTree) extends TypeTree
+
+  case class IndexedQueryType(underlying: TypeTree) extends TypeTree
+  case class IndexedAccessType(objectType: TypeTree, name: TypeTree) extends TypeTree
 
   object PolymorphicThisType extends TypeTree
 

@@ -14,6 +14,7 @@ import org.scalajs.tools.tsimporter.Trees.{ Modifier, Modifiers }
 
 case class Name(name: String) {
   override def toString() = Utils.scalaEscape(name)
+  def capitalize = Name(name.capitalize)
 }
 
 object Name {
@@ -54,6 +55,7 @@ object QualifiedName {
   val Array = scala_js dot Name("Array")
   val Dictionary = scala_js dot Name("Dictionary")
   val FunctionBase = scala_js dot Name("Function")
+  val Object = scala_js dot Name("Object")
   def Function(arity: Int) = scala_js dot Name("Function"+arity)
   def Tuple(arity: Int) = scala_js dot Name("Tuple"+arity)
   val Union = scala_js dot Name("|")
@@ -186,6 +188,7 @@ class ClassSymbol(nme: Name) extends ContainerSymbol(nme) {
 
 class ModuleSymbol(nme: Name) extends ContainerSymbol(nme) {
   var companionClass: ClassSymbol = _
+  var isGlobal: Boolean = true
 
   override def toString() = s"object $name"
 }
@@ -295,6 +298,7 @@ object TypeRef {
   val Any = TypeRef(scala_js dot Name("Any"))
   val Dynamic = TypeRef(scala_js dot Name("Dynamic"))
   val Double = TypeRef(scala dot Name("Double"))
+  val Int = TypeRef(scala dot Name("Int"))
   val Boolean = TypeRef(scala dot Name("Boolean"))
   val String = TypeRef(java_lang dot Name("String"))
   val Object = TypeRef(scala_js dot Name("Object"))
