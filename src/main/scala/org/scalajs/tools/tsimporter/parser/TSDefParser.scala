@@ -183,6 +183,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       typeDesc
     | stringLiteral ^^ ConstantType
     | numberLiteral ^^ ConstantType
+    | booleanLiteral ^^ ConstantType
   )
 
   lazy val optResultType =
@@ -227,6 +228,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     | functionType
     | stringType
     | numberType
+    | booleanType
     | typeQuery
     | tupleType
     | thisType
@@ -260,6 +262,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val numberType: Parser[TypeTree] =
     numberLiteral ^^ ConstantType
+
+  lazy val booleanType: Parser[TypeTree] =
+    booleanLiteral ^^ ConstantType
 
   lazy val thisType: Parser[TypeTree] =
     "this" ^^^ PolymorphicThisType
@@ -343,6 +348,11 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
         DoubleLiteral(d)
       }
     }
+
+  lazy val booleanLiteral: Parser[BooleanLiteral] = (
+      "true" ^^^ BooleanLiteral(true)
+    | "false" ^^^ BooleanLiteral(false)
+  )
 
   private val isCoreTypeName =
     Set("any", "void", "number", "bool", "boolean", "string", "null", "undefined", "never")
