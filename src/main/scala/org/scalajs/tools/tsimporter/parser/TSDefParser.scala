@@ -202,7 +202,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     unionTypeDesc
 
   lazy val unionTypeDesc: Parser[TypeTree] =
-    rep1sep(intersectionTypeDesc, "|") ^^ {
+    opt("|") ~> rep1sep(intersectionTypeDesc, "|") ^^ {
       _.reduceLeft(UnionType)
     }
 
