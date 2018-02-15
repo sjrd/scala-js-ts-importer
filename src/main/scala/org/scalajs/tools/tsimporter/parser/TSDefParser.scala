@@ -7,10 +7,6 @@ package org.scalajs.tools.tsimporter.parser
 
 import org.scalajs.tools.tsimporter.Trees._
 
-import java.io.File
-
-import scala.collection.mutable.ListBuffer
-
 import scala.util.parsing.combinator._
 import scala.util.parsing.combinator.token._
 import scala.util.parsing.combinator.syntactical._
@@ -54,11 +50,13 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     phrase(ambientDeclarations)(new lexical.Scanner(input))
 
   lazy val ambientDeclarations: Parser[List[DeclTree]] =
-    rep(ambientDeclaration)
+    rep(ambientDeclaration).map(_.flatMap(_.toList))
 
-  lazy val ambientDeclaration: Parser[DeclTree] = (
+  lazy val ambientDeclaration: Parser[Option[DeclTree]] = ((
       opt("declare") ~> opt("export") ~> moduleElementDecl1
     | opt("export") ~> opt("declare") ~> moduleElementDecl1
+  ).map(Some(_))
+    | "export" ~> lexical.Identifier("as") ~> "namespace" ~> identifier <~ opt(";") ^^^ None
   )
 
   lazy val ambientModuleDecl: Parser[DeclTree] =
