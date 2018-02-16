@@ -138,7 +138,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   )
 
   lazy val typeParam: Parser[TypeParam] =
-    typeName ~ opt("extends" ~> typeRef) <~ opt("=" ~> typeRef) ^^ TypeParam
+    typeName ~ opt("extends" ~> typeDesc) <~ opt("=" ~> typeDesc) ^^ TypeParam
 
   lazy val classParent =
     opt("extends" ~> typeRef)
