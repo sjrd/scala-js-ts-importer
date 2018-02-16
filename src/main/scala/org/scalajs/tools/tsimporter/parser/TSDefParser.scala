@@ -109,7 +109,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     repsep(identifier <~ opt("=" ~ numericLit), ",") <~ opt(",")
 
   lazy val ambientClassDecl: Parser[DeclTree] =
-    "class" ~> typeName ~ tparams ~ classParent ~ classImplements ~ memberBlock <~ opt(";") ^^ ClassDecl
+    (abstractModifier <~ "class") ~ typeName ~ tparams ~ classParent ~ classImplements ~ memberBlock <~ opt(";") ^^ {
+      case am ~ tn ~ tp ~ cp ~ ci ~ mb => ClassDecl(tn, tp, cp, ci, mb, am)
+    }
 
   lazy val ambientInterfaceDecl: Parser[DeclTree] =
     "interface" ~> typeName ~ tparams ~ intfInheritance ~ memberBlock <~ opt(";") ^^ InterfaceDecl
@@ -128,6 +130,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val importIdentifierSeq =
     rep1sep(identifier ~ opt(lexical.Identifier("as") ~ identifier), ",")
+
+  lazy val abstractModifier =
+    opt(lexical.Identifier("abstract")) ^^ (_.isDefined)
 
   lazy val tparams = (
       "<" ~> rep1sep(typeParam, ",") <~ ">"
@@ -178,6 +183,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       typeDesc
     | stringLiteral ^^ ConstantType
     | numberLiteral ^^ ConstantType
+    | booleanLiteral ^^ ConstantType
   )
 
   lazy val optResultType =
@@ -222,6 +228,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     | functionType
     | stringType
     | numberType
+    | booleanType
     | typeQuery
     | tupleType
     | thisType
@@ -255,6 +262,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val numberType: Parser[TypeTree] =
     numberLiteral ^^ ConstantType
+
+  lazy val booleanType: Parser[TypeTree] =
+    booleanLiteral ^^ ConstantType
 
   lazy val thisType: Parser[TypeTree] =
     "this" ^^^ PolymorphicThisType
@@ -309,6 +319,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     | "public" ^^^ Modifier.Public
     | "readonly" ^^^ Modifier.ReadOnly
     | "protected" ^^^ Modifier.Protected
+    | lexical.Identifier("abstract") ^^^ Modifier.Abstract
   )
 
   lazy val identifier =
@@ -337,6 +348,11 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
         DoubleLiteral(d)
       }
     }
+
+  lazy val booleanLiteral: Parser[BooleanLiteral] = (
+      "true" ^^^ BooleanLiteral(true)
+    | "false" ^^^ BooleanLiteral(false)
+  )
 
   private val isCoreTypeName =
     Set("any", "void", "number", "bool", "boolean", "string", "null", "undefined", "never")

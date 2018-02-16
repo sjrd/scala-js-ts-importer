@@ -66,13 +66,14 @@ class Importer(val output: java.io.PrintWriter) {
           m.protectName()
           m.tpe = TypeRef(tsym.name)
         }
-        val applySym = sym.newMethod(Name("apply"))
+        val applySym = sym.newMethod(Name("apply"), Set.empty[Modifier])
         applySym.params += new ParamSymbol(Name("value"), TypeRef(tsym.name))
         applySym.resultType = TypeRef.String
         applySym.isBracketAccess = true
 
-      case ClassDecl(TypeNameName(name), tparams, parent, implements, members) =>
+      case ClassDecl(TypeNameName(name), tparams, parent, implements, members, isAbstract) =>
         val sym = owner.getClassOrCreate(name)
+        sym.isAbstract = isAbstract
         sym.isTrait = false
         parent.foreach(sym.parents += typeToScala(_))
         for {
@@ -85,7 +86,7 @@ class Importer(val output: java.io.PrintWriter) {
         processMembersDecls(owner, sym, members)
         if (!sym.members.exists(_.name == Name.CONSTRUCTOR)) {
           processDefDecl(sym, Name.CONSTRUCTOR,
-              FunSignature(Nil, Nil, Some(TypeRefTree(CoreType("void")))))
+              FunSignature(Nil, Nil, Some(TypeRefTree(CoreType("void")))), Set.empty[Modifier])
         }
 
       case InterfaceDecl(TypeNameName(name), tparams, inheritance, members) =>
@@ -117,7 +118,7 @@ class Importer(val output: java.io.PrintWriter) {
         sym.tpe = typeToScala(tpe)
 
       case FunctionDecl(IdentName(name), signature) =>
-        processDefDecl(owner, name, signature)
+        processDefDecl(owner, name, signature, Set.empty[Modifier])
 
       case ImportDecl => // Ignore imports
 
@@ -142,14 +143,14 @@ class Importer(val output: java.io.PrintWriter) {
 
     for (member <- members) member match {
       case CallMember(signature) =>
-        processDefDecl(owner, Name("apply"), signature, protectName = false)
+        processDefDecl(owner, Name("apply"), signature, Set.empty[Modifier], protectName = false)
 
       case ConstructorMember(sig @ FunSignature(tparamsIgnored, params, Some(resultType)))
       if owner.isInstanceOf[ModuleSymbol] && resultType == companionClassRef =>
         val classSym = enclosing.getClassOrCreate(owner.name)
         classSym.isTrait = false
         processDefDecl(classSym, Name.CONSTRUCTOR,
-            FunSignature(Nil, params, Some(TypeRefTree(CoreType("void")))))
+            FunSignature(Nil, params, Some(TypeRefTree(CoreType("void")))), Set.empty[Modifier])
 
       case PropertyMember(PropertyNameName(name), opt, tpe, mods) if mods(Modifier.Static) =>
         assert(owner.isInstanceOf[ClassSymbol],
@@ -164,28 +165,28 @@ class Importer(val output: java.io.PrintWriter) {
           if owner.isInstanceOf[ClassSymbol] && !modifiers(Modifier.Static) =>
         owner.asInstanceOf[ClassSymbol].isTrait = false
         processDefDecl(owner, Name.CONSTRUCTOR,
-            FunSignature(Nil, signature.params, Some(TypeRefTree(CoreType("void")))))
+            FunSignature(Nil, signature.params, Some(TypeRefTree(CoreType("void")))), modifiers)
 
       case FunctionMember(PropertyNameName(name), opt, signature, modifiers)
           if modifiers(Modifier.Static) =>
         assert(owner.isInstanceOf[ClassSymbol],
             s"Cannot process static member $name in module definition")
         val module = enclosing.getModuleOrCreate(owner.name)
-        processDefDecl(module, name, signature)
+        processDefDecl(module, name, signature, modifiers)
 
-      case FunctionMember(PropertyNameName(name), opt, signature, _) =>
-        processDefDecl(owner, name, signature)
+      case FunctionMember(PropertyNameName(name), opt, signature, modifiers) =>
+        processDefDecl(owner, name, signature, modifiers)
 
       case IndexMember(IdentName(indexName), indexType, valueType) =>
         val indexTpe = typeToScala(indexType)
         val valueTpe = typeToScala(valueType)
 
-        val getterSym = owner.newMethod(Name("apply"))
+        val getterSym = owner.newMethod(Name("apply"), Set.empty[Modifier])
         getterSym.params += new ParamSymbol(indexName, indexTpe)
         getterSym.resultType = valueTpe
         getterSym.isBracketAccess = true
 
-        val setterSym = owner.newMethod(Name("update"))
+        val setterSym = owner.newMethod(Name("update"), Set.empty[Modifier])
         setterSym.params += new ParamSymbol(indexName, indexTpe)
         setterSym.params += new ParamSymbol(Name("v"), valueTpe)
         setterSym.resultType = TypeRef.Unit
@@ -205,7 +206,7 @@ class Importer(val output: java.io.PrintWriter) {
         case ObjectType(members) if members.forall(_.isInstanceOf[CallMember]) =>
           // alternative notation for overload methods - #3
           for (CallMember(signature) <- members)
-            processDefDecl(owner, name, signature, protectName)
+            processDefDecl(owner, name, signature, modifiers, protectName)
         case ObjectType(members) =>
           val module = enclosing.getModuleOrCreate(owner.name)
           module.isGlobal = false
@@ -223,12 +224,8 @@ class Importer(val output: java.io.PrintWriter) {
   }
 
   private def processDefDecl(owner: ContainerSymbol, name: Name,
-      signature: FunSignature, protectName: Boolean = true) {
-    // Discard specialized signatures
-    if (signature.params.exists(_.tpe.exists(_.isInstanceOf[ConstantType])))
-      return
-
-    val sym = owner.newMethod(name)
+      signature: FunSignature, modifiers: Modifiers, protectName: Boolean = true) {
+    val sym = owner.newMethod(name, modifiers)
     if (protectName)
       sym.protectName()
 
@@ -285,6 +282,9 @@ class Importer(val output: java.io.PrintWriter) {
 
       case ConstantType(DoubleLiteral(d)) =>
         TypeRef.Double
+
+      case ConstantType(BooleanLiteral(_)) =>
+        TypeRef.Boolean
 
       case ObjectType(List(IndexMember(_, TypeRefTree(CoreType("string"), _), valueType))) =>
         val valueTpe = typeToScala(valueType)
