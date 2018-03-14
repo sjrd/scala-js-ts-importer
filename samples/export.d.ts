@@ -17,3 +17,5 @@ declare namespace PIXI {
 declare module "pixi.js" {
     export = PIXI;
 }
+
+export as namespace asNamespace;
