@@ -45,6 +45,7 @@ object Mixed extends js.Object {
   var EMPTY: Mixed = js.native
   var NUMERIC: Mixed = js.native
   var STRING: Mixed = js.native
+  var NEGATIVE: Mixed = js.native
   @JSBracketAccess
   def apply(value: Mixed): String = js.native
 }
