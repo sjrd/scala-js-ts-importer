@@ -5,109 +5,79 @@
 
 package org.scalajs.tools.tsimporter
 
-import blog.codeninja.scalajs.vue._
-import org.scalajs.dom.webworkers.Worker
-import org.scalajs.dom.{MessageEvent, console}
+import java.io.{ Console => _, Reader => _, _ }
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.collection.immutable.PagedSeq
 
-class Data(var input: Input,
-           var isLoading: Boolean,
-           var output: ScalaOutput,
-           var samples: js.Array[Sample]
-          ) extends js.Object {
-}
+import Trees._
 
-class Input(var source: String, var outputPackage: js.UndefOr[String]) extends js.Object
+import scala.util.parsing.input._
+import parser.TSDefParser
 
-class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
-
-class Sample(var filename: String, var label: String) extends js.Object
-
-@JSExportTopLevel("Main")
+/** Entry point for the TypeScript importer of Scala.js */
 object Main {
-  var vue: Vue = _
+  def main(args: Array[String]) {
+    if (args.length < 2) {
+      Console.err.println("""
+                            |Usage: scalajs-ts-importer <input.d.ts> <output.scala> [<package>]
+                            |  <input.d.ts>     TypeScript type definition file to read
+                            |  <output.scala>   Output Scala.js file
+                            |  <package>        Package name for the output (defaults to "importedjs")
+                          """.stripMargin.trim)
+      System.exit(1)
+    }
 
-  @JSExport
-  def main(): Unit = {
-    main(js.Array[String]())
+    val inputFileName = args(0)
+    val outputFileName = args(1)
+    val outputPackage = if (args.length > 2) args(2) else "importedjs"
+
+    importTsFile(inputFileName, outputFileName, outputPackage) match {
+      case Right(()) =>
+        ()
+      case Left(message) =>
+        Console.err.println(message)
+        System.exit(2)
+    }
   }
 
-  @JSExport
-  def main(args: js.Array[String]): Unit = {
-    main(args.toArray)
-  }
-
-  def main(args: Array[String]): Unit = {
-    val worker = new Worker("worker.js")
-
-    val data = new Data(
-      input = new Input(
-        source = "",
-        outputPackage = ""
-      ),
-      isLoading = false,
-      output = new ScalaOutput(
-        text = "",
-        hasError = false
-      ),
-      samples = js.Array(
-        new Sample("electron", "electron"),
-        new Sample("elasticsearch", "elasticsearch"),
-        new Sample("rx-core", "RxJS-Core"),
-        new Sample("google-app-script.base", "Google Apps Script (Base)"),
-        new Sample("zip-js", "zip.js"),
-        new Sample("jpm", "Firefox Addon SDK (jpm)")
-      )
-    )
-
-    worker.onmessage = (e: js.Any) => {
-      val event = e.asInstanceOf[MessageEvent].data
-      event match {
-        case str: String => console.info(str)
-        case _ =>
-          // Uses type-cast instead of pickler, to minimize dependency.
-          val obj = event.asInstanceOf[js.Dynamic]
-          data.output = new ScalaOutput(obj.text.asInstanceOf[String], obj.hasError.asInstanceOf[Boolean])
-          data.isLoading = false
+  def importTsFile(inputFileName: String, outputFileName: String, outputPackage: String): Either[String, Unit] = {
+    parseDefinitions(readerForFile(inputFileName)).map { definitions =>
+      val output = new PrintWriter(new BufferedWriter(
+        new FileWriter(outputFileName)))
+      try {
+        process(definitions, output, outputPackage)
+        Right(())
+      } finally {
+        output.close()
       }
     }
+  }
 
-    def translate(data: Data): Unit = {
-      console.info("[Main] send to worker")
-      data.isLoading = true
-      worker.postMessage(data.input)
+  private def process(definitions: List[DeclTree], output: PrintWriter,
+                      outputPackage: String) {
+    new Importer(output)(definitions, outputPackage)
+  }
+
+  private def parseDefinitions(reader: Reader[Char]): Either[String, List[DeclTree]] = {
+    val parser = new TSDefParser
+    parser.parseDefinitions(reader) match {
+      case parser.Success(rawCode, _) =>
+        Right(rawCode)
+
+      case parser.NoSuccess(msg, next) =>
+        Left(
+          "Parse error at %s\n".format(next.pos.toString) +
+            msg + "\n" +
+            next.pos.longString)
     }
+  }
 
-    vue = new Vue(js.Dynamic.literal(
-      el = "#app",
-      data = data,
-      methods = js.Dynamic.literal(
-        translate = translate _: js.ThisFunction0[Data, _],
-        loadSample = js.ThisFunction.fromFunction2 { (data: Data, sample: Sample) =>
-          import org.scalajs.dom.experimental._
-          data.isLoading = true
-
-          val fetchSampleTypeScript = Fetch.fetch(s"samples-webapp/${sample.filename}.d.ts").toFuture
-          val futureSourceText = fetchSampleTypeScript.flatMap { response =>
-            response.text().toFuture.map { text =>
-              response.status match {
-                case 200 => text
-                case _ => s"""Failed to fetch sample.
-                             |
-                             |Error response:
-                             |${text}""".stripMargin
-              }
-            }
-          }
-          futureSourceText.foreach { text =>
-            data.input.source = text
-            translate(data)
-          }
-        }
-      )
-    ))
+  /** Builds a [[scala.util.parsing.input.PagedSeqReader]] for a file
+   *
+   *  @param fileName name of the file to be read
+   */
+  private def readerForFile(fileName: String) = {
+    new PagedSeqReader(PagedSeq.fromReader(
+      new BufferedReader(new FileReader(fileName))))
   }
 }
