@@ -296,9 +296,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     "new" ~> functionSignature ^^ ConstructorMember
 
   lazy val indexMember: Parser[MemberTree] =
-    opt("readonly") ~ ("[" ~> identifier ~ typeAnnotation <~ "]") ~ typeAnnotation ^^ {
-      case readonly ~ (indexName ~ indexType) ~ valueType =>
-        IndexMember(indexName, indexType, valueType, readonly.isDefined)
+    modifiers ~ ("[" ~> identifier ~ typeAnnotation <~ "]") ~ typeAnnotation ^^ {
+      case mods ~ (indexName ~ indexType) ~ valueType =>
+        IndexMember(indexName, indexType, valueType, mods)
     }
 
   lazy val namedMember: Parser[MemberTree] =

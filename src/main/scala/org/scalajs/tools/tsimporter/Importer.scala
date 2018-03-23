@@ -177,7 +177,7 @@ class Importer(val output: java.io.PrintWriter) {
       case FunctionMember(PropertyNameName(name), opt, signature, modifiers) =>
         processDefDecl(owner, name, signature, modifiers)
 
-      case IndexMember(IdentName(indexName), indexType, valueType, readonly) =>
+      case IndexMember(IdentName(indexName), indexType, valueType, modifiers) =>
         val indexTpe = typeToScala(indexType)
         val valueTpe = typeToScala(valueType)
 
@@ -186,7 +186,7 @@ class Importer(val output: java.io.PrintWriter) {
         getterSym.resultType = valueTpe
         getterSym.isBracketAccess = true
 
-        if (!readonly){
+        if (!modifiers(Modifier.ReadOnly)){
           val setterSym = owner.newMethod(Name("update"), Set.empty[Modifier])
           setterSym.params += new ParamSymbol(indexName, indexTpe)
           setterSym.params += new ParamSymbol(Name("v"), valueTpe)
