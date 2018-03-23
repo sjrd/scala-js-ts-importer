@@ -38,6 +38,8 @@ declare module modifiers {
       readonly authority: string;
       readonly path: string;
       private cache;
+      private ignoreMe: number;
+      private static ignoreMe2: number;
       private updateCache();
       private static resolve(): String;
   }
