@@ -181,7 +181,7 @@ object Trees {
 
   case class ConstructorMember(signature: FunSignature) extends MemberTree
 
-  case class IndexMember(indexName: Ident, indexType: TypeTree, valueType: TypeTree) extends MemberTree
+  case class IndexMember(indexName: Ident, indexType: TypeTree, valueType: TypeTree, modifiers: Modifiers) extends MemberTree
 
   case class PropertyMember(name: PropertyName, optional: Boolean,
       tpe: TypeTree, modifiers: Modifiers) extends MemberTree
