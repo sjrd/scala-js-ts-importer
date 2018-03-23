@@ -42,8 +42,8 @@ class TSDefLexical extends Lexical with StdTokens with ImplicitConversions {
             digits => digits.foldLeft(0L)(_ * 8 + _).toString
           }
       )
-    | stringOf1(digit) ~ opt(stringOf1('.', digit)) ^^ {
-        case part1 ~ part2 => part1 + (part2.getOrElse(""))
+    | opt('-')  ~ stringOf1(digit) ~ opt(stringOf1('.', digit)) ^^ {
+        case sign ~ part1 ~ part2 => sign.getOrElse("") + part1 + (part2.getOrElse(""))
       }
   ) ^^ NumericLit
 

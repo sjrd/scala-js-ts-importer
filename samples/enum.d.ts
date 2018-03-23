@@ -10,7 +10,7 @@ declare module enumtype {
     }
 
     export enum Mixed {
-        EMPTY, NUMERIC=2, STRING="string"
+        EMPTY, NUMERIC = 2, STRING = "string", NEGATIVE = -1
     }
 
 }
