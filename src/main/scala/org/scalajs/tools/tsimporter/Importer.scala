@@ -177,7 +177,7 @@ class Importer(val output: java.io.PrintWriter) {
       case FunctionMember(PropertyNameName(name), opt, signature, modifiers) =>
         processDefDecl(owner, name, signature, modifiers)
 
-      case IndexMember(IdentName(indexName), indexType, valueType) =>
+      case IndexMember(IdentName(indexName), indexType, valueType, readonly) =>
         val indexTpe = typeToScala(indexType)
         val valueTpe = typeToScala(valueType)
 
@@ -186,11 +186,13 @@ class Importer(val output: java.io.PrintWriter) {
         getterSym.resultType = valueTpe
         getterSym.isBracketAccess = true
 
-        val setterSym = owner.newMethod(Name("update"), Set.empty[Modifier])
-        setterSym.params += new ParamSymbol(indexName, indexTpe)
-        setterSym.params += new ParamSymbol(Name("v"), valueTpe)
-        setterSym.resultType = TypeRef.Unit
-        setterSym.isBracketAccess = true
+        if (!readonly){
+          val setterSym = owner.newMethod(Name("update"), Set.empty[Modifier])
+          setterSym.params += new ParamSymbol(indexName, indexTpe)
+          setterSym.params += new ParamSymbol(Name("v"), valueTpe)
+          setterSym.resultType = TypeRef.Unit
+          setterSym.isBracketAccess = true
+        }
 
       case PrivateMember => // ignore
 
@@ -286,7 +288,7 @@ class Importer(val output: java.io.PrintWriter) {
       case ConstantType(BooleanLiteral(_)) =>
         TypeRef.Boolean
 
-      case ObjectType(List(IndexMember(_, TypeRefTree(CoreType("string"), _), valueType))) =>
+      case ObjectType(List(IndexMember(_, TypeRefTree(CoreType("string"), _), valueType, _))) =>
         val valueTpe = typeToScala(valueType)
         TypeRef(QualifiedName.Dictionary, List(valueTpe))
 
