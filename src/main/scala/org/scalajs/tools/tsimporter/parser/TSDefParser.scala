@@ -310,7 +310,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     }
 
   lazy val privateMember =
-    "private" ~> opt("static") ~> propertyName ~ opt(functionSignature) ^^^ PrivateMember
+    "private" ~> opt("static") ~> propertyName ~ opt(functionSignature | typeAnnotation) ^^^ PrivateMember
 
   lazy val modifiers: Parser[Modifiers] =
     rep(modifier).map(_.toSet)
