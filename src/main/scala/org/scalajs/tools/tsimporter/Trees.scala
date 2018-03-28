@@ -100,7 +100,7 @@ object Trees {
 
   // Type parameters
 
-  case class TypeParam(name: TypeName, upperBound: Option[TypeRef]) extends Tree
+  case class TypeParam(name: TypeName, upperBound: Option[TypeTree]) extends Tree
 
   // Literals
 
