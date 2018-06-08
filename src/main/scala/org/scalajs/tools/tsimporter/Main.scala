@@ -17,26 +17,19 @@ import parser.TSDefParser
 /** Entry point for the TypeScript importer of Scala.js */
 object Main {
   def main(args: Array[String]) {
-    if (args.length < 2) {
-      Console.err.println("""
-        |Usage: scalajs-ts-importer <input.d.ts> <output.scala> [<package>]
-        |  <input.d.ts>     TypeScript type definition file to read
-        |  <output.scala>   Output Scala.js file
-        |  <package>        Package name for the output (defaults to "importedjs")
-      """.stripMargin.trim)
-      System.exit(1)
-    }
+    Config.parser.parse(args, Config()) match {
+      case None => // do nothing. Scopt shows nice error message.
 
-    val inputFileName = args(0)
-    val outputFileName = args(1)
-    val outputPackage = if (args.length > 2) args(2) else "importedjs"
+      case Some(config) =>
+        val outputPackage = config.packageName
 
-    importTsFile(inputFileName, outputFileName, outputPackage) match {
-      case Right(()) =>
-        ()
-      case Left(message) =>
-        Console.err.println(message)
-        System.exit(2)
+        importTsFile(config.inputFileName, config.outputFileName, outputPackage) match {
+          case Right(()) =>
+            ()
+          case Left(message) =>
+            Console.err.println(message)
+            System.exit(2)
+        }
     }
 }
 

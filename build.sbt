@@ -16,6 +16,7 @@ val `scala-js-ts-importer` = project.in(file("."))
     mainClass := Some("org.scalajs.tools.tsimporter.Main"),
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6",
+      "com.github.scopt" %% "scopt" % "3.7.0",
       "org.scalatest" %% "scalatest" % "3.0.4" % Test
     )
   )
