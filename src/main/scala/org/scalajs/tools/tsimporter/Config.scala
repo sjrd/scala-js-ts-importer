@@ -1,10 +1,9 @@
 package org.scalajs.tools.tsimporter
 
-
 case class Config(
-  inputFileName: String = "",
-  outputFileName: String = "",
-  packageName: String = "importedjs"
+    inputFileName: String = "",
+    outputFileName: String = "",
+    packageName: String = "importedjs"
 )
 
 object Config {
