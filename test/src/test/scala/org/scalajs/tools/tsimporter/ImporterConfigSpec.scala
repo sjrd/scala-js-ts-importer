@@ -34,4 +34,32 @@ class ImporterConfigSpec extends AnyFunSpec {
       assert(outputContent.text === expectedContent)
     }
   }
+  
+  describe("interface-variables") {
+    it("js-native implemented") {
+      val sourceTypeScript = "samples/config/interface-variables/source.d.ts"
+      val expectedContent = contentOf("samples/config/interface-variables/implemented.scala")
+      val outputContent = WorkerMain.translate(new Input(
+        source = contentOf(sourceTypeScript),
+        outputPackage = "source",
+        generateFactory = false,
+        forceAbstractFieldOnTrait = false
+      ))
+      assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
+      assert(outputContent.text === expectedContent)
+    }
+    
+    it("abstract") {
+      val sourceTypeScript = "samples/config/interface-variables/source.d.ts"
+      val expectedContent = contentOf("samples/config/interface-variables/abstract.scala")
+      val outputContent = WorkerMain.translate(new Input(
+        source = contentOf(sourceTypeScript),
+        outputPackage = "source",
+        generateFactory = false,
+        forceAbstractFieldOnTrait = true
+      ))
+      assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
+      assert(outputContent.text === expectedContent)
+    }
+  }
 }

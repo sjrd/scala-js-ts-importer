@@ -88,7 +88,7 @@ class Printer(private val output: PrintWriter, config: Config) {
 
       case sym: ClassSymbol =>
         val sealedKw = if (sym.isSealed) "sealed " else ""
-        val abstractKw = if (sym.isAbstract) "abstract " else ""
+        val abstractKw = if (sym.isAbstract && !sym.isTrait) "abstract " else ""
         val kw = if (sym.isTrait) "trait" else "class"
         val constructorStr =
           if (sym.isTrait) ""
@@ -99,7 +99,9 @@ class Printer(private val output: PrintWriter, config: Config) {
           else sym.parents.toList
 
         pln"";
-        pln"@js.native"
+        if (!sym.isAbstractTrait()) {
+          pln"@js.native"
+        }
         if (!sym.isTrait) {
           if (currentJSNamespace.isEmpty)
             pln"@JSGlobal"
@@ -152,6 +154,7 @@ class Printer(private val output: PrintWriter, config: Config) {
           else if (sym.modifiers(Modifier.ReadOnly)) "def"
           else "var"
         p"  $access$decl $name: ${sym.tpe}"
+
         if (!sym.modifiers(Modifier.Abstract))
           p" = js.native"
         pln""

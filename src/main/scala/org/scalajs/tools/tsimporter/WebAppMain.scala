@@ -15,7 +15,8 @@ class Data(var input: Input,
           ) extends js.Object {
 }
 
-class Input(var source: String, var outputPackage: js.UndefOr[String], var generateFactory: Boolean) extends js.Object
+class Input(var source: String, var outputPackage: js.UndefOr[String], var generateFactory: Boolean,
+            var forceAbstractFieldOnTrait: Boolean = false) extends js.Object
 
 class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
 

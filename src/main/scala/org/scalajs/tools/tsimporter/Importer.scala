@@ -227,7 +227,13 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
           sym.tpe = if (optional) TypeRef(QualifiedName.UndefOr, List(underlying)) else underlying
           processFactory(module, classSym, members)
         case _ =>
-          val sym = owner.newField(name, modifiers)
+          val mods = owner match {
+            case sym: ClassSymbol if config.forceAbstractFieldOnTrait && sym.isTrait =>
+              sym.isAbstract = true
+              modifiers + Modifier.Abstract
+            case _ => modifiers
+          }
+          val sym = owner.newField(name, mods)
           if (protectName)
             sym.protectName()
           val underlying = typeToScala(tpe)
@@ -238,10 +244,16 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
 
   private def processDefDecl(owner: ContainerSymbol, name: Name,
       signature: FunSignature, modifiers: Modifiers, protectName: Boolean = true, optional: Boolean = true) {
-    val sym = owner.newMethod(name, modifiers)
+    val mods = owner match {
+      case sym: ClassSymbol if config.forceAbstractFieldOnTrait && sym.isTrait =>
+        sym.isAbstract = true
+        modifiers + Modifier.Abstract
+      case _ => modifiers
+    }
+    val sym = owner.newMethod(name, mods)
     if (protectName)
       sym.protectName()
-
+    
     sym.tparams ++= typeParamsToScala(signature.tparams)
 
     for (FunParam(IdentName(paramName), opt, TypeOrAny(tpe)) <- signature.params) {
