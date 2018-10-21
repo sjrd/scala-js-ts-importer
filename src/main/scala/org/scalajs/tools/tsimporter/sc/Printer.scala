@@ -8,14 +8,18 @@ package org.scalajs.tools.tsimporter.sc
 import java.io.PrintWriter
 import org.scalajs.tools.tsimporter.Trees.Modifier
 
-class Printer(private val output: PrintWriter, outputPackage: String) {
+class Printer(private val output: PrintWriter, outputPackage: String, forceAbstractFieldOnTrait: Boolean) {
   import Printer._
 
   private implicit val self = this
 
   private var currentJSNamespace = ""
 
-  def printSymbol(sym: Symbol) {
+  def printSymbol(sym: Symbol): Unit = {
+    printSymbol(sym, None)
+  }
+
+  private def printSymbol(sym: Symbol, containerSymbol: Option[ContainerSymbol]) {
     val name = sym.name
     sym match {
       case comment: CommentSymbol =>
@@ -144,7 +148,12 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           else if (sym.modifiers(Modifier.ReadOnly)) "def"
           else "var"
         p"  $access$decl $name: ${sym.tpe}"
-        if (!sym.modifiers(Modifier.Abstract))
+
+        val forceAbstractField = containerSymbol.fold(false) {
+          case traitSym: ClassSymbol => traitSym.isTrait && forceAbstractFieldOnTrait
+          case _ => false
+        }
+        if (!forceAbstractField && !sym.modifiers(Modifier.Abstract))
           p" = js.native"
         pln""
 
@@ -184,7 +193,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
     val (constructors, others) =
       owner.members.toList.partition(_.name == Name.CONSTRUCTOR)
     for (sym <- constructors ++ others)
-      printSymbol(sym)
+      printSymbol(sym, Some(owner))
   }
 
   private def canBeTopLevel(sym: Symbol): Boolean =

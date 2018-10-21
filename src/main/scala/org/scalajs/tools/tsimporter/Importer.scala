@@ -16,13 +16,13 @@ class Importer(val output: java.io.PrintWriter) {
   import Importer._
 
   /** Entry point */
-  def apply(declarations: List[DeclTree], outputPackage: String) {
+  def apply(declarations: List[DeclTree], outputPackage: String, forceAbstractFieldOnTrait: Boolean) {
     val rootPackage = new PackageSymbol(Name.EMPTY)
 
     for (declaration <- declarations)
       processDecl(rootPackage, declaration)
 
-    new Printer(output, outputPackage).printSymbol(rootPackage)
+    new Printer(output, outputPackage, forceAbstractFieldOnTrait).printSymbol(rootPackage)
   }
 
   private def processDecl(owner: ContainerSymbol, declaration: DeclTree) {

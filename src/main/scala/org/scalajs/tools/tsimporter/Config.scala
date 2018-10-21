@@ -3,7 +3,8 @@ package org.scalajs.tools.tsimporter
 case class Config(
     inputFileName: String = "",
     outputFileName: String = "",
-    packageName: String = "importedjs"
+    packageName: String = "importedjs",
+    forceAbstractFieldOnTrait: Boolean = false
 )
 
 object Config {
@@ -19,6 +20,10 @@ object Config {
     arg[String]("<package>").optional()
       .text("Package name for the output (defaults to \"importedjs\")")
       .action((pn, config) => config.copy(packageName = pn))
+
+    opt[Unit]("forceAbstractFieldOnTrait").optional()
+      .text("Leave fields on TypeScript interfaces abstract (defaults to implemented \"var field: String = js.native\")")
+      .action((_, config) => config.copy(forceAbstractFieldOnTrait = true))
 
     help("help").abbr("h")
       .text("prints help")

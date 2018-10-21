@@ -45,8 +45,8 @@ object Main {
   }
 
   private def process(definitions: List[DeclTree], output: PrintWriter,
-      outputPackage: String) {
-    new Importer(output)(definitions, outputPackage)
+      outputPackage: String, abstractField: Boolean) {
+    new Importer(output)(definitions, outputPackage, abstractField)
   }
 
   private def parseDefinitions(reader: Reader[Char]): Either[String, List[DeclTree]] = {
