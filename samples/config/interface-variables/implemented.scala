@@ -3,7 +3,7 @@ import scala.scalajs.js
 import js.annotation._
 import js.|
 
-package `interface-variables` {
+package source {
 
 @js.native
 trait GPGPUProgram extends js.Object {
