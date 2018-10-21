@@ -17,21 +17,18 @@ import parser.TSDefParser
 /** Entry point for the TypeScript importer of Scala.js */
 object Main {
   def main(args: Array[String]) {
-    Config.parser.parse(args, Config()) match {
-      case None => // do nothing. Scopt shows nice error message.
+    for (config <- Config.parser.parse(args, Config())) {
+      val outputPackage = config.packageName
 
-      case Some(config) =>
-        val outputPackage = config.packageName
-
-        importTsFile(config.inputFileName, config.outputFileName, outputPackage) match {
-          case Right(()) =>
-            ()
-          case Left(message) =>
-            Console.err.println(message)
-            System.exit(2)
-        }
+      importTsFile(config.inputFileName, config.outputFileName, outputPackage) match {
+        case Right(()) =>
+          ()
+        case Left(message) =>
+          Console.err.println(message)
+          System.exit(2)
+      }
     }
-}
+  }
 
   def importTsFile(inputFileName: String, outputFileName: String, outputPackage: String): Either[String, Unit] = {
     parseDefinitions(readerForFile(inputFileName)).map { definitions =>
