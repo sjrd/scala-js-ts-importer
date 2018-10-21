@@ -1,6 +1,6 @@
 package org.scalajs.tools.tsimporter
 
-import java.io.{ File, FilenameFilter }
+import java.io.File
 import org.scalatest.FunSpec
 import scala.io.Source
 
@@ -19,9 +19,12 @@ class ImporterSpec extends FunSpec {
       it(s"should import ${input.getName}") {
         val expected = new File(inputDirectory, input.getName + ".scala")
         val output = new File(outputDir, input.getName + ".scala")
-
-        assert(Right(()) == Main.importTsFile(input.getAbsolutePath, output.getAbsolutePath, input.getName.takeWhile(_ != '.')))
-
+        val config = Config(
+            inputFileName = input.getAbsolutePath,
+            outputFileName = output.getAbsolutePath,
+            packageName = input.getName.takeWhile(_ != '.')
+        )
+        assert(Right(()) == Main.importTsFile(config))
         assert(output.exists())
         assert(contentOf(output) == contentOf(expected))
       }
