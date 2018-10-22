@@ -33,7 +33,7 @@ object Main {
       parseDefinitions(reader).map { definitions =>
         val output = new PrintWriter(new BufferedWriter(new FileWriter(config.outputFileName)))
         try {
-          process(definitions, output, config.packageName)
+          process(definitions, output, config)
           Right(())
         } finally {
           output.close()
@@ -44,9 +44,8 @@ object Main {
     }
   }
 
-  private def process(definitions: List[DeclTree], output: PrintWriter,
-      outputPackage: String, abstractField: Boolean) {
-    new Importer(output)(definitions, outputPackage, abstractField)
+  private def process(definitions: List[DeclTree], output: PrintWriter, config: Config) {
+    new Importer(output, config)(definitions)
   }
 
   private def parseDefinitions(reader: Reader[Char]): Either[String, List[DeclTree]] = {

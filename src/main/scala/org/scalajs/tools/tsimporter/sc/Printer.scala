@@ -8,18 +8,14 @@ package org.scalajs.tools.tsimporter.sc
 import java.io.PrintWriter
 import org.scalajs.tools.tsimporter.Trees.Modifier
 
-class Printer(private val output: PrintWriter, outputPackage: String, forceAbstractFieldOnTrait: Boolean) {
+class Printer(private val output: PrintWriter, outputPackage: String) {
   import Printer._
 
   private implicit val self = this
 
   private var currentJSNamespace = ""
 
-  def printSymbol(sym: Symbol): Unit = {
-    printSymbol(sym, None)
-  }
-
-  private def printSymbol(sym: Symbol, containerSymbol: Option[ContainerSymbol]) {
+  def printSymbol(sym: Symbol) {
     val name = sym.name
     sym match {
       case comment: CommentSymbol =>
@@ -85,7 +81,7 @@ class Printer(private val output: PrintWriter, outputPackage: String, forceAbstr
 
       case sym: ClassSymbol =>
         val sealedKw = if (sym.isSealed) "sealed " else ""
-        val abstractKw = if (sym.isAbstract) "abstract " else ""
+        val abstractKw = if (sym.isAbstract && !sym.isTrait) "abstract " else ""
         val kw = if (sym.isTrait) "trait" else "class"
         val constructorStr =
           if (sym.isTrait) ""
@@ -96,7 +92,9 @@ class Printer(private val output: PrintWriter, outputPackage: String, forceAbstr
           else sym.parents.toList
 
         pln"";
-        pln"@js.native"
+        if (!sym.isAbstractTrait()) {
+          pln"@js.native"
+        }
         if (!sym.isTrait) {
           if (currentJSNamespace.isEmpty)
             pln"@JSGlobal"
@@ -149,11 +147,7 @@ class Printer(private val output: PrintWriter, outputPackage: String, forceAbstr
           else "var"
         p"  $access$decl $name: ${sym.tpe}"
 
-        val forceAbstractField = containerSymbol.fold(false) {
-          case traitSym: ClassSymbol => traitSym.isTrait && forceAbstractFieldOnTrait
-          case _ => false
-        }
-        if (!forceAbstractField && !sym.modifiers(Modifier.Abstract))
+        if (!sym.modifiers(Modifier.Abstract))
           p" = js.native"
         pln""
 
@@ -193,7 +187,7 @@ class Printer(private val output: PrintWriter, outputPackage: String, forceAbstr
     val (constructors, others) =
       owner.members.toList.partition(_.name == Name.CONSTRUCTOR)
     for (sym <- constructors ++ others)
-      printSymbol(sym, Some(owner))
+      printSymbol(sym)
   }
 
   private def canBeTopLevel(sym: Symbol): Boolean =

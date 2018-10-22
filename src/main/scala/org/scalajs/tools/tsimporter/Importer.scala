@@ -12,17 +12,17 @@ import sc._
  *  It reads the TypeScript AST and produces (hopefully) equivalent Scala
  *  code.
  */
-class Importer(val output: java.io.PrintWriter) {
+class Importer(val output: java.io.PrintWriter, config: Config) {
   import Importer._
 
   /** Entry point */
-  def apply(declarations: List[DeclTree], outputPackage: String, forceAbstractFieldOnTrait: Boolean) {
+  def apply(declarations: List[DeclTree]) {
     val rootPackage = new PackageSymbol(Name.EMPTY)
 
     for (declaration <- declarations)
       processDecl(rootPackage, declaration)
 
-    new Printer(output, outputPackage, forceAbstractFieldOnTrait).printSymbol(rootPackage)
+    new Printer(output, config.packageName).printSymbol(rootPackage)
   }
 
   private def processDecl(owner: ContainerSymbol, declaration: DeclTree) {
@@ -217,7 +217,13 @@ class Importer(val output: java.io.PrintWriter) {
           val sym = owner.newField(name, modifiers)
           sym.tpe = TypeRef(QualifiedName(module.name, classSym.name))
         case _ =>
-          val sym = owner.newField(name, modifiers)
+          val mods = owner match {
+            case sym: ClassSymbol if config.forceAbstractFieldOnTrait && sym.isTrait =>
+              sym.isAbstract = true
+              modifiers + Modifier.Abstract
+            case _ => modifiers
+          }
+          val sym = owner.newField(name, mods)
           if (protectName)
             sym.protectName()
           sym.tpe = typeToScala(tpe)
