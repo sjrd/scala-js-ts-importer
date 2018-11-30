@@ -52,15 +52,21 @@ object QualifiedName {
   val scala = Root dot Name.scala
   val scala_js = scala dot Name.scalajs dot Name.js
   val java_lang = Root dot Name.java dot Name.lang
-  val js = Root dot Name.js
   val jstypedarray = Root dot Name.js dot Name.typedarray
 
   val Array = scala_js dot Name("Array")
   val Dictionary = scala_js dot Name("Dictionary")
   val FunctionBase = scala_js dot Name("Function")
   val Object = scala_js dot Name("Object")
-  val Thenable = js dot Name("Thenable")
-  val JsArray = js dot Name("Array")
+  val Thenable = scala_js dot Name("Thenable")
+  val JSArray = scala_js dot Name("Array")
+  val Float32Array = jstypedarray dot Name("Float32Array")
+  val Float64Array = jstypedarray dot Name("Float64Array")
+  val Int8Array = jstypedarray dot Name("Int8Array")
+  val Int16Array = jstypedarray dot Name("Int16Array")
+  val Int32Array = jstypedarray dot Name("Int32Array")
+  val Uint8Array = jstypedarray dot Name("Uint8Array")
+  val Uint16Array = jstypedarray dot Name("Uint16Array")
   val Uint32Array = jstypedarray dot Name("Uint32Array")
   def Function(arity: Int) = scala_js dot Name("Function"+arity)
   def Tuple(arity: Int) = scala_js dot Name("Tuple"+arity)

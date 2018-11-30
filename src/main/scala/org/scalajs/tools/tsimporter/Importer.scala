@@ -269,7 +269,14 @@ class Importer(val output: java.io.PrintWriter) {
           case TypeName("Function") => QualifiedName.FunctionBase
           case TypeName("object") => QualifiedName.Object
           case TypeName("PromiseLike") => QualifiedName.Thenable
-          case TypeName("ReadonlyArray") => QualifiedName.JsArray
+          case TypeName("ReadonlyArray") => QualifiedName.JSArray
+          case TypeName("Float32Array") => QualifiedName.Float32Array
+          case TypeName("Float64Array") => QualifiedName.Float64Array
+          case TypeName("Int8Array") => QualifiedName.Int8Array
+          case TypeName("Int16Array") => QualifiedName.Int16Array
+          case TypeName("Int32Array") => QualifiedName.Int32Array
+          case TypeName("Uint8Array") => QualifiedName.Uint8Array
+          case TypeName("Uint16Array") => QualifiedName.Uint16Array
           case TypeName("Uint32Array") => QualifiedName.Uint32Array
           case TypeNameName(name) => QualifiedName(name)
           case QualifiedTypeName(qualifier, TypeNameName(name)) =>
