@@ -268,6 +268,9 @@ class Importer(val output: java.io.PrintWriter) {
           case TypeName("Array") => QualifiedName.Array
           case TypeName("Function") => QualifiedName.FunctionBase
           case TypeName("object") => QualifiedName.Object
+          case TypeName("PromiseLike") => QualifiedName.Thenable
+          case TypeName("ReadonlyArray") => QualifiedName.JsArray
+          case TypeName("Uint32Array") => QualifiedName.Uint32Array
           case TypeNameName(name) => QualifiedName(name)
           case QualifiedTypeName(qualifier, TypeNameName(name)) =>
             val qual1 = qualifier map (x => Name(x.name))

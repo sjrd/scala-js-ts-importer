@@ -23,6 +23,7 @@ object Name {
   val js = Name("js")
   val java = Name("java")
   val lang = Name("lang")
+  val typedarray = Name("typedarray")
 
   val EMPTY = Name("")
   val CONSTRUCTOR = Name("<init>")
@@ -51,11 +52,16 @@ object QualifiedName {
   val scala = Root dot Name.scala
   val scala_js = scala dot Name.scalajs dot Name.js
   val java_lang = Root dot Name.java dot Name.lang
+  val js = Root dot Name.js
+  val jstypedarray = Root dot Name.js dot Name.typedarray
 
   val Array = scala_js dot Name("Array")
   val Dictionary = scala_js dot Name("Dictionary")
   val FunctionBase = scala_js dot Name("Function")
   val Object = scala_js dot Name("Object")
+  val Thenable = js dot Name("Thenable")
+  val JsArray = js dot Name("Array")
+  val Uint32Array = jstypedarray dot Name("Uint32Array")
   def Function(arity: Int) = scala_js dot Name("Function"+arity)
   def Tuple(arity: Int) = scala_js dot Name("Tuple"+arity)
   val Union = scala_js dot Name("|")
