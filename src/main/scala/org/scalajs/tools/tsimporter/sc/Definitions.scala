@@ -295,7 +295,15 @@ class ParamSymbol(nme: Name) extends Symbol(nme) {
   }
 }
 
-case class TypeRef(typeName: QualifiedName, targs: List[TypeRef] = Nil) {
+sealed trait TypeRefOrWildcard
+
+case class Wildcard(upperBound: Option[TypeRefOrWildcard]) extends TypeRefOrWildcard {
+  override def toString() = {
+    "_" + upperBound.fold("")(bound => s" <: $bound")
+  }
+}
+
+case class TypeRef(typeName: QualifiedName, targs: List[TypeRefOrWildcard] = Nil) extends TypeRefOrWildcard {
   override def toString() = {
     if (targs.isEmpty)
       typeName.toString
@@ -326,7 +334,7 @@ object TypeRef {
     def apply(types: List[TypeRef]): TypeRef =
       TypeRef(QualifiedName.Union, types)
 
-    def unapply(typeRef: TypeRef): Option[List[TypeRef]] = typeRef match {
+    def unapply(typeRef: TypeRef): Option[List[TypeRefOrWildcard]] = typeRef match {
       case TypeRef(QualifiedName.Union, types) =>
         Some(types)
 
@@ -338,7 +346,7 @@ object TypeRef {
     def apply(types: List[TypeRef]): TypeRef =
       TypeRef(QualifiedName.Intersection, types)
 
-    def unapply(typeRef: TypeRef): Option[List[TypeRef]] = typeRef match {
+    def unapply(typeRef: TypeRef): Option[List[TypeRefOrWildcard]] = typeRef match {
       case TypeRef(QualifiedName.Intersection, types) =>
         Some(types)
 
