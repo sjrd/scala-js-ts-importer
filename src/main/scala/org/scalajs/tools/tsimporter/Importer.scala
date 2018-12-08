@@ -280,6 +280,10 @@ class Importer(val output: java.io.PrintWriter) {
           case TypeName("Uint8Array") => QualifiedName.Uint8Array
           case TypeName("Uint16Array") => QualifiedName.Uint16Array
           case TypeName("Uint32Array") => QualifiedName.Uint32Array
+          case TypeName("Uint8ClampedArray") => QualifiedName.Uint8ClampedArray
+          case TypeName("ArrayBuffer") => QualifiedName.ArrayBuffer
+          case TypeName("ArrayBufferView") => QualifiedName.ArrayBufferView
+          case TypeName("DataView") => QualifiedName.DataView
           case TypeNameName(name) => QualifiedName(name)
           case QualifiedTypeName(qualifier, TypeNameName(name)) =>
             val qual1 = qualifier map (x => Name(x.name))
