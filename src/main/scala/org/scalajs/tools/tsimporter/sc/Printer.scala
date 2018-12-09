@@ -226,10 +226,21 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
     }
   }
 
+  def printWildcard(wc: Wildcard): Unit = {
+    wc match {
+      case Wildcard(None) =>
+        p"_"
+
+      case Wildcard(Some(typeRefOrWildcard)) =>
+        p"_ <: $typeRefOrWildcard"
+    }
+  }
+
   private def print(x: Any) {
     x match {
       case x: Symbol => printSymbol(x)
       case x: TypeRef => printTypeRef(x)
+      case x: Wildcard => printWildcard(x)
       case QualifiedName(Name.scala, Name.scalajs, Name.js, name) =>
         output.print("js.")
         output.print(name)

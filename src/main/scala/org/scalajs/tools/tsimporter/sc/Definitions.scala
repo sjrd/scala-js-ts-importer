@@ -23,6 +23,7 @@ object Name {
   val js = Name("js")
   val java = Name("java")
   val lang = Name("lang")
+  val typedarray = Name("typedarray")
 
   val EMPTY = Name("")
   val CONSTRUCTOR = Name("<init>")
@@ -51,11 +52,26 @@ object QualifiedName {
   val scala = Root dot Name.scala
   val scala_js = scala dot Name.scalajs dot Name.js
   val java_lang = Root dot Name.java dot Name.lang
+  val jstypedarray = Root dot Name.js dot Name.typedarray
 
   val Array = scala_js dot Name("Array")
   val Dictionary = scala_js dot Name("Dictionary")
   val FunctionBase = scala_js dot Name("Function")
   val Object = scala_js dot Name("Object")
+  val Thenable = scala_js dot Name("Thenable")
+  val JSArray = scala_js dot Name("Array")
+  val Float32Array = jstypedarray dot Name("Float32Array")
+  val Float64Array = jstypedarray dot Name("Float64Array")
+  val Int8Array = jstypedarray dot Name("Int8Array")
+  val Int16Array = jstypedarray dot Name("Int16Array")
+  val Int32Array = jstypedarray dot Name("Int32Array")
+  val Uint8Array = jstypedarray dot Name("Uint8Array")
+  val Uint16Array = jstypedarray dot Name("Uint16Array")
+  val Uint32Array = jstypedarray dot Name("Uint32Array")
+  val Uint8ClampedArray = jstypedarray dot Name("Uint8ClampedArray")
+  val ArrayBuffer = jstypedarray dot Name("ArrayBuffer")
+  val ArrayBufferView = jstypedarray dot Name("ArrayBufferView")
+  val DataView = jstypedarray dot Name("DataView")
   def Function(arity: Int) = scala_js dot Name("Function"+arity)
   def Tuple(arity: Int) = scala_js dot Name("Tuple"+arity)
   val Union = scala_js dot Name("|")
@@ -283,7 +299,15 @@ class ParamSymbol(nme: Name) extends Symbol(nme) {
   }
 }
 
-case class TypeRef(typeName: QualifiedName, targs: List[TypeRef] = Nil) {
+sealed trait TypeRefOrWildcard
+
+case class Wildcard(upperBound: Option[TypeRefOrWildcard]) extends TypeRefOrWildcard {
+  override def toString() = {
+    "_" + upperBound.fold("")(bound => s" <: $bound")
+  }
+}
+
+case class TypeRef(typeName: QualifiedName, targs: List[TypeRefOrWildcard] = Nil) extends TypeRefOrWildcard {
   override def toString() = {
     if (targs.isEmpty)
       typeName.toString
@@ -314,7 +338,7 @@ object TypeRef {
     def apply(types: List[TypeRef]): TypeRef =
       TypeRef(QualifiedName.Union, types)
 
-    def unapply(typeRef: TypeRef): Option[List[TypeRef]] = typeRef match {
+    def unapply(typeRef: TypeRef): Option[List[TypeRefOrWildcard]] = typeRef match {
       case TypeRef(QualifiedName.Union, types) =>
         Some(types)
 
@@ -326,7 +350,7 @@ object TypeRef {
     def apply(types: List[TypeRef]): TypeRef =
       TypeRef(QualifiedName.Intersection, types)
 
-    def unapply(typeRef: TypeRef): Option[List[TypeRef]] = typeRef match {
+    def unapply(typeRef: TypeRef): Option[List[TypeRefOrWildcard]] = typeRef match {
       case TypeRef(QualifiedName.Intersection, types) =>
         Some(types)
 
