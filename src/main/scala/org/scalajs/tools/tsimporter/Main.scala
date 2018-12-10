@@ -7,8 +7,6 @@ package org.scalajs.tools.tsimporter
 
 import java.io.{ Console => _, Reader => _, _ }
 
-import scala.collection.immutable.PagedSeq
-
 import Trees._
 
 import scala.util.parsing.input._
