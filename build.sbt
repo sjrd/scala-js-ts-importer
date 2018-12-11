@@ -3,7 +3,7 @@ import sbt.Keys.resolvers
 inThisBuild(Def.settings(
   organization := "org.scalajs.tools",
   version := "0.1-SNAPSHOT",
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.12.8",
   scalacOptions ++= Seq(
     "-deprecation",
     "-unchecked",
@@ -20,7 +20,8 @@ val `scala-js-ts-importer` = project.in(file("."))
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.3",
       "blog.codeninja" % "scala-js-vue" % "2.4.2",
-      "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.0.5",
+      "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.1.1",
+      "com.github.scopt" %%% "scopt" % "3.7.0",
       "org.scalatest" %%% "scalatest" % "3.0.4" % Test
     ),
     scalaJSUseMainModuleInitializer := false

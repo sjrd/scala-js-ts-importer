@@ -263,11 +263,27 @@ class Importer(val output: java.io.PrintWriter) {
       case TypeRefTree(tpe: CoreType, Nil) =>
         coreTypeToScala(tpe, anyAsDynamic)
 
+      case TypeRefTree(TypeName("ReadonlyArray"), List(arrayType)) =>
+        TypeRef(QualifiedName.JSArray, List(Wildcard(Some(typeToScala(arrayType)))))
+
       case TypeRefTree(base, targs) =>
         val baseTypeRef = base match {
           case TypeName("Array") => QualifiedName.Array
           case TypeName("Function") => QualifiedName.FunctionBase
           case TypeName("object") => QualifiedName.Object
+          case TypeName("PromiseLike") => QualifiedName.Thenable
+          case TypeName("Float32Array") => QualifiedName.Float32Array
+          case TypeName("Float64Array") => QualifiedName.Float64Array
+          case TypeName("Int8Array") => QualifiedName.Int8Array
+          case TypeName("Int16Array") => QualifiedName.Int16Array
+          case TypeName("Int32Array") => QualifiedName.Int32Array
+          case TypeName("Uint8Array") => QualifiedName.Uint8Array
+          case TypeName("Uint16Array") => QualifiedName.Uint16Array
+          case TypeName("Uint32Array") => QualifiedName.Uint32Array
+          case TypeName("Uint8ClampedArray") => QualifiedName.Uint8ClampedArray
+          case TypeName("ArrayBuffer") => QualifiedName.ArrayBuffer
+          case TypeName("ArrayBufferView") => QualifiedName.ArrayBufferView
+          case TypeName("DataView") => QualifiedName.DataView
           case TypeNameName(name) => QualifiedName(name)
           case QualifiedTypeName(qualifier, TypeNameName(name)) =>
             val qual1 = qualifier map (x => Name(x.name))
