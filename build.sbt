@@ -1,4 +1,4 @@
-import sbt.Keys.resolvers
+import sbt.Keys.{ artifactPath, resolvers }
 
 inThisBuild(Def.settings(
   organization := "org.scalajs.tools",
@@ -24,7 +24,11 @@ val `scala-js-ts-importer` = project.in(file("."))
       "com.github.scopt" %%% "scopt" % "3.7.0",
       "org.scalatest" %%% "scalatest" % "3.0.4" % Test
     ),
-    scalaJSUseMainModuleInitializer := false
+    scalaJSUseMainModuleInitializer := false,
+    emitSourceMaps := false,
+    Seq(fastOptJS, fullOptJS) map { packageJSKey =>
+      artifactPath in (Compile, packageJSKey) := ((crossTarget in (Compile, packageJSKey)).value / (moduleName.value + "-opt.js"))
+    }
   )
   .enablePlugins(ScalaJSPlugin)
 
