@@ -7,8 +7,6 @@ package org.scalajs.tools.tsimporter
 
 import java.io.{ Console => _, Reader => _, _ }
 
-import scala.collection.immutable.PagedSeq
-
 import Trees._
 
 import scala.util.parsing.input._
@@ -31,15 +29,20 @@ object Main {
   }
 
   def importTsFile(inputFileName: String, outputFileName: String, outputPackage: String): Either[String, Unit] = {
-    parseDefinitions(readerForFile(inputFileName)).map { definitions =>
-      val output = new PrintWriter(new BufferedWriter(
-          new FileWriter(outputFileName)))
-      try {
-        process(definitions, output, outputPackage)
-        Right(())
-      } finally {
-        output.close()
+    val javaReader = new BufferedReader(new FileReader(inputFileName))
+    try {
+      val reader = new PagedSeqReader(PagedSeq.fromReader(javaReader))
+      parseDefinitions(reader).map { definitions =>
+        val output = new PrintWriter(new BufferedWriter(new FileWriter(outputFileName)))
+        try {
+          process(definitions, output, outputPackage)
+          Right(())
+        } finally {
+          output.close()
+        }
       }
+    } finally {
+      javaReader.close()
     }
   }
 
@@ -60,14 +63,5 @@ object Main {
             msg + "\n" +
             next.pos.longString)
     }
-  }
-
-  /** Builds a [[scala.util.parsing.input.PagedSeqReader]] for a file
-   *
-   *  @param fileName name of the file to be read
-   */
-  private def readerForFile(fileName: String) = {
-    new PagedSeqReader(PagedSeq.fromReader(
-        new BufferedReader(new FileReader(fileName))))
   }
 }
