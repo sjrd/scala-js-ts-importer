@@ -13,4 +13,9 @@ trait GPGPUProgram extends js.Object {
   var supportsBroadcasting: Boolean
 }
 
+trait Foo extends js.Object {
+  var field: js.Array[String]
+  def method(): Unit
+}
+
 }

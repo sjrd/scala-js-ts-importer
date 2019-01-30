@@ -14,4 +14,10 @@ trait GPGPUProgram extends js.Object {
   var supportsBroadcasting: Boolean = js.native
 }
 
+@js.native
+trait Foo extends js.Object {
+  var field: js.Array[String] = js.native
+  def method(): Unit = js.native
+}
+
 }

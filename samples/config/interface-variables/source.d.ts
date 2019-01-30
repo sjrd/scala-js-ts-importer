@@ -5,3 +5,8 @@ export interface GPGPUProgram {
     userCode: string;
     supportsBroadcasting?: boolean;
 }
+
+export interface Foo {
+    field: string[];
+    method(): void;
+}
