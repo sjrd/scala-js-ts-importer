@@ -120,10 +120,11 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val importDecl: Parser[DeclTree] =
     "import" ~> opt(
-      (
+      repsep(
           identifier
-        |  "{" ~ importIdentifierSeq ~ "}"
+        | "{" ~ importIdentifierSeq ~ "}"
         | "*" ~ lexical.Identifier("as") ~ identifier
+        , ","
       ) ~ lexical.Identifier("from")
     ) ~ stringLiteral <~ opt(";") ^^^ ImportDecl
 
