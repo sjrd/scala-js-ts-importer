@@ -154,7 +154,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   )
 
   lazy val functionSignature =
-    tparams ~ ("(" ~> repsep(functionParam, ",") <~ ")") ~ optResultType ^^ FunSignature
+    tparams ~ ("(" ~> repsep(functionParam, ",") <~ opt(",") <~ ")") ~ optResultType ^^ FunSignature
 
   lazy val functionParam =
     repeatedParamMarker ~ identifier ~ optionalMarker ~ optParamType ^^ {
