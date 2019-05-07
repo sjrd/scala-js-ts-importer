@@ -124,7 +124,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
         |  "{" ~ importIdentifierSeq ~ "}"
         | "*" ~ lexical.Identifier("as") ~ identifier
       ) ~ lexical.Identifier("from")
-    ) ~ stringLiteral <~ ";" ^^^ ImportDecl
+    ) ~ stringLiteral <~ opt(";") ^^^ ImportDecl
 
   lazy val importIdentifierSeq =
     rep1sep(identifier ~ opt(lexical.Identifier("as") ~ identifier), ",") <~ opt(",")
