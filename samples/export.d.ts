@@ -19,3 +19,5 @@ declare module "pixi.js" {
 }
 
 export as namespace asNamespace;
+
+export default Hoge
