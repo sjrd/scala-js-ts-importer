@@ -190,6 +190,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val resultType: Parser[TypeTree] = (
       ("void" ^^^ TypeRef(CoreType("void")))
+    | typeGuard
     | typeDesc
   )
 
@@ -234,6 +235,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     | indexTypeQuery
     | "(" ~> typeDesc <~ ")"
   )
+
+  lazy val typeGuard: Parser[TypeTree] =
+    identifier ~ lexical.Identifier("is") ~> singleTypeDesc ^^^ TypeGuard
 
   lazy val typeRef: Parser[TypeRef] =
     baseTypeRef ~ opt(typeArgs) ^^ {

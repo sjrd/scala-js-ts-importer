@@ -371,6 +371,9 @@ class Importer(val output: java.io.PrintWriter) {
       case PolymorphicThisType =>
         TypeRef.This
 
+      case TypeGuard =>
+        TypeRef.Boolean
+
       case _ =>
         // ???
         TypeRef.Any
