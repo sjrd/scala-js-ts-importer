@@ -8,6 +8,7 @@ import { First, Second } from "module";
 import { Third as T, Fourth } from "module";
 import * as validator from "module";
 import "./assets/module";
+import { First as Alpha, Second as Blavo, } from "module";
 
 declare const hello: String;
 
