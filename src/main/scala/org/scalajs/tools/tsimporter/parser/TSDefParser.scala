@@ -102,7 +102,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     "function" ~> identifier ~ functionSignature <~ opt(";") ^^ FunctionDecl
 
   lazy val ambientEnumDecl: Parser[DeclTree] =
-    "enum" ~> typeName ~ ("{" ~> ambientEnumBody <~ "}") ^^ EnumDecl
+    opt("const") ~> "enum" ~> typeName ~ ("{" ~> ambientEnumBody <~ "}") ^^ EnumDecl
 
   lazy val ambientEnumBody: Parser[List[Ident]] =
     repsep(identifier <~ opt("=" ~ (numericLit | stringLit) ), ",") <~ opt(",")
