@@ -15,9 +15,9 @@ trait C extends js.Object {
 
 @js.native
 trait D extends js.Object {
-  var c: C.type = js.native
-  var cat: C.`catch`.type = js.native
-  var del: C.delete.type = js.native
+  var c: C = js.native
+  var cat: Any /* C.`catch` */ = js.native
+  var del: Any /* C.delete */ = js.native
 }
 
 @js.native
