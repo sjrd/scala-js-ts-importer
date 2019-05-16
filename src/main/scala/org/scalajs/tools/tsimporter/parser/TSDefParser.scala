@@ -272,8 +272,8 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     "keyof" ~> typeDesc ^^ IndexedQueryType
 
   lazy val typeQuery: Parser[TypeTree] =
-    "typeof" ~> rep1sep(ident, ".") ^^ { parts =>
-      TypeQuery(QualifiedIdent(parts.init.map(Ident), Ident(parts.last)))
+    "typeof" ~> rep1sep(identifier, ".") ^^ { parts =>
+      TypeQuery(QualifiedIdent(parts.init, parts.last))
     }
 
   lazy val tupleType: Parser[TypeTree] =
