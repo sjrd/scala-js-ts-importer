@@ -13,4 +13,8 @@ declare module enumtype {
         EMPTY, NUMERIC = 2, STRING = "string", NEGATIVE = -1
     }
 
+    export const enum RenderLineNumbersType {
+        Off = 0,
+        On = 1,
+    }
 }

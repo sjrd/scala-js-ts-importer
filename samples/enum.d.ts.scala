@@ -50,6 +50,19 @@ object Mixed extends js.Object {
   def apply(value: Mixed): String = js.native
 }
 
+@js.native
+sealed trait RenderLineNumbersType extends js.Object {
+}
+
+@js.native
+@JSGlobal("enumtype.RenderLineNumbersType")
+object RenderLineNumbersType extends js.Object {
+  var Off: RenderLineNumbersType = js.native
+  var On: RenderLineNumbersType = js.native
+  @JSBracketAccess
+  def apply(value: RenderLineNumbersType): String = js.native
+}
+
 }
 
 }
