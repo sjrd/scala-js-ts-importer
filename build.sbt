@@ -20,9 +20,9 @@ val `scala-js-ts-importer` = project.in(file("."))
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.3",
       "blog.codeninja" % "scala-js-vue" % "2.4.2",
-      "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.1.1",
-      "com.github.scopt" %%% "scopt" % "3.7.0",
-      "org.scalatest" %%% "scalatest" % "3.0.4" % Test
+      "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.1.2",
+      "com.github.scopt" %%% "scopt" % "3.7.1",
+      "org.scalatest" %%% "scalatest" % "3.0.5" % Test
     ),
     scalaJSUseMainModuleInitializer := false,
     emitSourceMaps := false,
