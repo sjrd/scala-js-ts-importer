@@ -15,15 +15,15 @@ trait C extends js.Object {
 
 @js.native
 trait D extends js.Object {
-  var c: C = js.native
-  var cat: Any /* C.`catch` */ = js.native
-  var del: Any /* C.delete */ = js.native
+  var x: Any /* X.type */ = js.native
+  var cat: Any /* X.`catch`.type */ = js.native
+  var del: Any /* X.delete.type */ = js.native
 }
 
 @js.native
 @JSGlobal("typequery")
 object Typequery extends js.Object {
-  val C: C = js.native
+  val X: C = js.native
 }
 
 }

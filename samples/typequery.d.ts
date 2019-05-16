@@ -3,11 +3,11 @@ declare module typequery {
         catch<T>(ex: T): void;
         delete<T>(array: T[], key: number): void;
     }
-    export const C: C;
+    export const X: C;
 
     export interface D {
-        c: typeof C;
-        cat: typeof C.catch;
-        del: typeof C.delete;
+        x: typeof X;
+        cat: typeof X.catch;
+        del: typeof X.delete;
     }
 }

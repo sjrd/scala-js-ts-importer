@@ -216,10 +216,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         p"this.type"
 
       case TypeRef.Singleton(termRef) =>
-        termRef.parts match {
-          case Seq(name) => p"$name"
-          case _ => p"Any /* $termRef */"
-        }
+        p"Any /* $termRef.type */"
 
       case TypeRef.Repeated(underlying) =>
         p"$underlying*"
