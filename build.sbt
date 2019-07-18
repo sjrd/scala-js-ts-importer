@@ -27,7 +27,7 @@ val `scala-js-ts-importer` = project.in(file("."))
     scalaJSUseMainModuleInitializer := false,
     emitSourceMaps := false,
     Seq(fastOptJS, fullOptJS) map { packageJSKey =>
-      artifactPath in (Compile, packageJSKey) := ((crossTarget in (Compile, packageJSKey)).value / (moduleName.value + "-opt.js"))
+      artifactPath in (Compile, packageJSKey) := (resourceDirectory in Compile).value / (moduleName.value + "-opt.js")
     }
   )
   .enablePlugins(ScalaJSPlugin)
