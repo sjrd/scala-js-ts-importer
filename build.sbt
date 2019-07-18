@@ -22,7 +22,7 @@ val `scala-js-ts-importer` = project.in(file("."))
       "blog.codeninja" % "scala-js-vue" % "2.4.2",
       "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.1.2",
       "com.github.scopt" %%% "scopt" % "3.7.1",
-      "org.scalatest" %%% "scalatest" % "3.0.5" % Test
+      "org.scalatest" %%% "scalatest" % "3.0.8" % Test
     ),
     scalaJSUseMainModuleInitializer := false,
     emitSourceMaps := false,
