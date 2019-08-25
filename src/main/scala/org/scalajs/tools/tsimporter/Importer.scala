@@ -152,13 +152,15 @@ class Importer(val output: java.io.PrintWriter) {
         processDefDecl(classSym, Name.CONSTRUCTOR,
             FunSignature(Nil, params, Some(TypeRefTree(CoreType("void")))), Set.empty[Modifier])
 
-      case PropertyMember(PropertyNameName(name), opt, tpe, mods) if mods(Modifier.Static) =>
+      case PropertyMember(PropertyNameName(name), opt, underlying, mods) if mods(Modifier.Static) =>
         assert(owner.isInstanceOf[ClassSymbol],
             s"Cannot process static member $name in module definition")
         val module = enclosing.getModuleOrCreate(owner.name)
+        val tpe = if (opt) OptionalType(underlying) else underlying
         processPropertyDecl(enclosing, module, name, tpe, mods)
 
-      case PropertyMember(PropertyNameName(name), opt, tpe, mods) =>
+      case PropertyMember(PropertyNameName(name), opt, underlying, mods) =>
+        val tpe = if (opt) OptionalType(underlying) else underlying
         processPropertyDecl(enclosing, owner, name, tpe, mods)
 
       case FunctionMember(PropertyName("constructor"), _, signature, modifiers)
@@ -172,7 +174,7 @@ class Importer(val output: java.io.PrintWriter) {
         assert(owner.isInstanceOf[ClassSymbol],
             s"Cannot process static member $name in module definition")
         val module = enclosing.getModuleOrCreate(owner.name)
-        processDefDecl(module, name, signature, modifiers)
+        processDefDecl(module, name, signature, modifiers, optional = opt)
 
       case FunctionMember(PropertyNameName(name), opt, signature, modifiers) =>
         processDefDecl(owner, name, signature, modifiers)
@@ -226,7 +228,7 @@ class Importer(val output: java.io.PrintWriter) {
   }
 
   private def processDefDecl(owner: ContainerSymbol, name: Name,
-      signature: FunSignature, modifiers: Modifiers, protectName: Boolean = true) {
+      signature: FunSignature, modifiers: Modifiers, protectName: Boolean = true, optional: Boolean = true) {
     val sym = owner.newMethod(name, modifiers)
     if (protectName)
       sym.protectName()
@@ -238,9 +240,11 @@ class Importer(val output: java.io.PrintWriter) {
       paramSym.optional = opt
       tpe match {
         case RepeatedType(tpe0) =>
+          // TS1047: Rest parameter cannot be optional
           paramSym.tpe = TypeRef.Repeated(typeToScala(tpe0))
         case _ =>
-          paramSym.tpe = typeToScala(tpe)
+          val tpe2 = if (opt) OptionalType(tpe) else tpe
+          paramSym.tpe = typeToScala(tpe2)
       }
       sym.params += paramSym
     }
@@ -373,6 +377,9 @@ class Importer(val output: java.io.PrintWriter) {
 
       case TypeGuard =>
         TypeRef.Boolean
+
+      case OptionalType(underlying) =>
+        TypeRef.Optional(typeToScala(underlying))
 
       case _ =>
         // ???
