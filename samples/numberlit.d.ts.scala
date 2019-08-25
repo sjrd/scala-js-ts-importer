@@ -9,7 +9,7 @@ package numberlit {
 
 @js.native
 trait Machine extends js.Object {
-  var state: Int = js.native
+  var state: js.UndefOr[Int] = js.native
   def setState(flag: Int | Boolean): Int = js.native
 }
 

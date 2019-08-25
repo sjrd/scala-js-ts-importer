@@ -152,13 +152,15 @@ class Importer(val output: java.io.PrintWriter) {
         processDefDecl(classSym, Name.CONSTRUCTOR,
             FunSignature(Nil, params, Some(TypeRefTree(CoreType("void")))), Set.empty[Modifier])
 
-      case PropertyMember(PropertyNameName(name), opt, tpe, mods) if mods(Modifier.Static) =>
+      case PropertyMember(PropertyNameName(name), opt, underlying, mods) if mods(Modifier.Static) =>
         assert(owner.isInstanceOf[ClassSymbol],
             s"Cannot process static member $name in module definition")
         val module = enclosing.getModuleOrCreate(owner.name)
+        val tpe = if (opt) OptionalType(underlying) else underlying
         processPropertyDecl(enclosing, module, name, tpe, mods)
 
-      case PropertyMember(PropertyNameName(name), opt, tpe, mods) =>
+      case PropertyMember(PropertyNameName(name), opt, underlying, mods) =>
+        val tpe = if (opt) OptionalType(underlying) else underlying
         processPropertyDecl(enclosing, owner, name, tpe, mods)
 
       case FunctionMember(PropertyName("constructor"), _, signature, modifiers)
@@ -371,6 +373,9 @@ class Importer(val output: java.io.PrintWriter) {
       case PolymorphicThisType =>
         TypeRef.This
 
+      case OptionalType(underlying) =>
+        TypeRef.Optional(typeToScala(underlying))
+        
       case _ =>
         // ???
         TypeRef.Any
