@@ -152,16 +152,14 @@ class Importer(val output: java.io.PrintWriter) {
         processDefDecl(classSym, Name.CONSTRUCTOR,
             FunSignature(Nil, params, Some(TypeRefTree(CoreType("void")))), Set.empty[Modifier])
 
-      case PropertyMember(PropertyNameName(name), opt, underlying, mods) if mods(Modifier.Static) =>
+      case PropertyMember(PropertyNameName(name), opt, tpe, mods) if mods(Modifier.Static) =>
         assert(owner.isInstanceOf[ClassSymbol],
             s"Cannot process static member $name in module definition")
         val module = enclosing.getModuleOrCreate(owner.name)
-        val tpe = if (opt) OptionalType(underlying) else underlying
-        processPropertyDecl(enclosing, module, name, tpe, mods)
+        processPropertyDecl(enclosing, module, name, tpe, mods, optional = opt)
 
-      case PropertyMember(PropertyNameName(name), opt, underlying, mods) =>
-        val tpe = if (opt) OptionalType(underlying) else underlying
-        processPropertyDecl(enclosing, owner, name, tpe, mods)
+      case PropertyMember(PropertyNameName(name), opt, tpe, mods) =>
+        processPropertyDecl(enclosing, owner, name, tpe, mods, optional = opt)
 
       case FunctionMember(PropertyName("constructor"), _, signature, modifiers)
           if owner.isInstanceOf[ClassSymbol] && !modifiers(Modifier.Static) =>
@@ -204,7 +202,7 @@ class Importer(val output: java.io.PrintWriter) {
   }
 
   private def processPropertyDecl(enclosing: ContainerSymbol, owner: ContainerSymbol, name: Name,
-      tpe: TypeTree, modifiers: Modifiers, protectName: Boolean = true) {
+      tpe: TypeTree, modifiers: Modifiers, protectName: Boolean = true, optional: Boolean = true) {
     if (name.name != "prototype") {
       tpe match {
         case ObjectType(members) if members.forall(_.isInstanceOf[CallMember]) =>
@@ -222,7 +220,8 @@ class Importer(val output: java.io.PrintWriter) {
           val sym = owner.newField(name, modifiers)
           if (protectName)
             sym.protectName()
-          sym.tpe = typeToScala(tpe)
+          val underlying = typeToScala(tpe)
+          sym.tpe = if (optional) TypeRef(QualifiedName.UndefOr, List(underlying)) else underlying
       }
     }
   }
@@ -373,9 +372,6 @@ class Importer(val output: java.io.PrintWriter) {
       case PolymorphicThisType =>
         TypeRef.This
 
-      case OptionalType(tpe) =>
-        TypeRef(QualifiedName.UndefOr, List(typeToScala(tpe)))
-        
       case _ =>
         // ???
         TypeRef.Any
