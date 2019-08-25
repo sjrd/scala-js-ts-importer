@@ -334,18 +334,6 @@ object TypeRef {
   val Null = TypeRef(scala dot Name("Null"))
   val Nothing = TypeRef(scala dot Name("Nothing"))
   val This = Singleton(QualifiedName(Name.THIS))
-
-  object Optional {
-    def apply(types: TypeRef): TypeRef =
-      TypeRef(QualifiedName.UndefOr, List(types))
-
-    def unapply(typeRef: TypeRef): Option[List[TypeRefOrWildcard]] = typeRef match {
-      case TypeRef(QualifiedName.UndefOr, types) =>
-        Some(types)
-
-      case _ => None
-    }
-  }
   
   object Union {
     def apply(types: List[TypeRef]): TypeRef =

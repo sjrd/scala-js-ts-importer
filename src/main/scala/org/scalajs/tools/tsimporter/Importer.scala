@@ -373,8 +373,8 @@ class Importer(val output: java.io.PrintWriter) {
       case PolymorphicThisType =>
         TypeRef.This
 
-      case OptionalType(underlying) =>
-        TypeRef.Optional(typeToScala(underlying))
+      case OptionalType(tpe) =>
+        TypeRef(QualifiedName.UndefOr, List(typeToScala(tpe)))
         
       case _ =>
         // ???
