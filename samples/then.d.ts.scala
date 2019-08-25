@@ -9,7 +9,7 @@ package `then` {
 
 @js.native
 trait Thenable[T] extends js.Object {
-  def `then`[TResult](onfulfilled: js.Function1[T, TResult | Thenable[TResult]] = ???, onrejected: js.Function1[js.Any, TResult | Thenable[TResult]] = ???): Thenable[TResult] = js.native
+  def `then`[TResult](onfulfilled: js.UndefOr[js.Function1[T, TResult | Thenable[TResult]]] = ???, onrejected: js.UndefOr[js.Function1[js.Any, TResult | Thenable[TResult]]] = ???): Thenable[TResult] = js.native
 }
 
 @js.native

@@ -174,7 +174,7 @@ class Importer(val output: java.io.PrintWriter) {
         assert(owner.isInstanceOf[ClassSymbol],
             s"Cannot process static member $name in module definition")
         val module = enclosing.getModuleOrCreate(owner.name)
-        processDefDecl(module, name, signature, modifiers)
+        processDefDecl(module, name, signature, modifiers, optional = opt)
 
       case FunctionMember(PropertyNameName(name), opt, signature, modifiers) =>
         processDefDecl(owner, name, signature, modifiers)
@@ -228,7 +228,7 @@ class Importer(val output: java.io.PrintWriter) {
   }
 
   private def processDefDecl(owner: ContainerSymbol, name: Name,
-      signature: FunSignature, modifiers: Modifiers, protectName: Boolean = true) {
+      signature: FunSignature, modifiers: Modifiers, protectName: Boolean = true, optional: Boolean = true) {
     val sym = owner.newMethod(name, modifiers)
     if (protectName)
       sym.protectName()
@@ -240,9 +240,11 @@ class Importer(val output: java.io.PrintWriter) {
       paramSym.optional = opt
       tpe match {
         case RepeatedType(tpe0) =>
+          // TS1047: Rest parameter cannot be optional
           paramSym.tpe = TypeRef.Repeated(typeToScala(tpe0))
         case _ =>
-          paramSym.tpe = typeToScala(tpe)
+          val tpe2 = if (opt) OptionalType(tpe) else tpe
+          paramSym.tpe = typeToScala(tpe2)
       }
       sym.params += paramSym
     }

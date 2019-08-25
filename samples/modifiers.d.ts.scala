@@ -15,7 +15,7 @@ trait IEvent[T] extends js.Object {
 @JSGlobal("modifiers.Emitter")
 class Emitter[T] extends js.Object {
   def event: IEvent[T] = js.native
-  def fire(event: T = ???): Unit = js.native
+  def fire(event: js.UndefOr[T] = ???): Unit = js.native
   def dispose(): Unit = js.native
 }
 
