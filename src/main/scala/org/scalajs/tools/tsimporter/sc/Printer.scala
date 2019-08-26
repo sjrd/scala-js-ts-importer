@@ -221,7 +221,7 @@ class Printer(private val output: PrintWriter, config: Config) {
       pln"  )"
       for (sym <- optionalProps)
         pln"""  ${sym.name}.foreach(_v => _obj$$.update("${sym.name.name}", _v.asInstanceOf[js.Any]))"""
-      pln"  _obj$$.isInstanceOf[${owner.name}]"
+      pln"  _obj$$.asInstanceOf[${owner.name}]"
       pln"}"
     }
   }
