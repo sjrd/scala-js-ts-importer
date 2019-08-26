@@ -215,7 +215,7 @@ class Printer(private val output: PrintWriter, config: Config) {
         pln"  ${sym.name}: ${sym.tpe} = js.undefined,"
       pln"): ${owner.name} = {"
 
-      pln"  var _obj$$ = js.Dictionary[js.Any]("
+      pln"  val _obj$$ = js.Dictionary[js.Any]("
       for (sym <- requiredProps)
         pln"""    "${sym.name.name}" -> ${sym.name}.asInstanceOf[js.Any],"""
       pln"  )"
