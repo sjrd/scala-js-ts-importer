@@ -215,7 +215,8 @@ class Importer(val output: java.io.PrintWriter) {
           val classSym = module.getClassOrCreate(name.capitalize)
           processMembersDecls(module, classSym, members)
           val sym = owner.newField(name, modifiers)
-          sym.tpe = TypeRef(QualifiedName(module.name, classSym.name))
+          val underlying = TypeRef(QualifiedName(module.name, classSym.name))
+          sym.tpe = if (optional) TypeRef(QualifiedName.UndefOr, List(underlying)) else underlying
         case _ =>
           val sym = owner.newField(name, modifiers)
           if (protectName)

@@ -16,7 +16,7 @@ object Info {
 
 @js.native
 trait Settings extends js.Object {
-  var state: Settings.State = js.native
+  var state: js.UndefOr[Settings.State] = js.native
 }
 
 object Settings {

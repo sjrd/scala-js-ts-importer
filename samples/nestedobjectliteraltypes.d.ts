@@ -1,7 +1,7 @@
 declare module A {
   interface Info {
     settings: {
-      state: {
+      state?: {
         enable: boolean;
       };
     };
