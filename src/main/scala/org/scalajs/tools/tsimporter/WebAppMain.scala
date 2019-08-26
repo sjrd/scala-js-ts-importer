@@ -15,7 +15,7 @@ class Data(var input: Input,
           ) extends js.Object {
 }
 
-class Input(var source: String, var outputPackage: js.UndefOr[String]) extends js.Object
+class Input(var source: String, var outputPackage: js.UndefOr[String], var generateFactory: Boolean) extends js.Object
 
 class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
 
@@ -41,7 +41,8 @@ object WebAppMain {
     val data = new Data(
       input = new Input(
         source = "",
-        outputPackage = ""
+        outputPackage = "",
+        generateFactory = false
       ),
       isLoading = false,
       output = new ScalaOutput(

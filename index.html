@@ -41,11 +41,21 @@
             <div class="ui basic segment" id="configuration">
                 <h5 class="ui header">Configuration</h5>
 
-                <div class="ui labeled fluid input">
-                    <div class="ui label">
-                        package
+                <div class="ui grid">
+                    <div class="column">
+                        <div class="ui labeled fluid input">
+                            <div class="ui label">
+                                package
+                            </div>
+                            <input placeholder="foo.bar" type="text" v-model="input.outputPackage">
+                        </div>
                     </div>
-                    <input placeholder="foo.bar" type="text" v-model="input.outputPackage">
+                    <div class="column">
+                        <div class="ui checkbox">
+                            <input type="checkbox" v-model="input.generateFactory">
+                            <label>Generate trait's factory method in companion object</label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
