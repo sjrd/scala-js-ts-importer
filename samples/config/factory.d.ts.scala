@@ -30,7 +30,7 @@ def apply(
   )
   inStock.foreach(_v => _obj$.update("inStock", _v.asInstanceOf[js.Any]))
   `for`.foreach(_v => _obj$.update("for", _v.asInstanceOf[js.Any]))
-  _obj$.isInstanceOf[Thing]
+  _obj$.asInstanceOf[Thing]
 }
 
 @js.native
@@ -49,7 +49,7 @@ def apply(
   )
   x.foreach(_v => _obj$.update("x", _v.asInstanceOf[js.Any]))
   y.foreach(_v => _obj$.update("y", _v.asInstanceOf[js.Any]))
-  _obj$.isInstanceOf[Obj]
+  _obj$.asInstanceOf[Obj]
 }
 }
 }
