@@ -250,8 +250,7 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
           // TS1047: Rest parameter cannot be optional
           paramSym.tpe = TypeRef.Repeated(typeToScala(tpe0))
         case _ =>
-          val tpe2 = if (opt) OptionalType(tpe) else tpe
-          paramSym.tpe = typeToScala(tpe2)
+          paramSym.tpe = typeToScala(tpe)
       }
       sym.params += paramSym
     }
@@ -384,9 +383,6 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
         
       case PolymorphicThisType =>
         TypeRef.This
-
-      case OptionalType(underlying) =>
-        TypeRef.Optional(typeToScala(underlying))
 
       case _ =>
         // ???
