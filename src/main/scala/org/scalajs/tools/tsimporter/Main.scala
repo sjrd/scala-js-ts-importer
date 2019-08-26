@@ -16,9 +16,7 @@ import parser.TSDefParser
 object Main {
   def main(args: Array[String]) {
     for (config <- Config.parser.parse(args, Config())) {
-      val outputPackage = config.packageName
-
-      importTsFile(config.inputFileName, config.outputFileName, outputPackage) match {
+      importTsFile(config.inputFileName, config) match {
         case Right(()) =>
           ()
         case Left(message) =>
@@ -28,14 +26,14 @@ object Main {
     }
   }
 
-  def importTsFile(inputFileName: String, outputFileName: String, outputPackage: String): Either[String, Unit] = {
+  def importTsFile(inputFileName: String, config: Config): Either[String, Unit] = {
     val javaReader = new BufferedReader(new FileReader(inputFileName))
     try {
       val reader = new PagedSeqReader(PagedSeq.fromReader(javaReader))
       parseDefinitions(reader).map { definitions =>
-        val output = new PrintWriter(new BufferedWriter(new FileWriter(outputFileName)))
+        val output = new PrintWriter(new BufferedWriter(new FileWriter(config.outputFileName)))
         try {
-          process(definitions, output, outputPackage)
+          process(definitions, output, config)
           Right(())
         } finally {
           output.close()
@@ -46,9 +44,8 @@ object Main {
     }
   }
 
-  private def process(definitions: List[DeclTree], output: PrintWriter,
-      outputPackage: String) {
-    new Importer(output)(definitions, outputPackage)
+  private def process(definitions: List[DeclTree], output: PrintWriter, config: Config) {
+    new Importer(output)(definitions, config)
   }
 
   private def parseDefinitions(reader: Reader[Char]): Either[String, List[DeclTree]] = {
