@@ -192,7 +192,6 @@ class Printer(private val output: PrintWriter, config: Config) {
     val (constructors, others) =
       owner.members.toList.partition(_.name == Name.CONSTRUCTOR)
     if (bufferSymbol) {
-      
       traitFactoryBuffer.update(owner.name, others.collect {
         case sym: FieldSymbol => sym
       })
@@ -201,28 +200,29 @@ class Printer(private val output: PrintWriter, config: Config) {
       printSymbol(sym)
   }
   
-  private def printFactory(owner: ContainerSymbol) {
-    if (traitFactoryBuffer.get(owner.name).nonEmpty) {
-      val others = traitFactoryBuffer.getOrElse(owner.name, Seq.empty)
-      val (requiredProps,optionalProps) = others.partition(_.tpe.typeName != QualifiedName.UndefOr)
-      traitFactoryBuffer.remove(owner.name)
-
-      pln""
-      pln"def apply("
-      for (sym <- requiredProps)
-        pln"  ${sym.name}: ${sym.tpe},"
-      for (sym <- optionalProps)
-        pln"  ${sym.name}: ${sym.tpe} = js.undefined,"
-      pln"): ${owner.name} = {"
-
-      pln"  val _obj$$ = js.Dictionary[js.Any]("
-      for (sym <- requiredProps)
-        pln"""    "${sym.name.name}" -> ${sym.name}.asInstanceOf[js.Any],"""
-      pln"  )"
-      for (sym <- optionalProps)
-        pln"""  ${sym.name}.foreach(_v => _obj$$.update("${sym.name.name}", _v.asInstanceOf[js.Any]))"""
-      pln"  _obj$$.asInstanceOf[${owner.name}]"
-      pln"}"
+  private def printFactory(owner: ContainerSymbol): Unit = {
+    traitFactoryBuffer.get(owner.name) match {
+      case Some(others) if others.nonEmpty =>
+        val (requiredProps,optionalProps) = others.partition(_.tpe.typeName != QualifiedName.UndefOr)
+        traitFactoryBuffer.remove(owner.name)
+  
+        pln""
+        pln"def apply("
+        for (sym <- requiredProps)
+          pln"  ${sym.name}: ${sym.tpe},"
+        for (sym <- optionalProps)
+          pln"  ${sym.name}: ${sym.tpe} = js.undefined,"
+        pln"): ${owner.name} = {"
+  
+        pln"  val _obj$$ = js.Dictionary[js.Any]("
+        for (sym <- requiredProps)
+          pln"""    "${sym.name.name}" -> ${sym.name}.asInstanceOf[js.Any],"""
+        pln"  )"
+        for (sym <- optionalProps)
+          pln"""  ${sym.name}.foreach(_v => _obj$$.update("${sym.name.name}", _v.asInstanceOf[js.Any]))"""
+        pln"  _obj$$.asInstanceOf[${owner.name}]"
+        pln"}"
+      case _ => ()
     }
   }
 
