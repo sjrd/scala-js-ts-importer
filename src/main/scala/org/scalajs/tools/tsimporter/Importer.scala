@@ -99,10 +99,7 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
         }
         sym.tparams ++= typeParamsToScala(tparams)
         processMembersDecls(owner, sym, members)
-        if (config.generateCompanionObject) {
-          val module = owner.getModuleOrCreate(sym.name)
-          module.isGlobal = false
-        }
+        processFactory(owner, sym, members)
 
       case TypeAliasDecl(TypeNameName(name), tparams, alias) =>
         val sym = owner.newTypeAlias(name)
@@ -131,6 +128,13 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
     }
   }
 
+  private def processFactory(owner: ContainerSymbol, sym: Symbol, members: List[Trees.MemberTree]): Unit = {
+    if (config.generateCompanionObject && members.forall(_.isInstanceOf[PropertyMember])) {
+      val module = owner.getModuleOrCreate(sym.name)
+      module.isGlobal = false
+    }
+  }
+  
   private def processMembersDecls(enclosing: ContainerSymbol,
       owner: ContainerSymbol, members: List[MemberTree]) {
 
@@ -220,10 +224,7 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
           processMembersDecls(module, classSym, members)
           val sym = owner.newField(name, modifiers)
           sym.tpe = TypeRef(QualifiedName(module.name, classSym.name))
-          if (config.generateCompanionObject) {
-            val moduleForClass = module.getModuleOrCreate(classSym.name)
-            moduleForClass.isGlobal = false
-          }
+          processFactory(module, classSym, members)
         case _ =>
           val sym = owner.newField(name, modifiers)
           if (protectName)
