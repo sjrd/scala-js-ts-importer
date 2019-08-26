@@ -160,8 +160,6 @@ object Trees {
 
   case class FunctionType(signature: FunSignature) extends TypeTree
 
-  case class OptionalType(underlying: TypeTree) extends TypeTree
-
   case class UnionType(left: TypeTree, right: TypeTree) extends TypeTree
 
   case class IntersectionType(left: TypeTree, right: TypeTree) extends TypeTree

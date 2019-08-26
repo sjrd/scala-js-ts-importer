@@ -39,15 +39,19 @@ object WorkerMain {
   private def translate(input: Input): ScalaOutput = {
     val reader = new CharSequenceReader(input.source)
     val outputPackage = input.outputPackage.filter(_.nonEmpty).getOrElse("foo")
-    parseDefinitions(reader, outputPackage)
+    val config = Config(
+      packageName = outputPackage,
+      generateCompanionObject =  input.generateFactory
+    )
+    parseDefinitions(reader, config)
   }
 
-  private def parseDefinitions(reader: Reader[Char], outputPackage: String): ScalaOutput = {
+  private def parseDefinitions(reader: Reader[Char], config: Config): ScalaOutput = {
     val parser = new TSDefParser
     parser.parseDefinitions(reader) match {
       case parser.Success(tree, _) =>
         val writer = new StringWriter()
-        process(tree, new PrintWriter(writer), outputPackage)
+        process(tree, new PrintWriter(writer), config)
         new ScalaOutput(writer.getBuffer.toString, hasError = false)
 
       case parser.NoSuccess(msg, next) =>
@@ -59,8 +63,8 @@ object WorkerMain {
     }
   }
 
-  private def process(definitions: List[DeclTree], output: PrintWriter, outputPackage: String): Unit = {
-    new Importer(output)(definitions, outputPackage)
+  private def process(definitions: List[DeclTree], output: PrintWriter, config: Config): Unit = {
+    new Importer(output, config)(definitions)
   }
 
 }

@@ -59,6 +59,7 @@ object QualifiedName {
   val FunctionBase = scala_js dot Name("Function")
   val Object = scala_js dot Name("Object")
   val Thenable = scala_js dot Name("Thenable")
+  val UndefOr = scala_js dot Name("UndefOr")
   val JSArray = scala_js dot Name("Array")
   val Float32Array = jstypedarray dot Name("Float32Array")
   val Float64Array = jstypedarray dot Name("Float64Array")
@@ -76,7 +77,6 @@ object QualifiedName {
   def Tuple(arity: Int) = scala_js dot Name("Tuple"+arity)
   val Union = scala_js dot Name("|")
   val Intersection = QualifiedName(Name.INTERSECTION)
-  val Optional = scala_js dot Name("UndefOr")
 }
 
 class Symbol(val name: Name) {
@@ -334,18 +334,6 @@ object TypeRef {
   val Null = TypeRef(scala dot Name("Null"))
   val Nothing = TypeRef(scala dot Name("Nothing"))
   val This = Singleton(QualifiedName(Name.THIS))
-
-  object Optional {
-    def apply(types: TypeRef): TypeRef =
-      TypeRef(QualifiedName.Optional, List(types))
-
-    def unapply(typeRef: TypeRef): Option[List[TypeRefOrWildcard]] = typeRef match {
-      case TypeRef(QualifiedName.Optional, types) =>
-        Some(types)
-
-      case _ => None
-    }
-  }
   
   object Union {
     def apply(types: List[TypeRef]): TypeRef =

@@ -6,15 +6,22 @@
 package org.scalajs.tools.tsimporter.sc
 
 import java.io.PrintWriter
+
+import org.scalajs.tools.tsimporter.Config
 import org.scalajs.tools.tsimporter.Trees.Modifier
 
-class Printer(private val output: PrintWriter, outputPackage: String) {
+class Printer(private val output: PrintWriter, config: Config) {
   import Printer._
 
+  private val outputPackage = config.packageName
+  private val generateCompanionObject = config.generateCompanionObject
+  
   private implicit val self = this
 
   private var currentJSNamespace = ""
-
+  
+  private val traitFactoryBuffer = scala.collection.mutable.Map.empty[Name, List[FieldSymbol]]
+  
   def printSymbol(sym: Symbol) {
     val name = sym.name
     sym match {
@@ -108,7 +115,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           pln"$constructorStr extends $parents {"
         }
 
-        printMemberDecls(sym)
+        printMemberDecls(sym, sym.isTrait && config.generateCompanionObject)
         pln"}"
 
       case sym: ModuleSymbol =>
@@ -123,6 +130,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         } else {
           pln"object $name {"
         }
+        printFactory(sym)
         printMemberDecls(sym)
         pln"}"
 
@@ -180,11 +188,42 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
     }
   }
 
-  private def printMemberDecls(owner: ContainerSymbol) {
+  private def printMemberDecls(owner: ContainerSymbol, bufferSymbol: Boolean = false) {
     val (constructors, others) =
       owner.members.toList.partition(_.name == Name.CONSTRUCTOR)
+    if (bufferSymbol) {
+      
+      traitFactoryBuffer.update(owner.name, others.collect {
+        case sym: FieldSymbol => sym
+      })
+    }
     for (sym <- constructors ++ others)
       printSymbol(sym)
+  }
+  
+  private def printFactory(owner: ContainerSymbol) {
+    if (traitFactoryBuffer.get(owner.name).nonEmpty) {
+      val others = traitFactoryBuffer.getOrElse(owner.name, Seq.empty)
+      val (requiredProps,optionalProps) = others.partition(_.tpe.typeName != QualifiedName.UndefOr)
+      traitFactoryBuffer.remove(owner.name)
+
+      pln""
+      pln"def apply("
+      for (sym <- requiredProps)
+        pln"  ${sym.name}: ${sym.tpe},"
+      for (sym <- optionalProps)
+        pln"  ${sym.name}: ${sym.tpe} = js.undefined,"
+      pln"): ${owner.name} = {"
+
+      pln"  val _obj$$ = js.Dictionary[js.Any]("
+      for (sym <- requiredProps)
+        pln"""    "${sym.name.name}" -> ${sym.name}.asInstanceOf[js.Any],"""
+      pln"  )"
+      for (sym <- optionalProps)
+        pln"""  ${sym.name}.foreach(_v => _obj$$.update("${sym.name.name}", _v.asInstanceOf[js.Any]))"""
+      pln"  _obj$$.asInstanceOf[${owner.name}]"
+      pln"}"
+    }
   }
 
   private def canBeTopLevel(sym: Symbol): Boolean =
