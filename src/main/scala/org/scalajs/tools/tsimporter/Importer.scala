@@ -219,7 +219,8 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
           val classSym = module.getClassOrCreate(name.capitalize)
           processMembersDecls(module, classSym, members)
           val sym = owner.newField(name, modifiers)
-          sym.tpe = TypeRef(QualifiedName(module.name, classSym.name))
+          val underlying = TypeRef(QualifiedName(module.name, classSym.name))
+          sym.tpe = if (optional) TypeRef(QualifiedName.UndefOr, List(underlying)) else underlying
           if (config.generateCompanionObject) {
             val moduleForClass = module.getModuleOrCreate(classSym.name)
             moduleForClass.isGlobal = false
