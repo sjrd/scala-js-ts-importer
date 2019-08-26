@@ -54,4 +54,15 @@ def apply(
 }
 }
 
+@js.native
+trait MethodOnly extends js.Object {
+  def method(s: String): Unit = js.native
+}
+
+@js.native
+trait MethodAndProperty extends js.Object {
+  var prop: String = js.native
+  def method(s: String): Unit = js.native
+}
+
 }
