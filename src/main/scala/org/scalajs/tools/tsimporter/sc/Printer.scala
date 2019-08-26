@@ -192,6 +192,7 @@ class Printer(private val output: PrintWriter, config: Config) {
     val (constructors, others) =
       owner.members.toList.partition(_.name == Name.CONSTRUCTOR)
     if (bufferSymbol) {
+      
       traitFactoryBuffer.update(owner.name, others.collect {
         case sym: FieldSymbol => sym
       })

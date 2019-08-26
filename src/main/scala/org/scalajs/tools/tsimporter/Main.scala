@@ -45,7 +45,7 @@ object Main {
   }
 
   private def process(definitions: List[DeclTree], output: PrintWriter, config: Config) {
-    new Importer(output)(definitions, config)
+    new Importer(output, config)(definitions)
   }
 
   private def parseDefinitions(reader: Reader[Char]): Either[String, List[DeclTree]] = {

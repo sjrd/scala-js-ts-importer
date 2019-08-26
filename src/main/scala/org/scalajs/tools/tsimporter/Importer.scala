@@ -12,11 +12,11 @@ import sc._
  *  It reads the TypeScript AST and produces (hopefully) equivalent Scala
  *  code.
  */
-class Importer(val output: java.io.PrintWriter) {
+class Importer(val output: java.io.PrintWriter, config: Config) {
   import Importer._
 
   /** Entry point */
-  def apply(declarations: List[DeclTree], config: Config) {
+  def apply(declarations: List[DeclTree]) {
     val rootPackage = new PackageSymbol(Name.EMPTY)
 
     for (declaration <- declarations)
@@ -99,6 +99,10 @@ class Importer(val output: java.io.PrintWriter) {
         }
         sym.tparams ++= typeParamsToScala(tparams)
         processMembersDecls(owner, sym, members)
+        if (config.generateCompanionObject) {
+          val module = owner.getModuleOrCreate(sym.name)
+          module.isGlobal = false
+        }
 
       case TypeAliasDecl(TypeNameName(name), tparams, alias) =>
         val sym = owner.newTypeAlias(name)
@@ -216,6 +220,10 @@ class Importer(val output: java.io.PrintWriter) {
           processMembersDecls(module, classSym, members)
           val sym = owner.newField(name, modifiers)
           sym.tpe = TypeRef(QualifiedName(module.name, classSym.name))
+          if (config.generateCompanionObject) {
+            val moduleForClass = module.getModuleOrCreate(classSym.name)
+            moduleForClass.isGlobal = false
+          }
         case _ =>
           val sym = owner.newField(name, modifiers)
           if (protectName)
