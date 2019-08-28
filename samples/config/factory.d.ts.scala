@@ -12,6 +12,7 @@ trait Thing extends js.Object {
   var obj: Thing.Obj = js.native
   var inStock: js.UndefOr[Boolean] = js.native
   var `for`: js.UndefOr[String] = js.native
+  var foo: String | Null = js.native
 }
 
 object Thing {
@@ -20,6 +21,7 @@ def apply(
   name: String,
   `type`: String,
   obj: Thing.Obj,
+  foo: String | Null = null,
   inStock: js.UndefOr[Boolean] = js.undefined,
   `for`: js.UndefOr[String] = js.undefined,
 ): Thing = {
@@ -27,6 +29,7 @@ def apply(
     "name" -> name.asInstanceOf[js.Any],
     "type" -> `type`.asInstanceOf[js.Any],
     "obj" -> obj.asInstanceOf[js.Any],
+    "foo" -> foo.asInstanceOf[js.Any],
   )
   inStock.foreach(_v => _obj$.update("inStock", _v.asInstanceOf[js.Any]))
   `for`.foreach(_v => _obj$.update("for", _v.asInstanceOf[js.Any]))
