@@ -7,6 +7,7 @@ interface Thing {
     };
     inStock?: boolean;
     for?: string
+    foo: string | null;
 }
 
 interface MethodOnly {
