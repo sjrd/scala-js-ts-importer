@@ -204,12 +204,17 @@ class Printer(private val output: PrintWriter, config: Config) {
     traitFactoryBuffer.get(owner.name) match {
       case Some(others) if others.nonEmpty =>
         val (requiredProps,optionalProps) = others.partition(_.tpe.typeName != QualifiedName.UndefOr)
+        val (nonNullableProps, nullableProps) = requiredProps.partition { prop =>
+          !(prop.tpe.typeName == QualifiedName.Union && prop.tpe.targs.contains(TypeRef.Null))
+        }
         traitFactoryBuffer.remove(owner.name)
   
         pln""
         pln"def apply("
-        for (sym <- requiredProps)
+        for (sym <- nonNullableProps)
           pln"  ${sym.name}: ${sym.tpe},"
+        for (sym <- nullableProps)
+          pln"  ${sym.name}: ${sym.tpe} = null,"
         for (sym <- optionalProps)
           pln"  ${sym.name}: ${sym.tpe} = js.undefined,"
         pln"): ${owner.name} = {"
