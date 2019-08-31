@@ -25,14 +25,14 @@ def apply(
   inStock: js.UndefOr[Boolean] = js.undefined,
   `for`: js.UndefOr[String] = js.undefined,
 ): Thing = {
-  val _obj$ = js.Dictionary[js.Any](
+  val _obj$ = js.Dynamic.literal(
     "name" -> name.asInstanceOf[js.Any],
     "type" -> `type`.asInstanceOf[js.Any],
     "obj" -> obj.asInstanceOf[js.Any],
     "foo" -> foo.asInstanceOf[js.Any],
   )
-  inStock.foreach(_v => _obj$.update("inStock", _v.asInstanceOf[js.Any]))
-  `for`.foreach(_v => _obj$.update("for", _v.asInstanceOf[js.Any]))
+  inStock.foreach(_v => _obj$.updateDynamic("inStock")(_v.asInstanceOf[js.Any]))
+  `for`.foreach(_v => _obj$.updateDynamic("for")(_v.asInstanceOf[js.Any]))
   _obj$.asInstanceOf[Thing]
 }
 
@@ -48,10 +48,10 @@ def apply(
   x: js.UndefOr[Double] = js.undefined,
   y: js.UndefOr[Double] = js.undefined,
 ): Obj = {
-  val _obj$ = js.Dictionary[js.Any](
+  val _obj$ = js.Dynamic.literal(
   )
-  x.foreach(_v => _obj$.update("x", _v.asInstanceOf[js.Any]))
-  y.foreach(_v => _obj$.update("y", _v.asInstanceOf[js.Any]))
+  x.foreach(_v => _obj$.updateDynamic("x")(_v.asInstanceOf[js.Any]))
+  y.foreach(_v => _obj$.updateDynamic("y")(_v.asInstanceOf[js.Any]))
   _obj$.asInstanceOf[Obj]
 }
 }

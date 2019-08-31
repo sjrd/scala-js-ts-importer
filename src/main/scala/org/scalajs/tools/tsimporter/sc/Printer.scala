@@ -219,12 +219,12 @@ class Printer(private val output: PrintWriter, config: Config) {
           pln"  ${sym.name}: ${sym.tpe} = js.undefined,"
         pln"): ${owner.name} = {"
   
-        pln"  val _obj$$ = js.Dictionary[js.Any]("
+        pln"  val _obj$$ = js.Dynamic.literal("
         for (sym <- requiredProps)
           pln"""    "${sym.name.name}" -> ${sym.name}.asInstanceOf[js.Any],"""
         pln"  )"
         for (sym <- optionalProps)
-          pln"""  ${sym.name}.foreach(_v => _obj$$.update("${sym.name.name}", _v.asInstanceOf[js.Any]))"""
+          pln"""  ${sym.name}.foreach(_v => _obj$$.updateDynamic("${sym.name.name}")(_v.asInstanceOf[js.Any]))"""
         pln"  _obj$$.asInstanceOf[${owner.name}]"
         pln"}"
       case _ => ()
