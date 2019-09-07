@@ -22,7 +22,7 @@ class Importer(val output: java.io.PrintWriter) {
     for (declaration <- declarations)
       processDecl(rootPackage, declaration)
 
-    new Printer(output, outputPackage).printSymbol(rootPackage)
+    new Printer(output, outputPackage).printSymbol(rootPackage, None)
   }
 
   private def processDecl(owner: ContainerSymbol, declaration: DeclTree) {

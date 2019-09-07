@@ -7,19 +7,16 @@ package intersectiontype {
 
 package intersectiontype {
 
-@js.native
 trait CoreOptions extends js.Object {
-  var statConcurrency: Double = js.native
+  var statConcurrency: Double
 }
 
-@js.native
 trait ExtraOptions extends js.Object {
-  var allowHalfOpen: Boolean = js.native
+  var allowHalfOpen: Boolean
 }
 
-@js.native
 trait MoreExtraOptions extends js.Object {
-  var store: Boolean = js.native
+  var store: Boolean
 }
 
 @js.native

@@ -11,10 +11,9 @@ class Foo extends js.Object {
   def foo(options: js.Any, key3: String): Unit = js.native
 }
 
-@js.native
 trait Bar extends js.Object {
-  var key1: String = js.native
-  var key2: String = js.native
+  var key1: String
+  var key2: String
 }
 
 }

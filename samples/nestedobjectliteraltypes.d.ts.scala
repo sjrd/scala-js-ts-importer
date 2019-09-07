@@ -7,23 +7,20 @@ package nestedobjectliteraltypes {
 
 package A {
 
-@js.native
 trait Info extends js.Object {
-  var settings: Info.Settings = js.native
+  var settings: Info.Settings
 }
 
 object Info {
 
-@js.native
 trait Settings extends js.Object {
-  var state: Settings.State = js.native
+  var state: Settings.State
 }
 
 object Settings {
 
-@js.native
 trait State extends js.Object {
-  var enable: Boolean = js.native
+  var enable: Boolean
 }
 }
 }

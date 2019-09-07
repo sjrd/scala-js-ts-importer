@@ -7,11 +7,9 @@ package extendsintersection {
 
 package M {
 
-@js.native
 trait A extends js.Object {
 }
 
-@js.native
 trait B extends js.Object {
 }
 

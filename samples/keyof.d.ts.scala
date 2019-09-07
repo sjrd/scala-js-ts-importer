@@ -5,12 +5,11 @@ import js.|
 
 package keyof {
 
-@js.native
 trait Thing extends js.Object {
-  var name: String = js.native
-  var width: Double = js.native
-  var height: Double = js.native
-  var inStock: Boolean = js.native
+  var name: String
+  var width: Double
+  var height: Double
+  var inStock: Boolean
 }
 
 @js.native

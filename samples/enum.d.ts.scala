@@ -7,7 +7,6 @@ package enum {
 
 package enumtype {
 
-@js.native
 sealed trait Color extends js.Object {
 }
 
@@ -21,7 +20,6 @@ object Color extends js.Object {
   def apply(value: Color): String = js.native
 }
 
-@js.native
 sealed trait Button extends js.Object {
 }
 
@@ -35,7 +33,6 @@ object Button extends js.Object {
   def apply(value: Button): String = js.native
 }
 
-@js.native
 sealed trait Mixed extends js.Object {
 }
 

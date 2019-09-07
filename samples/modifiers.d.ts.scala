@@ -7,7 +7,6 @@ package modifiers {
 
 package modifiers {
 
-@js.native
 trait IEvent[T] extends js.Object {
 }
 

@@ -7,13 +7,12 @@ package stringlit {
 
 package stringlit {
 
-@js.native
 trait IEditorOptions extends js.Object {
-  var ariaLabel: String = js.native
-  var rulers: js.Array[Double] = js.native
-  var selectionClipboard: Boolean = js.native
-  var lineNumbers: String | js.Function1[Double, String] = js.native
-  var readable: String | Boolean = js.native
+  var ariaLabel: String
+  var rulers: js.Array[Double]
+  var selectionClipboard: Boolean
+  var lineNumbers: String | js.Function1[Double, String]
+  var readable: String | Boolean
 }
 
 @js.native

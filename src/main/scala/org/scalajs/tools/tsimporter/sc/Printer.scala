@@ -15,7 +15,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
   private var currentJSNamespace = ""
 
-  def printSymbol(sym: Symbol) {
+  def printSymbol(sym: Symbol, owner: Option[ContainerSymbol]) {
     val name = sym.name
     sym match {
       case comment: CommentSymbol =>
@@ -51,7 +51,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           pln"package $thisPackage {"
 
           for (sym <- topLevels)
-            printSymbol(sym)
+            printSymbol(sym, owner)
 
           if (!packageObjectMembers.isEmpty) {
             val packageObjectName =
@@ -69,7 +69,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
               pln"object $packageObjectName extends js.Object {"
             }
             for (sym <- packageObjectMembers)
-              printSymbol(sym)
+              printSymbol(sym, owner)
             pln"}"
           }
 
@@ -90,9 +90,10 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
         val parents =
           if (sym.parents.isEmpty) List(TypeRef.Object)
           else sym.parents.toList
-
+        
         pln"";
-        pln"@js.native"
+        if (!isFieldOnlyTrait(sym))
+          pln"@js.native"
         if (!sym.isTrait) {
           if (currentJSNamespace.isEmpty)
             pln"@JSGlobal"
@@ -144,7 +145,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
           else if (sym.modifiers(Modifier.ReadOnly)) "def"
           else "var"
         p"  $access$decl $name: ${sym.tpe}"
-        if (!sym.modifiers(Modifier.Abstract))
+        if (!sym.modifiers(Modifier.Abstract) && !owner.exists(isFieldOnlyTrait))
           p" = js.native"
         pln""
 
@@ -184,7 +185,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
     val (constructors, others) =
       owner.members.toList.partition(_.name == Name.CONSTRUCTOR)
     for (sym <- constructors ++ others)
-      printSymbol(sym)
+      printSymbol(sym, Some(owner))
   }
 
   private def canBeTopLevel(sym: Symbol): Boolean =
@@ -194,6 +195,15 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
     sym match {
       case sym: MethodSymbol =>
         sym.name == Name.CONSTRUCTOR && sym.params.isEmpty
+      case _ =>
+        false
+    }
+  }
+
+  private def isFieldOnlyTrait(sym: ContainerSymbol): Boolean = {
+    sym match {
+      case classSym: ClassSymbol if classSym.isTrait =>
+        classSym.members.forall(_.isInstanceOf[FieldSymbol])
       case _ =>
         false
     }
@@ -238,7 +248,7 @@ class Printer(private val output: PrintWriter, outputPackage: String) {
 
   private def print(x: Any) {
     x match {
-      case x: Symbol => printSymbol(x)
+      case x: Symbol => printSymbol(x, None)
       case x: TypeRef => printTypeRef(x)
       case x: Wildcard => printWildcard(x)
       case QualifiedName(Name.scala, Name.scalajs, Name.js, name) =>
