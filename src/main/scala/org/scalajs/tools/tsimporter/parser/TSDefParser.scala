@@ -256,7 +256,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     "<" ~> rep1sep(typeDesc, ",") <~ ">"
 
   lazy val functionType: Parser[TypeTree] =
-    tparams ~ ("(" ~> repsep(functionParam, ",") <~ ")") ~ ("=>" ~> resultType) ^^ {
+    tparams ~ ("(" ~> repsep(functionParam, ",") <~ opt(",") <~ ")") ~ ("=>" ~> resultType) ^^ {
       case tparams ~ params ~ resultType =>
         FunctionType(FunSignature(tparams, params, Some(resultType)))
     }
