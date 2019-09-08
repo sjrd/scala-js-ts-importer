@@ -12,3 +12,12 @@ export interface Bar {
     key1: string,
     key2: string,
 }
+
+export type Callback<R> = (
+    value: R
+) => void;
+
+export type Handler<T,R> = (
+    event: T,
+    callback: Callback<R>,
+) => void;
