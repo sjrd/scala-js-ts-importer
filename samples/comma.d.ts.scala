@@ -17,4 +17,11 @@ trait Bar extends js.Object {
   var key2: String = js.native
 }
 
+@js.native
+@JSGlobalScope
+object Comma extends js.Object {
+  type Callback[R] = js.Function1[R, Unit]
+  type Handler[T, R] = js.Function2[T, Callback[R], Unit]
+}
+
 }
