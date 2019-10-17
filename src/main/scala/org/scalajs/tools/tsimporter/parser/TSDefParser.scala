@@ -46,6 +46,18 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
       "...", "=>"
   )
 
+  // for value expressions
+  val binaryValueOperators = Set(
+    "+", "-", "*", "/", "**", "%",
+    "<<", ">>>", ">>", "&", "|", "^"
+  )
+  lexical.delimiters ++= binaryValueOperators
+
+  val unaryValueOperators = Set(
+    "+", "-", "~"
+  )
+  lexical.delimiters ++= unaryValueOperators
+
   def parseDefinitions(input: Reader[Char]) =
     phrase(ambientDeclarations)(new lexical.Scanner(input))
 
@@ -105,7 +117,20 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     "enum" ~> typeName ~ ("{" ~> ambientEnumBody <~ "}") ^^ EnumDecl
 
   lazy val ambientEnumBody: Parser[List[Ident]] =
-    repsep(identifier <~ opt("=" ~ (numericLit | stringLit) ), ",") <~ opt(",")
+    repsep(identifier <~ opt("=" ~! valueExpression), ",") <~ opt(",")
+
+  lazy val valueExpression: Parser[_] =
+    rep1sep(success() ~>! rep(unaryValueOperator) ~
+      (numericLit | stringLit | identifierName | parenthesizedValueExpression), binaryValueOperator)
+
+  lazy val parenthesizedValueExpression =
+    "(" ~! valueExpression ~ ")"
+
+  lazy val binaryValueOperator =
+    elem("binary operator", tok => binaryValueOperators.contains(tok.chars))
+
+  lazy val unaryValueOperator =
+    elem("unary operator", tok => unaryValueOperators.contains(tok.chars))
 
   lazy val ambientClassDecl: Parser[DeclTree] =
     (abstractModifier <~ "class") ~ typeName ~ tparams ~ classParent ~ classImplements ~ memberBlock <~ opt(";") ^^ {
@@ -342,8 +367,8 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     stringLit ^^ StringLiteral
 
   lazy val numberLiteral: Parser[NumberLiteral] =
-    numericLit ^^ { s =>
-      val d = s.toDouble
+    opt("-") ~ numericLit ^^ { case minus ~ s =>
+      val d = (minus.getOrElse("") + s).toDouble
       if (!s.contains(".") && d.isValidInt) {
         IntLiteral(d.toInt)
       } else {
