@@ -24,7 +24,9 @@ val `scala-js-ts-importer` = project.in(file("."))
       "org.scalatest" %%% "scalatest" % "3.1.0" % Test
     ),
     scalaJSUseMainModuleInitializer := false,
-    emitSourceMaps := false,
+    scalaJSLinkerConfig ~= { 
+      _.withSourceMap(false)
+    },
     Seq(fastOptJS, fullOptJS) map { packageJSKey =>
       artifactPath in (Compile, packageJSKey) := (resourceDirectory in Compile).value / (moduleName.value + "-opt.js")
     }
