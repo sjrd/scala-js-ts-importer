@@ -36,7 +36,7 @@ object WorkerMain {
     WorkerGlobal.postMessage(s"[Worker] Sent result")
   }
 
-  private def translate(input: Input): ScalaOutput = {
+  def translate(input: Input): ScalaOutput = {
     val reader = new CharSequenceReader(input.source)
     val outputPackage = input.outputPackage.filter(_.nonEmpty).getOrElse("foo")
     val config = Config(
