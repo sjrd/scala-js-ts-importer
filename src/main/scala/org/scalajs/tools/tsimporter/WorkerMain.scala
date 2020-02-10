@@ -41,7 +41,8 @@ object WorkerMain {
     val outputPackage = input.outputPackage.filter(_.nonEmpty).getOrElse("foo")
     val config = Config(
       packageName = outputPackage,
-      generateCompanionObject =  input.generateFactory
+      generateCompanionObject = input.generateFactory,
+      forceAbstractFieldOnTrait = input.forceAbstractFieldOnTrait
     )
     parseDefinitions(reader, config)
   }

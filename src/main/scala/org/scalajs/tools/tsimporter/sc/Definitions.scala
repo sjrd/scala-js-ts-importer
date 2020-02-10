@@ -198,6 +198,10 @@ class ClassSymbol(nme: Name) extends ContainerSymbol(nme) {
   var isSealed: Boolean = false
   var isAbstract: Boolean = false
 
+  def isAbstractTrait(): Boolean = {
+    isTrait && isAbstract
+  }
+
   override def toString() = (
       (if (isSealed) "sealed " else "") +
       (if (isAbstract) "abstract" else "") +
