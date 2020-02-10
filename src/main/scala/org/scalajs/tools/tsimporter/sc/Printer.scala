@@ -260,7 +260,7 @@ class Printer(private val output: PrintWriter, config: Config) {
         p"this.type"
 
       case TypeRef.Singleton(termRef) =>
-        p"$termRef.type"
+        p"Any /* $termRef.type */"
 
       case TypeRef.Repeated(underlying) =>
         p"$underlying*"
