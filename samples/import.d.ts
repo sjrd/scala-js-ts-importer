@@ -1,4 +1,4 @@
-/// <reference path="./assets/module" />
+/// <reference path="./.assets/module.d.ts" />
 // Import variants from https://www.typescriptlang.org/docs/handbook/modules.html#import
 
 import Default from "module";
