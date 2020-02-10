@@ -1,15 +1,14 @@
-dist: trusty
+os: linux
+dist: bionic
 language: scala
-sudo: false
 
-scala: 2.12.8
+scala: 2.12.10
 
 jdk:
-  - openjdk8
   - openjdk11
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION samples/compile test
+  - sbt ++$TRAVIS_SCALA_VERSION test
   - $(npm bin)/tsc samples/*.d.ts
 
 before_cache:
@@ -17,12 +16,13 @@ before_cache:
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+  - find $HOME/.cache/coursier -name "*.lock" | xargs rm
 
 install:
   - . $HOME/.nvm/nvm.sh
-  - nvm install 8
-  - nvm use 8
-  - npm install typescript@2.6.2
+  - nvm install 12
+  - nvm use 12
+  - npm install typescript@3.7.5
 
 cache:
   directories:
