@@ -16,6 +16,7 @@ before_cache:
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+  - find $HOME/.cache/coursier -name "*.lock" | xargs rm
 
 install:
   - . $HOME/.nvm/nvm.sh
