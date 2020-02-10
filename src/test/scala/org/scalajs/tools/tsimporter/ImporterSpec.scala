@@ -31,6 +31,7 @@ class ImporterSpec extends AnyFunSpec with BeforeAndAfterAll {
           outputPackage = input.dropRight(".d.ts".length),
           generateFactory = false
         ))
+        assert(!outputContent.hasError, s"hasError: ${outputContent.text}")
         assert(outputContent.text === expectedContent)
       }
     }
