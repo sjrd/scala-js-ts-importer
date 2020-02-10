@@ -1,6 +1,6 @@
-dist: trusty
+os: linux
+dist: bionic
 language: scala
-sudo: false
 
 scala: 2.13.1
 
