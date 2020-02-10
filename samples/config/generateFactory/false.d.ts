@@ -18,12 +18,3 @@ interface MethodAndProperty {
     prop: string;
     method(s: string): void;
 }
-
-interface MethodOnly {
-    method(s: string): void;
-}
-
-interface MethodAndProperty {
-    prop: string;
-    method(s: string): void;
-}
