@@ -2,7 +2,7 @@ os: linux
 dist: bionic
 language: scala
 
-scala: 2.13.1
+scala: 2.12.10
 
 jdk:
   - openjdk11
