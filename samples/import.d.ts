@@ -6,6 +6,8 @@ import { Single } from "module";
 import { Single as Renamed } from "module";
 import { First, Second } from "module";
 import { Third as T, Fourth } from "module";
+import { First as Alpha, Second as Bravo, } from "module";
+import Foo, { Second as Z } from "module";
 import * as validator from "module";
 import "./assets/module";
 
