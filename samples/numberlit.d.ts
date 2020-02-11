@@ -10,4 +10,11 @@ declare module numberlit {
 
         setState(flag: 0 | 1 | boolean): 0 | 1;
     }
+
+    export enum STATUS_FLAGS {
+        NONE = (0),
+        DATA_URL = 1 << 0,
+        COMPLETE = (1 << 1),
+        LOADING = ((1) << (2))
+    }
 }

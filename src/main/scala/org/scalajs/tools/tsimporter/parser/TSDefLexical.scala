@@ -32,20 +32,31 @@ class TSDefLexical extends Lexical with StdTokens with ImplicitConversions {
   def identifierPart =
     elem("", isIdentifierPart) | (pseudoChar filter isIdentifierPart)
 
-  def numericLiteral = (
+  def numericLiteral = {
+    val const = (
       '0' ~> (
-          (elem('x') | 'X') ~> rep1(hexDigit) ^^ {
-            digits => digits.foldLeft(0L)(_ * 16 + _).toString
-          }
-        | rep1(octalDigit) ^^ {
-            // not standard, but I guess it could happen nevertheless
-            digits => digits.foldLeft(0L)(_ * 8 + _).toString
-          }
-      )
-    | opt('-')  ~ stringOf1(digit) ~ opt(stringOf1('.', digit)) ^^ {
+        (elem('x') | 'X') ~> rep1(hexDigit) ^^ {
+          digits => digits.foldLeft(0L)(_ * 16 + _).toString
+        }
+          | rep1(octalDigit) ^^ {
+          // not standard, but I guess it could happen nevertheless
+          digits => digits.foldLeft(0L)(_ * 8 + _).toString
+        }
+      ) | opt('-')  ~ stringOf1(digit) ~ opt(stringOf1('.', digit)) ^^ {
         case sign ~ part1 ~ part2 => sign.getOrElse("") + part1 + (part2.getOrElse(""))
       }
-  ) ^^ NumericLit
+    )
+    val term = ('(' ~ const ~ ')' ^^ {
+      case open ~ num ~ close => num
+    } | const)
+    val expression = 
+      term ~ opt(whitespace) ~ repN(2, '<') ~ opt(whitespace) ~ term ^^ {
+        case term1 ~ _ ~ _ ~ _ ~ term2 => (term1.toInt << term2.toInt).toString
+      } | term
+    ('(' ~ expression ~ ')' ^^ {
+      case _ ~ exp ~ _ => exp
+    } | expression) ^^ NumericLit
+  }
 
   def stringLiteral =
     (quoted('\"') | quoted('\'')) ^^ StringLit
