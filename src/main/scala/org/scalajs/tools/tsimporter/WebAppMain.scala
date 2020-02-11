@@ -53,10 +53,10 @@ object WebAppMain {
       samples = js.Array(
         new Sample("https://cdn.jsdelivr.net/npm/electron@8.0.0/electron.d.ts", "electron"),
         new Sample("https://cdn.jsdelivr.net/npm/@types/jpm@0.0.5/index.d.ts", "Firefox Addon SDK (jpm)"),
-        new Sample("https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/752136c29dec6f1e559dfc62f6acba08f207c280/types/google-1-script/google-apps-script.base.d.ts", "Google Apps Script (Base)"),
+        new Sample("https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/752136c29dec6f1e559dfc62f6acba08f207c280/types/google-apps-script/google-apps-script.base.d.ts", "Google Apps Script (Base)"),
         new Sample("https://cdn.jsdelivr.net/npm/pixi.js@5.2.1/pixi.js.d.ts", "pixi.js"),
         new Sample("https://cdn.jsdelivr.net/npm/@types/zip.js@2.0.27/index.d.ts", "zip.js"),
-    )
+      )
     )
 
     worker.onmessage = (e: js.Any) => {
