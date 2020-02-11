@@ -353,7 +353,12 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
           }
           val targs = paramTypes :+ resType
 
-          TypeRef(QualifiedName.Function(params.size), targs)
+          val typeRef = if (params.nonEmpty && params.head.name.name == "this") {
+            QualifiedName.ThisFunction(params.size - 1)
+          } else {
+            QualifiedName.Function(params.size)
+          }
+          TypeRef(typeRef, targs)
         }
 
       case IntersectionType(left, right) =>
