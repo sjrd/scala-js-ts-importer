@@ -308,7 +308,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     }
 
   lazy val namedMember: Parser[MemberTree] =
-    modifiers ~ propertyName ~ optionalMarker >> {
+    ((modifiers ~ propertyName) | success(Set.empty[Modifier]) ~ propertyName) ~ optionalMarker >> {
       case mods ~ name ~ optional => (
           functionSignature ^^ (FunctionMember(name, optional, _, mods))
         | typeAnnotation ^^ (PropertyMember(name, optional, _, mods))

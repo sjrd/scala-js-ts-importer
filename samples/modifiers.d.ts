@@ -44,4 +44,12 @@ declare module modifiers {
       private static resolve(): String;
   }
 
+  interface A {
+      public: boolean;
+      static: boolean;
+      readonly: boolean;
+      abstract: boolean;
+      protected: boolean;
+  }
+
 }
