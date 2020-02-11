@@ -74,6 +74,7 @@ object QualifiedName {
   val ArrayBufferView = jstypedarray dot Name("ArrayBufferView")
   val DataView = jstypedarray dot Name("DataView")
   def Function(arity: Int) = scala_js dot Name("Function"+arity)
+  def ThisFunction(arity: Int) = scala_js dot Name("ThisFunction"+arity)
   def Tuple(arity: Int) = scala_js dot Name("Tuple"+arity)
   val Union = scala_js dot Name("|")
   val Intersection = QualifiedName(Name.INTERSECTION)
