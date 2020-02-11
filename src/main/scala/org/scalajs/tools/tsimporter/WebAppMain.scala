@@ -20,7 +20,7 @@ class Input(var source: String, var outputPackage: js.UndefOr[String], var gener
 
 class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
 
-class Sample(var filename: String, var label: String) extends js.Object
+class Sample(var url: String, var label: String) extends js.Object
 
 @JSExportTopLevel("Main")
 object WebAppMain {
@@ -51,13 +51,12 @@ object WebAppMain {
         hasError = false
       ),
       samples = js.Array(
-        new Sample("electron", "electron"),
-        new Sample("elasticsearch", "elasticsearch"),
-        new Sample("rx-core", "RxJS-Core"),
-        new Sample("google-app-script.base", "Google Apps Script (Base)"),
-        new Sample("zip-js", "zip.js"),
-        new Sample("jpm", "Firefox Addon SDK (jpm)")
-      )
+        new Sample("https://cdn.jsdelivr.net/npm/electron@8.0.0/electron.d.ts", "electron"),
+        new Sample("https://cdn.jsdelivr.net/npm/@types/jpm@0.0.5/index.d.ts", "Firefox Addon SDK (jpm)"),
+        new Sample("https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/752136c29dec6f1e559dfc62f6acba08f207c280/types/google-1-script/google-apps-script.base.d.ts", "Google Apps Script (Base)"),
+        new Sample("https://cdn.jsdelivr.net/npm/pixi.js@5.2.1/pixi.js.d.ts", "pixi.js"),
+        new Sample("https://cdn.jsdelivr.net/npm/@types/zip.js@2.0.27/index.d.ts", "zip.js"),
+    )
     )
 
     worker.onmessage = (e: js.Any) => {
@@ -87,7 +86,7 @@ object WebAppMain {
           import org.scalajs.dom.experimental._
           data.isLoading = true
 
-          val fetchSampleTypeScript = Fetch.fetch(s"samples-webapp/${sample.filename}.d.ts").toFuture
+          val fetchSampleTypeScript = Fetch.fetch(sample.url).toFuture
           val futureSourceText = fetchSampleTypeScript.flatMap { response =>
             response.text().toFuture.map { text =>
               response.status match {
