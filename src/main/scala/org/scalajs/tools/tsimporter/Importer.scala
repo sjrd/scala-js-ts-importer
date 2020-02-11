@@ -278,7 +278,10 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
             case symbol: ClassSymbol => ownerOuter.get
             case _ => owner
           }
-          val anonymousName = s"${name.capitalize}${paramName.capitalize}"
+          val anonymousName = name match {
+            case Name.CONSTRUCTOR => s"${owner.name.capitalize}Constructor${paramName.capitalize}"
+            case _ => s"${name.capitalize}${paramName.capitalize}"
+          }
           val anonyousClass = container.getClassOrCreate(name.copy(name = anonymousName))
           processMembersDecls(container, anonyousClass, members)
           paramSym.tpe = typeToScala(Trees.TypeRef(TypeName(anonymousName)))
