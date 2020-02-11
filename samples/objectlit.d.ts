@@ -9,3 +9,8 @@ type IPlugin = {
 type IPlugin2<T> = {
     name: T;
 };
+
+declare function area(options: {
+    width: number;
+    height: number;
+}): number;

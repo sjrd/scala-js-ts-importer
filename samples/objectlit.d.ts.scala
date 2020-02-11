@@ -31,10 +31,17 @@ trait IPlugin2Object[T] extends js.Object {
 }
 
 @js.native
+trait AreaOptions extends js.Object {
+  var width: Double = js.native
+  var height: Double = js.native
+}
+
+@js.native
 @JSGlobalScope
 object Objectlit extends js.Object {
   type IPlugin = IPluginObject
   type IPlugin2[T] = IPlugin2Object[T]
+  def area(options: AreaOptions): Double = js.native
 }
 
 }
