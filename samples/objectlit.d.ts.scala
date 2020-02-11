@@ -19,4 +19,22 @@ object NumericKeyObjectType extends js.Object {
   var `2.1`: Double = js.native
 }
 
+@js.native
+trait IPluginObject extends js.Object {
+  var name: String = js.native
+  def sum(a: Double, b: Double): Double = js.native
+}
+
+@js.native
+trait IPlugin2Object[T] extends js.Object {
+  var name: T = js.native
+}
+
+@js.native
+@JSGlobalScope
+object Objectlit extends js.Object {
+  type IPlugin = IPluginObject
+  type IPlugin2[T] = IPlugin2Object[T]
+}
+
 }
