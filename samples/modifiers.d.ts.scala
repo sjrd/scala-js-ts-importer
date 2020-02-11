@@ -57,6 +57,15 @@ object Uri extends js.Object {
 }
 
 @js.native
+trait A extends js.Object {
+  var public: Boolean = js.native
+  var static: Boolean = js.native
+  var readonly: Boolean = js.native
+  var `abstract`: Boolean = js.native
+  var `protected`: Boolean = js.native
+}
+
+@js.native
 @JSGlobal("modifiers")
 object Modifiers extends js.Object {
   val id: String = js.native
