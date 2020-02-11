@@ -103,8 +103,18 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
 
       case TypeAliasDecl(TypeNameName(name), tparams, alias) =>
         val sym = owner.newTypeAlias(name)
-        sym.tparams ++= typeParamsToScala(tparams)
-        sym.alias = typeToScala(alias)
+        alias match {
+          case tpe @ ObjectType(members) =>
+            val anonymousName = s"${ name.name }Object"
+            val anonyousClass = owner.getClassOrCreate(name.copy(name = anonymousName))
+            anonyousClass.tparams ++= typeParamsToScala(tparams)
+            processMembersDecls(owner, anonyousClass, members)
+            sym.tparams ++= typeParamsToScala(tparams)
+            sym.alias = typeToScala(Trees.TypeRef(TypeName(anonymousName), tparams.map(p => Trees.TypeRef(p.name))))
+          case _ =>
+            sym.tparams ++= typeParamsToScala(tparams)
+            sym.alias = typeToScala(alias)
+        }
 
       case VarDecl(IdentName(name), TypeOrAny(tpe)) =>
         val sym = owner.newField(name, Set.empty)
@@ -333,7 +343,6 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
         TypeRef(QualifiedName.Dictionary, List(valueTpe))
 
       case ObjectType(members) =>
-        // ???
         TypeRef.Any
 
       case FunctionType(FunSignature(tparams, params, Some(resultType))) =>
