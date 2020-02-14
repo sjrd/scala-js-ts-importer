@@ -9,26 +9,28 @@ class ImporterConfigSpec extends AnyFunSpec {
 
   describe("generateFactory") {
     it("should generate factory") {
-      val generateFactory = true
+      val generateFactory = "generate"
       val sourceTypeScript = s"samples/config/generateFactory/${generateFactory}.d.ts"
       val expectedContent = contentOf(sourceTypeScript + ".scala")
       val outputContent = WorkerMain.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "factory",
-        generateFactory = generateFactory
+        generateFactory = generateFactory,
+        interfaceImplementation = "implemented"
       ))
       assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
       assert(outputContent.text === expectedContent)
     }
 
     it("should NOT generate factory") {
-      val generateFactory = false
+      val generateFactory = "donot"
       val sourceTypeScript = s"samples/config/generateFactory/${generateFactory}.d.ts"
       val expectedContent = contentOf(sourceTypeScript + ".scala")
       val outputContent = WorkerMain.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "factory",
-        generateFactory = generateFactory
+        generateFactory = generateFactory,
+        interfaceImplementation = "implemented"
       ))
       assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
       assert(outputContent.text === expectedContent)
@@ -42,8 +44,8 @@ class ImporterConfigSpec extends AnyFunSpec {
       val outputContent = WorkerMain.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "source",
-        generateFactory = false,
-        forceAbstractFieldOnTrait = false
+        generateFactory = "donot",
+        interfaceImplementation = "implemented"
       ))
       assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
       assert(outputContent.text === expectedContent)
@@ -55,8 +57,8 @@ class ImporterConfigSpec extends AnyFunSpec {
       val outputContent = WorkerMain.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "source",
-        generateFactory = false,
-        forceAbstractFieldOnTrait = true
+        generateFactory = "donot",
+        interfaceImplementation = "abstract"
       ))
       assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
       assert(outputContent.text === expectedContent)

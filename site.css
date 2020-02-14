@@ -2,18 +2,14 @@
     height: 100%;
 }
 main {
-    margin-left: 210px;
+    margin-left: 420px;
 }
 #configuration {
-    position: fixed;
-    top: 0;
-    height: 100px;
-    width:calc(100% - 210px)
+    margin-left: 210px
 }
 #editor{
     position: fixed;
-    top:100px;
-    width:calc(100% - 210px);
+    width: calc(100% - 420px);
 }
 #toc {
     z-index: 100;
@@ -31,7 +27,7 @@ main {
     list-style-type: decimal;
 }
 textarea.code {
-    height: calc(100% - 140px);
+    height: calc(100% - 60px);
     font-family: monospace;
     white-space: pre;
     overflow-wrap: normal;

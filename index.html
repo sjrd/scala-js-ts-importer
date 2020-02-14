@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <title>Type Definition Importer for Scala.js</title>
     <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.7.5/dist/semantic.min.css">
+          href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.3/dist/semantic.min.css">
     <link rel="stylesheet" href="site.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js"
+            integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.3/dist/semantic.min.js"
+            integrity="sha256-Dv09sUOqHDkaWvPqBa0GQp6Csd9Q2SkkVP2xtzYgwc0=" crossorigin="anonymous"></script>
 </head>
 <body class="full-height">
 
@@ -27,81 +31,194 @@
         <div class="item">
             <div class="header">Notes</div>
             <div class="vertical menu">
-                <div class="item">Manual editing is often needed, since the type system offered by TypeScript and Scala differ in subtle ways. </div>
+                <div class="item">Manual editing is often needed, since the type system offered by TypeScript and Scala
+                    differ in subtle ways.
+                </div>
             </div>
         </div>
-        <a class="item" href="https://github.com/exoego/scala-js-ts-importer">Github <i class="github alternate icon"></i></a>
+        <a class="item" href="https://github.com/exoego/scala-js-ts-importer">Github <i
+                class="github alternate icon"></i></a>
         <a class="item" href="https://twitter.com/exoego">Web App by @exoego<i class="twitter icon"></i></a>
         <a class="item" href="https://www.exoego.net/">on exoego.net <i class="home icon"></i></a>
         <a class="item" href="https://scala-lang.org/license/">under the Scala License <i class="external icon"></i></a>
     </div>
-
-    <main class="full-height">
-        <div class="ui fluid container full-height" >
-            <div class="ui basic segment" id="configuration">
-                <h5 class="ui header">Configuration</h5>
-                
-                <div class="ui grid">
-                    <div class="two column row">
-                        <div class="column">
-                            <div class="ui labeled fluid input">
-                                <div class="ui label">
-                                    package
-                                </div>
-                                <input placeholder="foo.bar" type="text" v-model="input.outputPackage">
-                            </div>
+    <div class="ui left fixed vertical menu" id="configuration">
+        <div class="item">
+            <div class="ui form">
+                <div class="field">
+                    <label>
+                        <span class="popup-help ui red text">
+                            Package
+                            <i class="help circle red icon"></i>
+                        </span>
+                        <div class="ui very wide fixed popup">
+                            <p>Specifies a package where a generated types belongs to.</p>
+                            <p>Can have sub package, like <strong>net.example.types</strong>.</p>
+                            <p>Default: <strong>foo</strong></p>
                         </div>
-                        <div class="column">
-                            <div class="ui checkbox">
-                                <input type="checkbox" v-model="input.generateFactory">
-                                <label>Generate trait's factory method in companion object</label>
-                            </div>
-                            <div class="ui checkbox">
-                                <input type="checkbox" v-model="input.forceAbstractFieldOnTrait">
-                                <label>Abstract properties-only trait</label>
-                            </div>
+                    </label>
+                    <input placeholder="foo.bar" type="text" v-model="input.outputPackage">
+                </div>
+                <div class="ui divider"></div>
+                <div class="grouped fields">
+                    <label>
+                        <span class="popup-help ui red text">
+                            Field-only interface
+                            <i class="help circle red icon"></i>
+                        </span>
+                        <div class="ui very wide fixed popup">
+                            <table class="ui celled table">
+                                <p>Speifies how to convert field-only interfaces. </p>
+                                <p>Such interfaces are usually used as parameter of function, so users will want to
+                                    construct and pass it to function.</p>
+                                <thead>
+                                <th>Given</th>
+                                <th>"Abstract"</th>
+                                <th>"Implemented"</th>
+                                </thead>
+                                <tbody>
+                                <td class="top aligned">
+                                <pre><code>interface Foo {
+  a: string;
+  b: number;
+}</code></pre>
+                                </td>
+                                <td class="top aligned">
+                                <pre class=""><code>trait Foo extends js.Object {
+  var a: String
+  var b: Double
+}</code></pre>
+                                    <p>Field-only interfaces will be abstract trait.</p>
+                                </td>
+                                <td class="top aligned">
+                                <pre><code>@js.native
+trait Foo extends js.Object {
+  var a: String = js.native
+  var b: Double = js.native
+}</code></pre>
+                                    <p>Field-only interfaces will be js.native-implemented trait. They can not be
+                                        directly constructed, so may be inconvenient.</p>
+                                </td>
+                                </tbody>
+                            </table>
+                        </div>
+                    </label>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" v-model="input.interfaceImplementation" value="abstract"
+                                   id="interface-abstract">
+                            <label for="interface-abstract">Abstract (recommended)</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" v-model="input.interfaceImplementation" value="implemented"
+                                   id="interface-implemented">
+                            <label for="interface-implemented">Native-implemented</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui divider"></div>
+                <div class="grouped fields">
+                    <label>
+                        <span class="popup-help ui red text">
+                            Factory method for field-only interface
+                            <i class="help circle red icon"></i>
+                        </span>
+                        <div class="ui very wide fixed popup">
+                            <p>Specifies whether factory methods for field-only trait are added or not.</p>
+                            <table class="ui celled table">
+                                <thead>
+                                <th>Given</th>
+                                <th>"Do not generate"</th>
+                                <th>"Generate"</th>
+                                </thead>
+                                <tbody>
+                                <td class="top aligned">
+                                <pre><code>interface Foo {
+  a: string;
+  b: number;
+}
+                            </code></pre>
+                                </td>
+                                <td class="top aligned">
+                                    <pre class=""><code>// no factory generated</code></pre>
+                                    <p>This can reduce size of type definition.</p>
+                                </td>
+                                <td class="top aligned">
+                                <pre><code>object Foo {
+  def apply(
+    a: String,
+    b: Double,
+  ): Foo = {
+    val _obj$ = js.Dynamic.literal(
+      "a" -> a.asInstanceOf[js.Any],
+      "b" -> b.asInstanceOf[js.Any],
+    )
+    _obj$.asInstanceOf[Foo]
+  }
+}                            </code></pre>
+                                    <p>These methods are useful if traits are generated as @js.native marked trait,
+                                        since such trait can not be directly constructed.</p>
+                                </td>
+                                </tbody>
+                            </table>
+                        </div>
+                    </label>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" v-model="input.generateFactory" value="donot" id="factory-donot">
+                            <label for="factory-donot">Do not generate</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" v-model="input.generateFactory" value="generate" id="factory-generate">
+                            <label for="factory-generate">Generate</label>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="ui basic segment full-height" id="editor">
-                <div class="ui dimmer" :class="{'active': isLoading}">
-                    <div class="ui text loader">Importing</div>
-                </div>
+    <main class="full-height">
+        <div class="ui basic segment full-height" id="editor">
+            <div class="ui dimmer" :class="{'active': isLoading}">
+                <div class="ui text loader">Importing</div>
+            </div>
 
-                <div class="ui form full-height">
-                    <div class="two fields full-height">
-                        <div class="field full-height">
-                            <h1 class="ui header">
-                                <img class="ui big image" src="src/main/resources/icon-typescript.png" >
-                                <div class="content">
-                                    TypeScript
-                                    <div class="sub header">Put some type description files (*.d.ts).</div>
-                                </div>
-                            </h1>
-                            <textarea class="code "
-                                      placeholder="export const FOO: number;"
-                                      rows="30"
-                                      v-model="input.source"
-                                      v-on:keyup.enter="translate"
-                                      v-on:change="translate"
-                            ></textarea>
-                        </div>
-                        <div class="field full-height" :class="{'error': output.hasError, 'success': !output.hasError}">
-                            <h1 class="ui header">
-                                <img class="ui big image" src="src/main/resources/icon-scalajs.png"  />
-                                <div class="content">
-                                    Scala.js
-                                    <div class="sub header">Get the results.</div>
-                                </div>
-                            </h1>
-                            <textarea class="code"
-                                      rows="30" readonly
-                                      placeholder="..."
-                                      v-model="output.text"
-                            ></textarea>
-                        </div>
+            <div class="ui form full-height">
+                <div class="two fields full-height">
+                    <div class="field full-height">
+                        <h1 class="ui header">
+                            <img class="ui big image" src="src/main/resources/icon-typescript.png">
+                            <div class="content">
+                                TypeScript
+                                <div class="sub header">Put some type description files (*.d.ts).</div>
+                            </div>
+                        </h1>
+                        <textarea class="code "
+                                  placeholder="export const FOO: number;"
+                                  rows="30"
+                                  v-model="input.source"
+                                  v-on:keyup.enter="translate"
+                                  v-on:change="translate"
+                        ></textarea>
+                    </div>
+                    <div class="field full-height" :class="{'error': output.hasError, 'success': !output.hasError}">
+                        <h1 class="ui header">
+                            <img class="ui big image" src="src/main/resources/icon-scalajs.png"/>
+                            <div class="content">
+                                Scala.js
+                                <div class="sub header">Get the results.</div>
+                            </div>
+                        </h1>
+                        <textarea class="code"
+                                  rows="30" readonly
+                                  placeholder="..."
+                                  v-model="output.text"
+                        ></textarea>
                     </div>
                 </div>
             </div>
@@ -117,9 +234,11 @@
     var _gaq = _gaq || [];
     _gaq.push(['_setAccount', 'UA-7673851-1']);
     _gaq.push(['_trackPageview']);
-    (function(doc){
-        var ga=doc.createElement('script');ga.type='text/javascript';ga.async=true;
-        ga.src=location.protocol+'//www.google-analytics.com/ga.js';
+    (function (doc) {
+        var ga = doc.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = location.protocol + '//www.google-analytics.com/ga.js';
         doc.getElementsByTagName('head')[0].appendChild(ga);
     })(document);
 </script>
