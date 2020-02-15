@@ -62,7 +62,7 @@ class Printer(private val output: PrintWriter, config: Config) {
 
           if (!packageObjectMembers.isEmpty) {
             val packageObjectName =
-              Name(thisPackage.name.head.toUpper + thisPackage.name.tail)
+              Name(s"${thisPackage.name.head.toUpper}${thisPackage.name.tail}")
 
             pln"";
             if (currentJSNamespace.isEmpty) {
