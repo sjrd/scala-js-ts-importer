@@ -228,7 +228,11 @@ class TypeAliasSymbol(nme: Name) extends Symbol(nme) {
 
 class FieldSymbol(nme: Name, val modifiers: Modifiers) extends Symbol(nme) with JSNameable {
   var tpe: TypeRef = TypeRef.Any
+  var inherited: Boolean = false
 
+  def needsOverride: Boolean = {
+    inherited
+  }
   override def toString() = s"${jsNameStr}${if (modifiers(Modifier.ReadOnly)) "val" else "var"} $name: $tpe"
 }
 
@@ -236,6 +240,7 @@ class MethodSymbol(nme: Name, val modifiers: Modifiers) extends Symbol(nme) with
   val tparams = new ListBuffer[TypeParamSymbol]
   val params = new ListBuffer[ParamSymbol]
   var resultType: TypeRef = TypeRef.Dynamic
+  var inherited: Boolean = false
 
   var isBracketAccess: Boolean = false
 
@@ -255,7 +260,7 @@ class MethodSymbol(nme: Name, val modifiers: Modifiers) extends Symbol(nme) with
     name match {
       case Name("toString") => noParams // Any return type will trigger the error
       case Name("clone")    => noParams // Any return type will trigger the error
-      case _                => false
+      case _                => inherited
     }
   }
 
