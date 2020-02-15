@@ -16,7 +16,7 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
   import Importer._
 
   /** Entry point */
-  def apply(declarations: List[DeclTree]) {
+  def apply(declarations: List[DeclTree]): Unit = {
     val rootPackage = new PackageSymbol(Name.EMPTY)
 
     for (declaration <- declarations)
@@ -25,7 +25,7 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
     new Printer(output, config).printSymbol(rootPackage)
   }
 
-  private def processDecl(owner: ContainerSymbol, declaration: DeclTree) {
+  private def processDecl(owner: ContainerSymbol, declaration: DeclTree): Unit = {
     declaration match {
       case ModuleDecl(PropertyNameName(name), innerDecls) =>
         assert(owner.isInstanceOf[PackageSymbol],
@@ -146,7 +146,7 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
   }
   
   private def processMembersDecls(enclosing: ContainerSymbol,
-      owner: ContainerSymbol, members: List[MemberTree]) {
+      owner: ContainerSymbol, members: List[MemberTree]): Unit = {
 
     val OwnerName = owner.name
 
@@ -220,7 +220,7 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
   }
 
   private def processPropertyDecl(enclosing: ContainerSymbol, owner: ContainerSymbol, name: Name,
-      tpe: TypeTree, modifiers: Modifiers, protectName: Boolean = true, optional: Boolean = true) {
+      tpe: TypeTree, modifiers: Modifiers, protectName: Boolean = true, optional: Boolean = true): Unit = {
     if (name.name != "prototype") {
       tpe match {
         case ObjectType(members) if members.forall(_.isInstanceOf[CallMember]) =>
@@ -253,7 +253,7 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
   }
 
   private def processDefDecl(owner: ContainerSymbol, name: Name,
-      signature: FunSignature, modifiers: Modifiers, protectName: Boolean = true, optional: Boolean = true, ownerOuter: Option[ContainerSymbol] = None) {
+      signature: FunSignature, modifiers: Modifiers, protectName: Boolean = true, optional: Boolean = true, ownerOuter: Option[ContainerSymbol] = None): Unit = {
     val mods = owner match {
       case sym: ClassSymbol if config.forceAbstractFieldOnTrait && sym.isTrait =>
         sym.isAbstract = true

@@ -68,7 +68,7 @@ object Trees {
           name.tail.forall(c => c == '$' || c.isUnicodeIdentifierPart)
     }
 
-    @inline final def requireValidIdent(name: String) {
+    @inline final def requireValidIdent(name: String): Unit = {
       require(isValidIdentifier(name), s"${name} is not a valid identifier")
     }
   }

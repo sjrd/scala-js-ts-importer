@@ -22,7 +22,7 @@ class Printer(private val output: PrintWriter, config: Config) {
   
   private val traitFactoryBuffer = scala.collection.mutable.Map.empty[Name, List[FieldSymbol]]
   
-  def printSymbol(sym: Symbol) {
+  def printSymbol(sym: Symbol): Unit = {
     val name = sym.name
     sym match {
       case comment: CommentSymbol =>
@@ -191,7 +191,7 @@ class Printer(private val output: PrintWriter, config: Config) {
     }
   }
 
-  private def printMemberDecls(owner: ContainerSymbol, bufferSymbol: Boolean = false) {
+  private def printMemberDecls(owner: ContainerSymbol, bufferSymbol: Boolean = false): Unit = {
     val (constructors, others) =
       owner.members.toList.partition(_.name == Name.CONSTRUCTOR)
     if (bufferSymbol) {
@@ -246,7 +246,7 @@ class Printer(private val output: PrintWriter, config: Config) {
     }
   }
 
-  def printTypeRef(tpe: TypeRef) {
+  def printTypeRef(tpe: TypeRef): Unit = {
     tpe match {
       case TypeRef(typeName, Nil) =>
         p"$typeName"
@@ -283,7 +283,7 @@ class Printer(private val output: PrintWriter, config: Config) {
     }
   }
 
-  private def print(x: Any) {
+  private def print(x: Any): Unit = {
     x match {
       case x: Symbol => printSymbol(x)
       case x: TypeRef => printTypeRef(x)
@@ -309,7 +309,7 @@ object Printer {
 
   private implicit class OutputHelper(val sc: StringContext) extends AnyVal {
     def p(args: Any*)(implicit printer: Printer,
-        sep: ListElemSeparator = ListElemSeparator.Comma) {
+        sep: ListElemSeparator = ListElemSeparator.Comma): Unit = {
       val strings = sc.parts.iterator
       val expressions = args.iterator
 
@@ -342,7 +342,7 @@ object Printer {
     }
 
     def pln(args: Any*)(implicit printer: Printer,
-        sep: ListElemSeparator = ListElemSeparator.Comma) {
+        sep: ListElemSeparator = ListElemSeparator.Comma): Unit = {
       p(args:_*)
       printer.output.println()
     }
