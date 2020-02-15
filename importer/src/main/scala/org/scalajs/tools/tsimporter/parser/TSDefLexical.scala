@@ -43,7 +43,7 @@ class TSDefLexical extends Lexical with StdTokens with ImplicitConversions {
           digits => digits.foldLeft(0L)(_ * 8 + _).toString
         }
       ) | opt('-')  ~ stringOf1(digit) ~ opt(stringOf1('.', digit)) ^^ {
-        case sign ~ part1 ~ part2 => sign.getOrElse("") + part1 + (part2.getOrElse(""))
+        case sign ~ part1 ~ part2 => sign.map(_.toString).getOrElse("") + part1 + (part2.getOrElse(""))
       }
     )
     val term = ('(' ~ const ~ ')' ^^ {
