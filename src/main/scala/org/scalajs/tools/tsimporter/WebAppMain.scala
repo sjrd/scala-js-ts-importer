@@ -2,11 +2,11 @@ package org.scalajs.tools.tsimporter
 
 import blog.codeninja.scalajs.vue._
 import org.scalajs.dom.webworkers.Worker
-import org.scalajs.dom.{MessageEvent, console}
+import org.scalajs.dom.{ MessageEvent, console }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.annotation.{ JSExport, JSExportTopLevel }
 
 class Data(var input: Input,
            var isLoading: Boolean,
@@ -15,8 +15,10 @@ class Data(var input: Input,
           ) extends js.Object {
 }
 
-class Input(var source: String, var outputPackage: js.UndefOr[String], var generateFactory: Boolean,
-            var forceAbstractFieldOnTrait: Boolean = false) extends js.Object
+class Input(var source: String, 
+            var outputPackage: js.UndefOr[String] = js.undefined, 
+            var generateFactory: String = "generate",
+            var interfaceImplementation: String = "abstract") extends js.Object
 
 class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
 
@@ -41,9 +43,7 @@ object WebAppMain {
 
     val data = new Data(
       input = new Input(
-        source = "",
-        outputPackage = "",
-        generateFactory = false
+        source = ""
       ),
       isLoading = false,
       output = new ScalaOutput(
@@ -80,6 +80,10 @@ object WebAppMain {
     vue = new Vue(js.Dynamic.literal(
       el = "#app",
       data = data,
+      mounted = () => {
+        // TODO: Use Semantic-UI-Vue
+        js.Dynamic.global.jQuery(".popup-help").popup()
+      },
       methods = js.Dynamic.literal(
         translate = translate _: js.ThisFunction0[Data, _],
         loadSample = js.ThisFunction.fromFunction2 { (data: Data, sample: Sample) =>

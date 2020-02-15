@@ -29,7 +29,8 @@ class ImporterSpec extends AnyFunSpec with BeforeAndAfterAll {
         val outputContent = WorkerMain.translate(new Input(
           source = contentOf(sourceTypeScript),
           outputPackage = input.dropRight(".d.ts".length),
-          generateFactory = false
+          generateFactory = "donot",
+          interfaceImplementation = "implemented"
         ))
         assert(!outputContent.hasError, s"hasError: ${outputContent.text}")
         assert(outputContent.text === expectedContent)
