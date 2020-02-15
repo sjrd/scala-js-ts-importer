@@ -22,7 +22,7 @@ class Printer(private val output: PrintWriter, config: Config) {
   
   private val traitFactoryBuffer = scala.collection.mutable.Map.empty[Name, List[FieldSymbol]]
   
-  def printSymbol(sym: Symbol): Unit = {
+  def printSymbol(sym: Symbol, enclosing: Option[Symbol]): Unit = {
     val name = sym.name
     sym match {
       case comment: CommentSymbol =>
@@ -58,7 +58,7 @@ class Printer(private val output: PrintWriter, config: Config) {
           pln"package $thisPackage {"
 
           for (sym <- topLevels)
-            printSymbol(sym)
+            printSymbol(sym, enclosing)
 
           if (!packageObjectMembers.isEmpty) {
             val packageObjectName =
@@ -75,8 +75,9 @@ class Printer(private val output: PrintWriter, config: Config) {
               pln"""@JSGlobal("$jsName")"""
               pln"object $packageObjectName extends js.Object {"
             }
+            val packageObject = sym
             for (sym <- packageObjectMembers)
-              printSymbol(sym)
+              printSymbol(sym, Some(packageObject))
             pln"}"
           }
 
@@ -143,22 +144,28 @@ class Printer(private val output: PrintWriter, config: Config) {
         pln" = ${sym.alias}"
 
       case sym: FieldSymbol =>
-        sym.jsName foreach { jsName =>
-          pln"""  @JSName("$jsName")"""
-        }
-        val access =
-          if (sym.modifiers(Modifier.Protected)) "protected "
-          else ""
         val decl =
           if (sym.modifiers(Modifier.Const)) "val"
           else if (sym.modifiers(Modifier.ReadOnly)) "def"
           else "var"
-        p"  $access$decl $name: ${sym.tpe}"
+        if (sym.needsOverride && decl == "var") {
+          // var cannot be override, so should be omitted
+        } else {
+          sym.jsName foreach { jsName =>
+            pln"""  @JSName("$jsName")"""
+          }
+          val access =
+            if (sym.modifiers(Modifier.Protected)) "protected "
+            else ""
+          val modifiers =
+            if (sym.needsOverride) "override " else ""
 
-        if (!sym.modifiers(Modifier.Abstract))
-          p" = js.native"
-        pln""
+          p"  $access$modifiers$decl $name: ${ sym.tpe }"
 
+          if (!sym.modifiers(Modifier.Abstract))
+            p" = js.native"
+          pln""
+        }
       case sym: MethodSymbol =>
         val params = sym.params
 
@@ -171,6 +178,7 @@ class Printer(private val output: PrintWriter, config: Config) {
           }
           if (sym.isBracketAccess)
             pln"""  @JSBracketAccess"""
+
           val modifiers =
             if (sym.needsOverride) "override " else ""
           p"  ${modifiers}def $name"
@@ -200,7 +208,7 @@ class Printer(private val output: PrintWriter, config: Config) {
       })
     }
     for (sym <- constructors ++ others)
-      printSymbol(sym)
+      printSymbol(sym, Some(owner))
   }
   
   private def printFactory(owner: ContainerSymbol): Unit = {
@@ -285,7 +293,7 @@ class Printer(private val output: PrintWriter, config: Config) {
 
   private def print(x: Any): Unit = {
     x match {
-      case x: Symbol => printSymbol(x)
+      case x: Symbol => printSymbol(x, null)
       case x: TypeRef => printTypeRef(x)
       case x: Wildcard => printWildcard(x)
       case QualifiedName(Name.scala, Name.scalajs, Name.js, name) =>
