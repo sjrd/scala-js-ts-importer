@@ -1,2 +1,2 @@
-importScripts("src/main/resources/scala-js-ts-importer-opt.js");
+importScripts("src/main/resources/webapp-opt.js");
 WorkerMain.main();
