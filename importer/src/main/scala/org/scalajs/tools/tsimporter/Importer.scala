@@ -350,6 +350,7 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
           case TypeName("Array") => QualifiedName.Array
           case TypeName("Function") => QualifiedName.FunctionBase
           case TypeName("object") => QualifiedName.Object
+          case TypeName("RegExp") => QualifiedName.RegExp
           case TypeName("PromiseLike") => QualifiedName.Thenable
           case TypeName("Float32Array") => QualifiedName.Float32Array
           case TypeName("Float64Array") => QualifiedName.Float64Array
