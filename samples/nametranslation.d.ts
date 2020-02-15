@@ -15,3 +15,4 @@ declare const dataView: DataView;
 declare const readonlyArray: ReadonlyArray<boolean>;
 
 declare const promiseLike: PromiseLike<String>;
+declare const regexp: RegExp;

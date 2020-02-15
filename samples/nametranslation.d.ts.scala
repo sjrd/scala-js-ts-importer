@@ -21,6 +21,7 @@ object Nametranslation extends js.Object {
   val dataView: js.typedarray.DataView = js.native
   val readonlyArray: js.Array[_ <: Boolean] = js.native
   val promiseLike: js.Thenable[String] = js.native
+  val regexp: js.RegExp = js.native
 }
 
 }
