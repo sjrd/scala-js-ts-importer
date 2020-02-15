@@ -1,6 +1,5 @@
 package org.scalajs.tools.tsimporter
 
-import blog.codeninja.scalajs.vue._
 import org.scalajs.dom.webworkers.Worker
 import org.scalajs.dom.{ MessageEvent, console }
 
@@ -68,16 +67,16 @@ object WebAppMain {
       worker.postMessage(data.input)
     }
 
-    vue = new Vue(js.Dynamic.literal(
+    vue = new Vue(new VueOptions(
       el = "#app",
       data = data,
       mounted = () => {
         // TODO: Use Semantic-UI-Vue
         js.Dynamic.global.jQuery(".popup-help").popup()
       },
-      methods = js.Dynamic.literal(
-        translate = translate _: js.ThisFunction0[Data, _],
-        loadSample = js.ThisFunction.fromFunction2 { (data: Data, sample: Sample) =>
+      methods = js.Dictionary(
+        "translate" -> js.ThisFunction.fromFunction1(translate),
+        "loadSample" -> js.ThisFunction.fromFunction2 { (data: Data, sample: Sample) =>
           import org.scalajs.dom.experimental._
           data.isLoading = true
 
