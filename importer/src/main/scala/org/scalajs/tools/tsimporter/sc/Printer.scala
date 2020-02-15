@@ -315,18 +315,25 @@ object Printer {
 
       val output = printer.output
       output.print(strings.next())
+      
+      def printIterator(iter: Iterator[_]): Unit = {
+        if (iter.hasNext) {
+          printer.print(iter.next())
+          while (iter.hasNext) {
+            output.print(sep.s)
+            printer.print(iter.next())
+          }
+        }
+      }
+      
       while (strings.hasNext) {
         expressions.next() match {
-          case seq: Seq[_] =>
+          case seq: scala.collection.immutable.Seq[_] =>
             val iter = seq.iterator
-            if (iter.hasNext) {
-              printer.print(iter.next())
-              while (iter.hasNext) {
-                output.print(sep.s)
-                printer.print(iter.next())
-              }
-            }
-
+            printIterator(iter)
+          case seq: scala.collection.mutable.Seq[_] =>
+            val iter = seq.iterator
+            printIterator(iter)
           case expr =>
             printer.print(expr)
         }
