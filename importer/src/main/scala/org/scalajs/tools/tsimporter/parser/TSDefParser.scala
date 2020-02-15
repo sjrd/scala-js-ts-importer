@@ -217,7 +217,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val singleTypeDesc: Parser[TypeTree] =
     baseTypeDesc ~ rep("[" ~> opt(typeDesc) <~ "]") ^^ {
       case base ~ arrayDims =>
-        (base /: arrayDims) {
+        arrayDims.foldLeft(base) {
           case (elem, None) => ArrayType(elem)
           case (elem, Some(index)) => IndexedAccessType(elem, index)
         }
