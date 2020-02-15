@@ -12,7 +12,7 @@ class ImporterConfigSpec extends AnyFunSpec {
       val generateFactory = "generate"
       val sourceTypeScript = s"samples/config/generateFactory/${generateFactory}.d.ts"
       val expectedContent = contentOf(sourceTypeScript + ".scala")
-      val outputContent = WorkerMain.translate(new Input(
+      val outputContent = Kicker.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "factory",
         generateFactory = generateFactory,
@@ -26,7 +26,7 @@ class ImporterConfigSpec extends AnyFunSpec {
       val generateFactory = "donot"
       val sourceTypeScript = s"samples/config/generateFactory/${generateFactory}.d.ts"
       val expectedContent = contentOf(sourceTypeScript + ".scala")
-      val outputContent = WorkerMain.translate(new Input(
+      val outputContent = Kicker.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "factory",
         generateFactory = generateFactory,
@@ -41,7 +41,7 @@ class ImporterConfigSpec extends AnyFunSpec {
     it("js-native implemented") {
       val sourceTypeScript = "samples/config/interface-variables/source.d.ts"
       val expectedContent = contentOf("samples/config/interface-variables/implemented.scala")
-      val outputContent = WorkerMain.translate(new Input(
+      val outputContent = Kicker.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "source",
         generateFactory = "donot",
@@ -54,7 +54,7 @@ class ImporterConfigSpec extends AnyFunSpec {
     it("abstract") {
       val sourceTypeScript = "samples/config/interface-variables/source.d.ts"
       val expectedContent = contentOf("samples/config/interface-variables/abstract.scala")
-      val outputContent = WorkerMain.translate(new Input(
+      val outputContent = Kicker.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "source",
         generateFactory = "donot",

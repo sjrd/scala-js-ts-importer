@@ -15,15 +15,6 @@ class Data(var input: Input,
           ) extends js.Object {
 }
 
-class Input(var source: String, 
-            var outputPackage: js.UndefOr[String] = js.undefined, 
-            var generateFactory: String = "generate",
-            var interfaceImplementation: String = "abstract") extends js.Object
-
-class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
-
-class Sample(var url: String, var label: String) extends js.Object
-
 @JSExportTopLevel("Main")
 object WebAppMain {
   var vue: Vue = _

@@ -1,40 +1,14 @@
 package org.scalajs.tools.tsimporter
 
+import java.io.{ PrintWriter, StringWriter }
 
-import java.io.{PrintWriter, StringWriter}
-
-import org.scalajs.dom
 import org.scalajs.tools.tsimporter.Trees.DeclTree
 import org.scalajs.tools.tsimporter.parser.TSDefParser
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel, JSGlobalScope}
-import scala.util.parsing.input.{CharSequenceReader, Reader}
+import scala.util.parsing.input.{ CharSequenceReader, Reader }
 
-@js.native
-@JSGlobalScope
-object WorkerGlobal extends js.Object {
-  def addEventListener(`type`: String, f: js.Function): Unit = js.native
-
-  def postMessage(data: js.Any): Unit = js.native
-}
-
-@JSExportTopLevel("WorkerMain")
-object WorkerMain {
-  @JSExport
-  def main(): Unit = {
-    WorkerGlobal.addEventListener("message", onMessage _)
-    WorkerGlobal.postMessage(s"[Worker] Started")
-  }
-
-  def onMessage(msg: dom.MessageEvent) = {
-    val s = msg.data.asInstanceOf[Input]
-    WorkerGlobal.postMessage(s"[Worker] Received message")
-
-    val so = translate(s)
-    WorkerGlobal.postMessage(so)
-    WorkerGlobal.postMessage(s"[Worker] Sent result")
-  }
+object Kicker {
 
   def translate(input: Input): ScalaOutput = {
     val reader = new CharSequenceReader(input.source)
@@ -67,5 +41,13 @@ object WorkerMain {
   private def process(definitions: List[DeclTree], output: PrintWriter, config: Config): Unit = {
     new Importer(output, config)(definitions)
   }
-
 }
+
+class Input(var source: String,
+            var outputPackage: js.UndefOr[String] = js.undefined,
+            var generateFactory: String = "generate",
+            var interfaceImplementation: String = "abstract") extends js.Object
+
+class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
+
+class Sample(var url: String, var label: String) extends js.Object

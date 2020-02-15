@@ -26,7 +26,7 @@ class ImporterSpec extends AnyFunSpec with BeforeAndAfterAll {
       it(s"should import ${ input }") {
         val sourceTypeScript = inputDir + "/" + input
         val expectedContent = contentOf(sourceTypeScript + ".scala")
-        val outputContent = WorkerMain.translate(new Input(
+        val outputContent = Kicker.translate(new Input(
           source = contentOf(sourceTypeScript),
           outputPackage = input.dropRight(".d.ts".length),
           generateFactory = "donot",
