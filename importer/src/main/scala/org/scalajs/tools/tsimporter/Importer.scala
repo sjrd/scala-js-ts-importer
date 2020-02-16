@@ -348,6 +348,8 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
       case TypeRefTree(base, targs) =>
         val baseTypeRef = base match {
           case TypeName("Array") => QualifiedName.Array
+          case TypeName("Error") => QualifiedName.JSError
+          case TypeName("Date") => QualifiedName.JSDate
           case TypeName("Function") => QualifiedName.FunctionBase
           case TypeName("object") => QualifiedName.Object
           case TypeName("RegExp") => QualifiedName.RegExp

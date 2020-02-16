@@ -62,6 +62,8 @@ object QualifiedName {
   val UndefOr = scala_js dot Name("UndefOr")
   val JSArray = scala_js dot Name("Array")
   val RegExp = scala_js dot Name("RegExp")
+  val JSDate = scala_js dot Name("Date")
+  val JSError = scala_js dot Name("Error")
   val Float32Array = jstypedarray dot Name("Float32Array")
   val Float64Array = jstypedarray dot Name("Float64Array")
   val Int8Array = jstypedarray dot Name("Int8Array")
