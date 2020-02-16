@@ -14,5 +14,6 @@ class VueOptions(
   val el: String,
   val data: js.Object,
   val mounted: js.Function,
+  val watch: js.Dictionary[js.Function ],
   val methods: js.Dictionary[js.Function]              
 ) extends js.Object
