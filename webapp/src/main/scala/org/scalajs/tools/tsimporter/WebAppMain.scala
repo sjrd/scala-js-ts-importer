@@ -74,6 +74,11 @@ object WebAppMain {
         // TODO: Use Semantic-UI-Vue
         js.Dynamic.global.jQuery(".popup-help").popup()
       },
+      watch = js.Dictionary(
+        "input.outputPackage" -> (() => translate(data)),
+        "input.generateFactory" -> (() => translate(data)),
+        "input.interfaceImplementation" -> (() => translate(data)),
+      ),
       methods = js.Dictionary(
         "translate" -> js.ThisFunction.fromFunction1(translate),
         "loadSample" -> js.ThisFunction.fromFunction2 { (data: Data, sample: Sample) =>
