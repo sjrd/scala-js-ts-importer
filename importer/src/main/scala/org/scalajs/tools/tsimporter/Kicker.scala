@@ -15,8 +15,8 @@ object Kicker {
     val outputPackage = input.outputPackage.filter(_.nonEmpty).getOrElse("foo")
     val config = Config(
       packageName = outputPackage,
-      generateCompanionObject = input.generateFactory == "generate",
-      forceAbstractFieldOnTrait = input.interfaceImplementation == "abstract"
+      generateCompanionObject = input.generateFactory == GenerateFactoryType.generate,
+      forceAbstractFieldOnTrait = input.interfaceImplementation == InterfaceImplementation.`abstract`
     )
     parseDefinitions(reader, config)
   }
@@ -43,10 +43,25 @@ object Kicker {
   }
 }
 
+@js.native
+sealed trait GenerateFactoryType extends js.Any
+object GenerateFactoryType{
+  val generate: GenerateFactoryType = "generate".asInstanceOf[GenerateFactoryType]
+  val donot: GenerateFactoryType = "donot".asInstanceOf[GenerateFactoryType]
+}
+
+@js.native
+sealed trait InterfaceImplementation  extends js.Any
+object InterfaceImplementation {
+  val `abstract`: InterfaceImplementation = "abstract".asInstanceOf[InterfaceImplementation]
+  val implemented: InterfaceImplementation = "implemented".asInstanceOf[InterfaceImplementation]
+}
+
+
 class Input(var source: String,
             var outputPackage: js.UndefOr[String] = js.undefined,
-            var generateFactory: String = "generate",
-            var interfaceImplementation: String = "abstract") extends js.Object
+            var generateFactory: GenerateFactoryType = GenerateFactoryType.donot,
+            var interfaceImplementation: InterfaceImplementation = InterfaceImplementation.implemented) extends js.Object
 
 class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
 
