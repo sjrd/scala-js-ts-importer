@@ -9,28 +9,26 @@ class ImporterConfigSpec extends AnyFunSpec {
 
   describe("generateFactory") {
     it("should generate factory") {
-      val generateFactory = "generate"
+      val generateFactory = GenerateFactoryType.generate
       val sourceTypeScript = s"samples/config/generateFactory/${generateFactory}.d.ts"
       val expectedContent = contentOf(sourceTypeScript + ".scala")
       val outputContent = Kicker.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "factory",
         generateFactory = generateFactory,
-        interfaceImplementation = "implemented"
       ))
       assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
       assert(outputContent.text === expectedContent)
     }
 
     it("should NOT generate factory") {
-      val generateFactory = "donot"
+      val generateFactory = GenerateFactoryType.donot
       val sourceTypeScript = s"samples/config/generateFactory/${generateFactory}.d.ts"
       val expectedContent = contentOf(sourceTypeScript + ".scala")
       val outputContent = Kicker.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "factory",
         generateFactory = generateFactory,
-        interfaceImplementation = "implemented"
       ))
       assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
       assert(outputContent.text === expectedContent)
@@ -44,8 +42,7 @@ class ImporterConfigSpec extends AnyFunSpec {
       val outputContent = Kicker.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "source",
-        generateFactory = "donot",
-        interfaceImplementation = "implemented"
+        interfaceImplementation = InterfaceImplementation.implemented
       ))
       assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
       assert(outputContent.text === expectedContent)
@@ -57,8 +54,7 @@ class ImporterConfigSpec extends AnyFunSpec {
       val outputContent = Kicker.translate(new Input(
         source = contentOf(sourceTypeScript),
         outputPackage = "source",
-        generateFactory = "donot",
-        interfaceImplementation = "abstract"
+        interfaceImplementation = InterfaceImplementation.`abstract`
       ))
       assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
       assert(outputContent.text === expectedContent)
