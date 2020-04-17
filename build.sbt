@@ -11,7 +11,7 @@ inThisBuild(Def.settings(
   )
 ))
 
-lazy val root = project.in(file("."))
+lazy val `scala-js-ts-importer` = project.in(file("."))
   .aggregate(importer, webapp, samples)
 
 lazy val webapp = project.in(file("webapp"))
