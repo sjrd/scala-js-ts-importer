@@ -18,7 +18,6 @@ lazy val webapp = project.in(file("webapp"))
   .settings(
     resolvers += "jitpack" at "https://jitpack.io",
     description := "TypeScript importer for Scala.js",
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "1.0.0"
     ),
@@ -35,7 +34,6 @@ lazy val webapp = project.in(file("webapp"))
 
 lazy val importer = project.in(file("importer"))
   .settings(
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.1.2",
       "net.exoego" %%% "scala-js-nodejs-v12" % "0.10.0" % Test,
