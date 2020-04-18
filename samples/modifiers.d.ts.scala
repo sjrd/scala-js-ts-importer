@@ -68,8 +68,8 @@ trait A extends js.Object {
 @js.native
 @JSGlobal("modifiers.Foo")
 class Foo extends js.Object {
-  def token(): String = js.native
-  def token(value: String): Unit = js.native
+  def token: String = js.native
+  def token_=(value: String): Unit = js.native
 }
 
 @js.native

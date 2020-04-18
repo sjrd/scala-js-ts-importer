@@ -317,16 +317,16 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
 
   lazy val getterMember: Parser[MemberTree] =
     (opt("static") <~ lexical.Identifier("get")) ~ (propertyName <~ "(" <~ ")") ~ typeAnnotation ^^ {
-      case optStatic ~ name ~ resultType => 
-        FunctionMember(name, false, FunSignature(Nil,Nil, Some(resultType)),
-          if (optStatic.isDefined) Set(Modifier.Static) else Set())
+      case optStatic ~ name ~ resultType =>
+        PropertyMember(name, false, resultType,
+          if (optStatic.isDefined) Set(Modifier.Static, Modifier.ReadOnly) else Set(Modifier.ReadOnly))
     }
 
   lazy val setterMember: Parser[MemberTree] =
     (opt("static") <~ lexical.Identifier("set")) ~ propertyName ~ functionSignature ^^ {
       case optStatic ~ name ~ funcSig =>
         FunctionMember(name, false, funcSig.copy(resultType = Some(TypeRef(TypeName("Unit")))),
-          if (optStatic.isDefined) Set(Modifier.Static) else Set())
+          if (optStatic.isDefined) Set(Modifier.Static, Modifier.Set) else Set(Modifier.Set))
     }
   
   lazy val privateMember =
