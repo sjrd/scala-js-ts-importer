@@ -184,6 +184,8 @@ class Printer(private val output: PrintWriter, config: Config) {
           p"  ${modifiers}def $name"
           if (!sym.tparams.isEmpty)
             p"[${sym.tparams}]"
+          if (sym.modifiers(Modifier.Set))
+            p"_="
           p"($params): ${sym.resultType}"
           if (!sym.modifiers(Modifier.Abstract))
             p" = js.native"
