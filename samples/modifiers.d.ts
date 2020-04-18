@@ -52,4 +52,8 @@ declare module modifiers {
       protected: boolean;
   }
 
+  export class Foo {
+    get token(): string;
+    set token(value: string);
+  }
 }
