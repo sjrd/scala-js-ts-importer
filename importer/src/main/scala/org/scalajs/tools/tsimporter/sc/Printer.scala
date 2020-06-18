@@ -14,8 +14,7 @@ class Printer(private val output: PrintWriter, config: Config) {
   import Printer._
 
   private val outputPackage = config.packageName
-  private val generateCompanionObject = config.generateCompanionObject
-  
+
   private implicit val self = this
 
   private var currentJSNamespace = ""
@@ -118,7 +117,7 @@ class Printer(private val output: PrintWriter, config: Config) {
           pln"$constructorStr extends $parents {"
         }
 
-        printMemberDecls(sym, sym.isTrait && config.generateCompanionObject)
+        printMemberDecls(sym, bufferSymbol = sym.isTrait && config.factoryConfig.generateFactory)
         pln"}"
 
       case sym: ModuleSymbol =>
@@ -134,7 +133,7 @@ class Printer(private val output: PrintWriter, config: Config) {
           pln"object $name {"
         }
         printFactory(sym)
-        printMemberDecls(sym)
+        printMemberDecls(sym, bufferSymbol = false)
         pln"}"
 
       case sym: TypeAliasSymbol =>
@@ -201,7 +200,7 @@ class Printer(private val output: PrintWriter, config: Config) {
     }
   }
 
-  private def printMemberDecls(owner: ContainerSymbol, bufferSymbol: Boolean = false): Unit = {
+  private def printMemberDecls(owner: ContainerSymbol, bufferSymbol: Boolean): Unit = {
     val (constructors, others) =
       owner.members.toList.partition(_.name == Name.CONSTRUCTOR)
     if (bufferSymbol) {
@@ -216,25 +215,29 @@ class Printer(private val output: PrintWriter, config: Config) {
   private def printFactory(owner: ContainerSymbol): Unit = {
     traitFactoryBuffer.get(owner.name) match {
       case Some(others) if others.nonEmpty =>
-        val (requiredProps,optionalProps) = others.partition(_.tpe.typeName != QualifiedName.UndefOr)
+        val (requiredProps, optionalProps) = others.partition(_.tpe.typeName != QualifiedName.UndefOr)
         val (nonNullableProps, nullableProps) = requiredProps.partition { prop =>
           !(prop.tpe.typeName == QualifiedName.Union && prop.tpe.targs.contains(TypeRef.Null))
         }
+        val props =
+          nonNullableProps.map(sym => (sym, "")) ++
+          nullableProps.map(sym => (sym, (" = null"))) ++
+          optionalProps.map(sym => (sym, (" = js.undefined")))
         traitFactoryBuffer.remove(owner.name)
-  
+
         pln""
         pln"def apply("
-        for (sym <- nonNullableProps)
-          pln"  ${sym.name}: ${sym.tpe},"
-        for (sym <- nullableProps)
-          pln"  ${sym.name}: ${sym.tpe} = null,"
-        for (sym <- optionalProps)
-          pln"  ${sym.name}: ${sym.tpe} = js.undefined,"
+        props.zipWithIndex.foreach { case ((sym, rhs), i) =>
+          val comma = if (config.factoryConfig.useTrailingComma || i < props.length - 1) "," else ""
+          pln"  ${sym.name}: ${sym.tpe}${rhs}${comma}"
+        }
         pln"): ${owner.name} = {"
-  
+
         pln"  val _obj$$ = js.Dynamic.literal("
-        for (sym <- requiredProps)
-          pln"""    "${sym.name.name}" -> ${sym.name}.asInstanceOf[js.Any],"""
+        requiredProps.zipWithIndex.foreach { case (sym, i) =>
+          val comma = if (config.factoryConfig.useTrailingComma || i < requiredProps.length - 1) "," else ""
+          pln"""    "${sym.name.name}" -> ${sym.name}.asInstanceOf[js.Any]${comma}"""
+        }
         pln"  )"
         for (sym <- optionalProps)
           pln"""  ${sym.name}.foreach(_v => _obj$$.updateDynamic("${sym.name.name}")(_v.asInstanceOf[js.Any]))"""

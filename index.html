@@ -132,6 +132,7 @@ trait Foo extends js.Object {
                                 <th>Given</th>
                                 <th>"Do not generate"</th>
                                 <th>"Generate"</th>
+                                <th>"Generate with no trailing comma"</th>
                                 </thead>
                                 <tbody>
                                 <td class="top aligned">
@@ -161,6 +162,21 @@ trait Foo extends js.Object {
                                     <p>These methods are useful if traits are generated as @js.native marked trait,
                                         since such trait can not be directly constructed.</p>
                                 </td>
+                                <td class="top aligned">
+                                <pre><code>object Foo {
+  def apply(
+    a: String,
+    b: Double
+  ): Foo = {
+    val _obj$ = js.Dynamic.literal(
+      "a" -> a.asInstanceOf[js.Any],
+      "b" -> b.asInstanceOf[js.Any]
+    )
+    _obj$.asInstanceOf[Foo]
+  }
+}                            </code></pre>
+                                    <p>This variant removes trailing commas for formatter that complains trailing commas. However, trailing commas are often preferred to reduce code diff./</p>
+                                </td>
                                 </tbody>
                             </table>
                         </div>
@@ -174,7 +190,13 @@ trait Foo extends js.Object {
                     <div class="field">
                         <div class="ui radio checkbox">
                             <input type="radio" v-model="input.generateFactory" value="generate" id="factory-generate">
-                            <label for="factory-generate">Generate</label>
+                            <label for="factory-generate">Generate (recommended)</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" v-model="input.generateFactory" value="generate-no-trailing-comma" id="factory-generate-no-trailing-commma">
+                            <label for="factory-generate-no-trailing-commma">Generate with no trailing comma</label>
                         </div>
                     </div>
                 </div>
