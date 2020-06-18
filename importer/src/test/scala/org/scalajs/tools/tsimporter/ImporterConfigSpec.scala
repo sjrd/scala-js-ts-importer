@@ -8,8 +8,21 @@ class ImporterConfigSpec extends AnyFunSpec {
   private def contentOf(file: String) = Fs.readFileSync(file, "utf-8")
 
   describe("generateFactory") {
-    it("should generate factory") {
+    it("should generate factory with trailing comma") {
       val generateFactory = GenerateFactoryType.generate
+      val sourceTypeScript = s"samples/config/generateFactory/${generateFactory}.d.ts"
+      val expectedContent = contentOf(sourceTypeScript + ".scala")
+      val outputContent = Kicker.translate(new Input(
+        source = contentOf(sourceTypeScript),
+        outputPackage = "factory",
+        generateFactory = generateFactory,
+      ))
+      assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
+      assert(outputContent.text === expectedContent)
+    }
+
+    it("should generate factory with NO trailing comma") {
+      val generateFactory = GenerateFactoryType.generateNoTrailingComma
       val sourceTypeScript = s"samples/config/generateFactory/${generateFactory}.d.ts"
       val expectedContent = contentOf(sourceTypeScript + ".scala")
       val outputContent = Kicker.translate(new Input(

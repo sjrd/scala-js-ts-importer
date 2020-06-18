@@ -139,7 +139,7 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
   }
 
   private def processFactory(owner: ContainerSymbol, sym: Symbol, members: List[Trees.MemberTree]): Unit = {
-    if (config.generateCompanionObject && members.forall(_.isInstanceOf[PropertyMember])) {
+    if (config.factoryConfig.generateFactory && members.forall(_.isInstanceOf[PropertyMember])) {
       val module = owner.getModuleOrCreate(sym.name)
       module.isGlobal = false
     }

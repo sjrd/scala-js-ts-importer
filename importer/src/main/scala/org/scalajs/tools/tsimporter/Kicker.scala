@@ -15,7 +15,11 @@ object Kicker {
     val outputPackage = input.outputPackage.filter(_.nonEmpty).getOrElse("foo")
     val config = Config(
       packageName = outputPackage,
-      generateCompanionObject = input.generateFactory == GenerateFactoryType.generate,
+      factoryConfig = input.generateFactory match {
+        case GenerateFactoryType.donot => FactoryConfig.DoNotGenerate
+        case GenerateFactoryType.generate => FactoryConfig.Generate
+        case GenerateFactoryType.generateNoTrailingComma => FactoryConfig.GenerateNoTrailingComma
+      },
       forceAbstractFieldOnTrait = input.interfaceImplementation == InterfaceImplementation.`abstract`
     )
     parseDefinitions(reader, config)
@@ -47,6 +51,7 @@ object Kicker {
 sealed trait GenerateFactoryType extends js.Any
 object GenerateFactoryType{
   val generate: GenerateFactoryType = "generate".asInstanceOf[GenerateFactoryType]
+  val generateNoTrailingComma: GenerateFactoryType = "generate-no-trailing-comma".asInstanceOf[GenerateFactoryType]
   val donot: GenerateFactoryType = "donot".asInstanceOf[GenerateFactoryType]
 }
 
