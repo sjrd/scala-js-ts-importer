@@ -43,11 +43,11 @@ object WebAppMain {
         hasError = false
       ),
       samples = js.Array(
-        new Sample("https://cdn.jsdelivr.net/npm/electron@8.0.0/electron.d.ts", "electron"),
+        new Sample("https://cdn.jsdelivr.net/npm/electron@9.1.0/electron.d.ts", "electron"),
         new Sample("https://cdn.jsdelivr.net/npm/@types/jpm@0.0.5/index.d.ts", "Firefox Addon SDK (jpm)"),
-        new Sample("https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/752136c29dec6f1e559dfc62f6acba08f207c280/types/google-apps-script/google-apps-script.base.d.ts", "Google Apps Script (Base)"),
-        new Sample("https://cdn.jsdelivr.net/npm/pixi.js@5.2.1/pixi.js.d.ts", "pixi.js"),
-        new Sample("https://cdn.jsdelivr.net/npm/@types/zip.js@2.0.27/index.d.ts", "zip.js"),
+        new Sample("https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/a92d898478072a57dabc21308f7d49698b5c1be8/types/google-apps-script/google-apps-script.base.d.ts", "Google Apps Script (Base)"),
+        new Sample("https://cdn.jsdelivr.net/npm/pixi.js@5.3.0/pixi.js.d.ts", "pixi.js"),
+        new Sample("https://cdn.jsdelivr.net/npm/@types/zip.js@2.0.28/index.d.ts", "zip.js"),
       )
     )
 
