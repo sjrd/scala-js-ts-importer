@@ -157,6 +157,13 @@ class ContainerSymbol(nme: Name) extends Symbol(nme) {
     result
   }
 
+  def removeTypeAlias(name: Name): Unit = {
+    val i = members.indexWhere(e => e.name == name && e.isInstanceOf[TypeAliasSymbol])
+    if (i >= 0) {
+      members.remove(i)
+    }
+  }
+
   def newField(name: Name, modifiers: Modifiers): FieldSymbol = {
     val result = new FieldSymbol(name, modifiers)
     members += result
@@ -230,6 +237,17 @@ class TypeAliasSymbol(nme: Name) extends Symbol(nme) {
 }
 
 class FieldSymbol(nme: Name, val modifiers: Modifiers) extends Symbol(nme) with JSNameable {
+  var tpe: TypeRef = TypeRef.Any
+  var inherited: Boolean = false
+  var rhs: Option[String] = None
+
+  def needsOverride: Boolean = {
+    inherited
+  }
+  override def toString() = s"${jsNameStr}${if (modifiers(Modifier.ReadOnly)) "val" else "var"} $name: $tpe"
+}
+
+class PseudoEnumSymbol(nme: Name, val modifiers: Modifiers) extends Symbol(nme) with JSNameable {
   var tpe: TypeRef = TypeRef.Any
   var inherited: Boolean = false
 

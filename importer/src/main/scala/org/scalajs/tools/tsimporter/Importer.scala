@@ -5,8 +5,12 @@
 
 package org.scalajs.tools.tsimporter
 
-import Trees.{ TypeRef => TypeRefTree, _ }
+import Trees.{TypeRef => TypeRefTree, _}
+import org.scalajs.tools.tsimporter.sc.TypeRef.Singleton
 import sc._
+
+import scala.collection.immutable.{AbstractSeq, LinearSeq}
+import scala.collection.mutable.ListBuffer
 
 /** The meat and potatoes: the importer
  *  It reads the TypeScript AST and produces (hopefully) equivalent Scala
@@ -111,6 +115,41 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
             processMembersDecls(owner, anonyousClass, members)
             sym.tparams ++= typeParamsToScala(tparams)
             sym.alias = typeToScala(Trees.TypeRef(TypeName(anonymousName), tparams.map(p => Trees.TypeRef(p.name))))
+          case tpe @ UnionType(_, _) if config.generateTypeAliasEnums =>
+            getLiterals(tpe) match {
+              case Seq() =>
+                sym.tparams ++= typeParamsToScala(tparams)
+                sym.alias = typeToScala(alias)
+              case nonEmpty =>
+                val traitDef = owner.getClassOrCreate(name)
+                traitDef.parents.clear()
+                traitDef.parents.addOne(TypeRef.Any)
+                traitDef.isSealed = true
+                val moduleDef = owner.getModuleOrCreate(name)
+                moduleDef.isGlobal = false
+
+                nonEmpty.foreach { c =>
+                  val (nameStr, lit) = c match {
+                    case Undefined() => ("Undefined", "js.undefined")
+                    case Null() => ("Null", "null")
+                    case BooleanLiteral(value) => (value.toString, value.toString)
+                    case IntLiteral(value) => (value.toString, value.toString)
+                    case DoubleLiteral(value) => (value.toString, value.toString)
+                    case StringLiteral(value) => (value, s""""${value}"""")
+                  }
+                  val f = moduleDef.newField(
+                    Name(nameStr),
+                    modifiers = Set(
+                      Modifier.Const,
+                      Modifier.Inline,
+                    )
+                  )
+                  f.tpe = TypeRef(name)
+                  f.rhs = Some(s"""$lit.asInstanceOf[${name}]""")
+                }
+                owner.removeTypeAlias(name)
+            }
+
           case _ =>
             sym.tparams ++= typeParamsToScala(tparams)
             sym.alias = typeToScala(alias)
@@ -135,6 +174,14 @@ class Importer(val output: java.io.PrintWriter, config: Config) {
 
       case _ =>
         owner.members += new CommentSymbol("??? "+declaration)
+    }
+  }
+
+  private def getLiterals(union: UnionType): Seq[Literal] = {
+    union match {
+      case UnionType(ConstantType(x), ConstantType(y)) => Seq(x, y)
+      case UnionType(u @ UnionType(_, _), ConstantType(x)) => getLiterals(u) ++ Seq(x)
+      case _ => Seq.empty
     }
   }
 

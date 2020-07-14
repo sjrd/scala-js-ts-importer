@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <title>Type Definition Importer for Scala.js</title>
     <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.3/dist/semantic.min.css">
+          href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.6/dist/semantic.min.css">
     <link rel="stylesheet" href="site.css">
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js"
-            integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.3/dist/semantic.min.js"
-            integrity="sha256-Dv09sUOqHDkaWvPqBa0GQp6Csd9Q2SkkVP2xtzYgwc0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.6/dist/semantic.min.js"
+            integrity="sha256-9H3HWYnPJ2bEHgkOrw+48KheOqYzTvJd1hbeU9sEDFk=" crossorigin="anonymous"></script>
+    <style>
+        pre code {
+            font-size: smaller;
+        }
+    </style>
 </head>
 <body class="full-height">
 
@@ -66,7 +71,7 @@
                             Field-only interface
                             <i class="help circle red icon"></i>
                         </span>
-                        <div class="ui very wide fixed popup">
+                        <div class="ui mini very wide fixed popup">
                             <table class="ui celled table">
                                 <p>Speifies how to convert field-only interfaces. </p>
                                 <p>Such interfaces are usually used as parameter of function, so users will want to
@@ -125,7 +130,7 @@ trait Foo extends js.Object {
                             Factory method for field-only interface
                             <i class="help circle red icon"></i>
                         </span>
-                        <div class="ui very wide fixed popup">
+                        <div class="ui mini very wide fixed popup">
                             <p>Specifies whether factory methods for field-only trait are added or not.</p>
                             <table class="ui celled table">
                                 <thead>
@@ -197,6 +202,63 @@ trait Foo extends js.Object {
                         <div class="ui radio checkbox">
                             <input type="radio" v-model="input.generateFactory" value="generate-no-trailing-comma" id="factory-generate-no-trailing-commma">
                             <label for="factory-generate-no-trailing-commma">Generate with no trailing comma</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui divider"></div>
+                <div class="grouped fields">
+                    <label>
+                        <span class="popup-help ui red text">
+                            Factory method for field-only interface
+                            <i class="help circle red icon"></i>
+                        </span>
+                        <div class="ui mini very wide fixed popup">
+                            <p>Generate pseudo-enums for type aliases of constants (String, Number, Boolean), or not.</p>
+                            <table class="ui celled table">
+                                <thead>
+                                <th>Given</th>
+                                <th>"Do not generate"</th>
+                                <th>"Generate"</th>
+                                </thead>
+                                <tbody>
+                                <td class="top aligned">
+                                <pre><code>type ErrorCode
+  = 'FORBIDDEN' | 'INVALID-BODY' | 400;
+                            </code></pre>
+                                </td>
+                                <td class="top aligned">
+                                    <pre class=""><code>type ErrorCode = String | Int
+                                    </code></pre>
+                                    <p>This can reduce size of type definition, but type-safeness is poor.</p>
+                                </td>
+                                <td class="top aligned">
+                                <pre><code>@js.native
+sealed trait ErrorCode extends js.Any {}
+object ErrorCode {
+  @inline val FORBIDDEN: ErrorCode
+    = "FORBIDDEN".asInstanceOf[ErrorCode]
+  @inline val `INVALID-BODY`: ErrorCode
+    = "INVALID-BODY".asInstanceOf[ErrorCode]
+  @inline val `400`: ErrorCode
+    = 400.asInstanceOf[ErrorCode]
+}
+                            </code></pre>
+                                    <p>This variant generates constants that pretend like enum (instances of sealed trait)./</p>
+                                </td>
+                                </tbody>
+                            </table>
+                        </div>
+                    </label>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" v-model="input.generateTypeAliasEnums" value="donot" id="type-alias-enum-donot">
+                            <label for="type-alias-enum-donot">Do not generate</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" v-model="input.generateTypeAliasEnums" value="generate" id="type-alias-enum-generate">
+                            <label for="type-alias-enum-generate">Generate (recommended)</label>
                         </div>
                     </div>
                 </div>

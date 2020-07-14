@@ -20,6 +20,10 @@ object Kicker {
         case GenerateFactoryType.generate => FactoryConfig.Generate
         case GenerateFactoryType.generateNoTrailingComma => FactoryConfig.GenerateNoTrailingComma
       },
+      generateTypeAliasEnums = input.generateTypeAliasEnums match {
+        case GenerateTypeAliasEnums.generate => true
+        case _ => false
+      },
       forceAbstractFieldOnTrait = input.interfaceImplementation == InterfaceImplementation.`abstract`
     )
     parseDefinitions(reader, config)
@@ -62,11 +66,19 @@ object InterfaceImplementation {
   val implemented: InterfaceImplementation = "implemented".asInstanceOf[InterfaceImplementation]
 }
 
+@js.native
+sealed trait GenerateTypeAliasEnums extends js.Any
+object GenerateTypeAliasEnums{
+  val generate: GenerateTypeAliasEnums = "generate".asInstanceOf[GenerateTypeAliasEnums]
+  val donot: GenerateTypeAliasEnums = "donot".asInstanceOf[GenerateTypeAliasEnums]
+}
+
 
 class Input(var source: String,
             var outputPackage: js.UndefOr[String] = js.undefined,
+            var generateTypeAliasEnums: GenerateTypeAliasEnums = GenerateTypeAliasEnums.generate,
             var generateFactory: GenerateFactoryType = GenerateFactoryType.donot,
-            var interfaceImplementation: InterfaceImplementation = InterfaceImplementation.implemented) extends js.Object
+            var interfaceImplementation: InterfaceImplementation = InterfaceImplementation.`abstract`) extends js.Object
 
 class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
 
