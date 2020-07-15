@@ -282,8 +282,9 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     }
 
   lazy val tupleType: Parser[TypeTree] =
-    "[" ~> rep1sep(typeDesc, ",") <~ "]" ^^ { parts =>
-      TupleType(parts)
+    "[" ~> repsep(typeDesc, ",") <~ "]" ^^ {
+      case Nil => ArrayType(TypeRef(typeNameToTypeRef("never")))
+      case parts => TupleType(parts)
     }
 
   lazy val objectType: Parser[TypeTree] =
