@@ -78,7 +78,7 @@ class Input(var source: String,
             var outputPackage: js.UndefOr[String] = js.undefined,
             var generateTypeAliasEnums: GenerateTypeAliasEnums = GenerateTypeAliasEnums.generate,
             var generateFactory: GenerateFactoryType = GenerateFactoryType.donot,
-            var interfaceImplementation: InterfaceImplementation = InterfaceImplementation.`abstract`) extends js.Object
+            var interfaceImplementation: InterfaceImplementation = InterfaceImplementation.implemented) extends js.Object
 
 class ScalaOutput(var text: String, var hasError: Boolean) extends js.Object
 

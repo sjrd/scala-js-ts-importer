@@ -34,6 +34,9 @@ object WebAppMain {
     val data = new Data(
       input = new Input(
         source = "",
+        generateTypeAliasEnums = GenerateTypeAliasEnums.generate,
+        generateFactory = GenerateFactoryType.generate,
+        interfaceImplementation = InterfaceImplementation.`abstract`,
       ),
       isLoading = false,
       output = new ScalaOutput(
