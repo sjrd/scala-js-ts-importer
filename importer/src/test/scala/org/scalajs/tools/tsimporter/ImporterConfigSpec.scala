@@ -73,4 +73,19 @@ class ImporterConfigSpec extends AnyFunSpec {
       assert(outputContent.text === expectedContent)
     }
   }
+
+  describe("type alias enum") {
+    it("js-native implemented") {
+      val sourceTypeScript = "samples/config/type-alias-enum/source.d.ts"
+      val expectedContent = contentOf("samples/config/type-alias-enum/generate.scala")
+      val outputContent = Kicker.translate(new Input(
+        source = contentOf(sourceTypeScript),
+        outputPackage = "source",
+        generateTypeAliasEnums = GenerateTypeAliasEnums.generate
+      ))
+      assert(!outputContent.hasError, s"hasError: ${ outputContent.text }")
+      assert(outputContent.text === expectedContent)
+    }
+
+  }
 }

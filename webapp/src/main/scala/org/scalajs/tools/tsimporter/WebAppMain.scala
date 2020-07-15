@@ -34,6 +34,7 @@ object WebAppMain {
     val data = new Data(
       input = new Input(
         source = "",
+        generateTypeAliasEnums = GenerateTypeAliasEnums.generate,
         generateFactory = GenerateFactoryType.generate,
         interfaceImplementation = InterfaceImplementation.`abstract`,
       ),
@@ -74,7 +75,9 @@ object WebAppMain {
       data = data,
       mounted = () => {
         // TODO: Use Semantic-UI-Vue
-        js.Dynamic.global.jQuery(".popup-help").popup()
+        js.Dynamic.global.jQuery(".popup-help").popup(js.Dynamic.literal(
+          jitter = 100
+        ))
       },
       watch = js.Dictionary(
         "input.outputPackage" -> (() => translate(data)),

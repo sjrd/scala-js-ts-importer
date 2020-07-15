@@ -159,9 +159,15 @@ class Printer(private val output: PrintWriter, config: Config) {
           val modifiers =
             if (sym.needsOverride) "override " else ""
 
-          p"  $access$modifiers$decl $name: ${ sym.tpe }"
+          val inline =
+            if (sym.modifiers(Modifier.Inline)) "@inline "
+            else ""
 
-          if (!sym.modifiers(Modifier.Abstract))
+          p"  $inline$access$modifiers$decl $name: ${ sym.tpe }"
+
+          if (sym.rhs.isDefined)
+            p" = ${sym.rhs.get}"
+          else if (!sym.modifiers(Modifier.Abstract))
             p" = js.native"
           pln""
         }

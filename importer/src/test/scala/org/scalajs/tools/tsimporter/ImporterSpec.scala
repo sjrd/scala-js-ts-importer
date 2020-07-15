@@ -29,6 +29,7 @@ class ImporterSpec extends AnyFunSpec with BeforeAndAfterAll {
         val outputContent = Kicker.translate(new Input(
           source = contentOf(sourceTypeScript),
           outputPackage = input.dropRight(".d.ts".length),
+          generateTypeAliasEnums = GenerateTypeAliasEnums.donot
         ))
         assert(!outputContent.hasError, s"hasError: ${outputContent.text}")
         assert(outputContent.text === expectedContent)

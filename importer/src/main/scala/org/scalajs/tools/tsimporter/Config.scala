@@ -5,6 +5,7 @@ case class Config(
   outputFileName: String = "",
   packageName: String = "importedjs",
   factoryConfig: FactoryConfig,
+  generateTypeAliasEnums: Boolean,
   forceAbstractFieldOnTrait: Boolean = false
 )
 
