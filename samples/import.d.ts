@@ -10,6 +10,7 @@ import { First as Alpha, Second as Bravo, } from "module";
 import Foo, { Second as Z } from "module";
 import * as validator from "module";
 import "./assets/module";
+import jsbn = require("jsbn");
 
 declare const hello: String;
 
