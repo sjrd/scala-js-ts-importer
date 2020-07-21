@@ -119,14 +119,17 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
     "type" ~> typeName ~ tparams ~ ("=" ~> typeDesc) <~ opt(";") ^^ TypeAliasDecl
 
   lazy val importDecl: Parser[DeclTree] =
-    "import" ~> opt(
-      repsep(
-          identifier
-        | "{" ~ importIdentifierSeq ~ "}"
-        | "*" ~ lexical.Identifier("as") ~ identifier
-        , ","
-      ) ~ lexical.Identifier("from")
-    ) ~ stringLiteral <~ opt(";") ^^^ ImportDecl
+    "import" ~> (
+        opt(
+          repsep(
+              identifier
+            | "{" ~ importIdentifierSeq ~ "}"
+            | "*" ~ lexical.Identifier("as") ~ identifier
+            , ","
+          ) ~ lexical.Identifier("from")
+        ) ~ stringLiteral
+      | identifier ~ "=" ~ lexical.Identifier("require") ~ "(" ~ stringLiteral ~ ")"
+    ) <~ opt(";") ^^^ ImportDecl
 
   lazy val importIdentifierSeq =
     rep1sep(identifier ~ opt(lexical.Identifier("as") ~ identifier), ",") <~ opt(",")
