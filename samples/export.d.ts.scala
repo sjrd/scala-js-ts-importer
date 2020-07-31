@@ -29,6 +29,26 @@ object PIXI extends js.Object {
 
 }
 
+package PIXI2 {
+
+@js.native
+@JSGlobal("PIXI2")
+object PIXI2 extends js.Object {
+  val VERSION: String = js.native
+}
+
+}
+
+package PIXI3 {
+
+@js.native
+@JSGlobal("PIXI3")
+object PIXI3 extends js.Object {
+  val VERSION: String = js.native
+}
+
+}
+
 @js.native
 @JSGlobalScope
 object Export extends js.Object {
