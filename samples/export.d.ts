@@ -14,6 +14,13 @@ declare namespace PIXI {
     const VERSION: string;
 }
 
+declare namespace PIXI2 {
+    const VERSION: string;
+}
+declare namespace PIXI3 {
+    const VERSION: string;
+}
+
 declare module "pixi.js" {
     export = PIXI;
 }
@@ -21,3 +28,7 @@ declare module "pixi.js" {
 export as namespace asNamespace;
 
 export default Hoge
+
+export {}
+export { PIXI }
+export { PIXI2, PIXI3 }

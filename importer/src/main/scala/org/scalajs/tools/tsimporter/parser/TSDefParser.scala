@@ -58,6 +58,7 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   ).map(Some(_))
     | "export" ~> lexical.Identifier("as") ~> "namespace" ~> identifier <~ opt(";") ^^^ None
     | "export" ~> "default" ~> identifier <~ opt(";") ^^^ None
+    | "export" ~> "{" ~> repsep(identifier, ",") <~ "}" ^^^ None
   )
 
   lazy val ambientModuleDecl: Parser[DeclTree] =
@@ -77,7 +78,8 @@ class TSDefParser extends StdTokenParsers with ImplicitConversions {
   lazy val moduleElementDecl: Parser[Option[DeclTree]] = (
       "export" ~> (
           moduleElementDecl1 ^^ (Some(_))
-        | "=" ~> identifier <~ ";" ^^^ None)
+        | "=" ~> identifier <~ ";" ^^^ None
+      )
     | moduleElementDecl1 ^^ (Some(_))
   )
 
