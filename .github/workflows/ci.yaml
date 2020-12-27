@@ -1,0 +1,26 @@
+name: CI
+on: [pull_request]
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        scala: [2.13.4]
+        nodejs: [14.15.2]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v10
+        with:
+          java-version: adopt@1.11
+      - uses: coursier/cache-action@v5
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.nodejs }}
+      - run: npm install
+      - name: verify type definitions
+        run: $(npm bin)/tsc samples/*.d.ts
+      - name: Run Tests
+        run: sbt ++${{ matrix.scala }} test
+        env:
+          NODEJS_VERSION: ${{ matrix.nodejs }}
