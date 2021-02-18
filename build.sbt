@@ -40,7 +40,7 @@ lazy val importer = project.in(file("importer"))
   .settings(
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.1.2",
-      "net.exoego" %%% "scala-js-nodejs-v12" % "0.12.0" % Test,
+      "net.exoego" %%% "scala-js-nodejs-v12" % "0.13.0" % Test,
       "org.scalatest" %%% "scalatest" % "3.2.3" % Test
     ),
     scalaJSLinkerConfig ~= {
