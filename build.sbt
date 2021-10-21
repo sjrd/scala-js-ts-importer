@@ -23,7 +23,7 @@ lazy val webapp = project.in(file("webapp"))
     resolvers += "jitpack" at "https://jitpack.io",
     description := "TypeScript importer for Scala.js",
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "1.2.0"
+      "org.scala-js" %%% "scalajs-dom" % "2.0.0"
     ),
     scalaJSUseMainModuleInitializer := false,
     scalaJSLinkerConfig ~= { 
