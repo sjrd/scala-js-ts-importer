@@ -270,9 +270,13 @@ class Printer(private val output: PrintWriter, config: Config) {
       case TypeRef(typeName, Nil) =>
         p"$typeName"
 
-      case TypeRef.Union(types) =>
+      case TypeRef.Union(types) if types.contains(TypeRef.Unit) =>
         implicit val withPipe = ListElemSeparator.Pipe
-        p"$types"
+        p"js.UndefOr[${types.filterNot(_ == TypeRef.Unit)}]"
+
+      case TypeRef.Union(types)  =>
+        implicit val withPipe = ListElemSeparator.Pipe
+        p"${types}"
 
       case TypeRef.Intersection(types) =>
         implicit val withWith = ListElemSeparator.WithKeyword
@@ -286,6 +290,9 @@ class Printer(private val output: PrintWriter, config: Config) {
 
       case TypeRef.Repeated(underlying) =>
         p"$underlying*"
+
+      case TypeRef(QualifiedName.UndefOr, List(u @ TypeRef.Union(types))) if types.contains(TypeRef.Unit) =>
+        p"$u"
 
       case TypeRef(typeName, targs) =>
         p"$typeName[$targs]"

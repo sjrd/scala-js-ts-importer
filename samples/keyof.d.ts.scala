@@ -14,7 +14,7 @@ trait Thing extends js.Object {
 
 @js.native
 trait LoDashStatic extends js.Object {
-  def at[T](`object`: T | Null | Unit, props: String*): js.Array[js.Any] = js.native
+  def at[T](`object`: js.UndefOr[T | Null], props: String*): js.Array[js.Any] = js.native
 }
 
 @js.native
